@@ -13,6 +13,8 @@ import { load_qmodu, load_next_qmodu, } from './bq_module_mgr.js';
 
 import { get_bib_verse, } from './bq_bible_mgr.js';
 
+import { test_pdf } from './bq_pdf_mgr.js'
+
 const DEBUG_ADMIN_OPS = false;
 const DEBUG_UPDATE_STATS = true;
 
@@ -36,6 +38,7 @@ const admin_ops = {
 	get_verse:"get bible verse",
 	//is_google_user:"Check if google signed-in",
 	//show_server_timestamp:"Show server timestamp",
+	test_jdpdf:"test_jdpdf",
 };
 
 const id_admin_ops = "id_admin_ops";
@@ -64,6 +67,9 @@ function do_selec(val_sel_w){
 	}
 	if(val_sel_w == admin_ops.get_verse){
 		test_get_verse();
+	}
+	if(val_sel_w == admin_ops.test_jdpdf){
+		test_pdf();
 	}
 	if(val_sel_w == admin_ops.upload_index_W){
 		upload_index("W");
