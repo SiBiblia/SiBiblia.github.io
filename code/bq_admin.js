@@ -39,6 +39,7 @@ const admin_ops = {
 	//is_google_user:"Check if google signed-in",
 	//show_server_timestamp:"Show server timestamp",
 	test_jdpdf:"test_jdpdf",
+	//delete_all_strong:"delete_all_strong",
 };
 
 const id_admin_ops = "id_admin_ops";
@@ -70,6 +71,9 @@ function do_selec(val_sel_w){
 	}
 	if(val_sel_w == admin_ops.test_jdpdf){
 		test_pdf();
+	}
+	if(val_sel_w == admin_ops.delete_all_strong){
+		delete_all_strong();
 	}
 	if(val_sel_w == admin_ops.upload_index_W){
 		upload_index("W");
@@ -380,30 +384,6 @@ function upload_index(kk){
 	close_pop_menu();	
 }
 
-/*
-async function update_index(pth, obj){
-	if(fb_mod == null){ console.error("update_index. fb_mod == null."); return; }
-	if(fb_mod.tc_fb_app == null){ console.error("update_index. fb_mod.tc_fb_app == null.");  return; }
-	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
-
-	const db_ref = fb_mod.md_db.ref(fb_database, pth);
-
-	const ctr_pth = pth + "/total";
-	const db_cnter = fb_mod.md_db.ref(fb_database, ctr_pth);	
-	await fb_mod.md_db.set(db_cnter, 0).catch((error) => { 
-		console.error(error); 
-	});
-	
-	const codes = Object.keys(obj);
-	for(const cod of codes){
-		const wr_data = {};
-		wr_data.total = fb_mod.md_db.increment(1);
-		wr_data[cod] = obj[cod];
-		await fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });	
-	}
-}
-*/
-
 function print_totals(){
 	if(fb_mod == null){ console.error("print_totals. fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("print_totals. fb_mod.tc_fb_app == null.");  return; }
@@ -693,5 +673,23 @@ function get_server_timestamp(){
 	
 	// 1746139712609
 	// 2025/05/1 5:48 pm aprox
+}
+
+function delete_all_strong(){
+	if(fb_mod == null){ console.error("get_server_timestamp. fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("get_server_timestamp. fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	const pth3 = "bib_codes/word_code";
+	
+	let db_ref = fb_mod.md_db.ref(fb_database, pth3);
+	let cond1 = fb_mod.md_db.limitToFirst(10000);
+	let db_qry = fb_mod.md_db.query(db_ref, cond1);
+	fb_mod.md_db.get(db_qry).then((snapshot) => {
+		snapshot.forEach((chd) => {
+			fb_mod.md_db.remove(chd.ref);
+		});
+	});	
+	
+	//fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });	
 }
 
