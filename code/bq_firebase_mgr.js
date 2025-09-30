@@ -56,6 +56,7 @@ export const firebase_ck_admin_path = firebase_bib_quest_path + 'ck_admin/';
 //let analytics = getAnalytics(tc_fb_app);
 export let tc_fb_app = null;
 export let tc_fb_auth = null;
+//export let tc_fb_test_auth = null;
 export let tc_fb_user = null;
 export let tc_fb_is_admin = false;
 export let bq_fb_user_finished_qmodules = null;
@@ -102,14 +103,14 @@ export function firebase_check_login(err_fn){
 	
 	return md_auth.signInWithPopup(tc_fb_auth, fb_provider).then((result) => {
 		// This gives you a Google Access Token. You can use it to access the Google API.
-		const fb_credential = md_auth.GoogleAuthProvider.credentialFromResult(result);
-		const fb_token = fb_credential.accessToken;
+		//const fb_credential = md_auth.GoogleAuthProvider.credentialFromResult(result);
+		//const fb_token = fb_credential.accessToken;
 		// The signed-in user info.
 		tc_fb_user = result.user;
 		// IdP data available using getAdditionalUserInfo(result)
 		
 		if(DEBUG_FB_LOGIN){
-			console.log('token=' + fb_token);
+			//console.log('token=' + fb_token);
 			console.log('user=' + JSON.stringify(tc_fb_user));
 			console.log('User_id=' + tc_fb_user.uid);
 			console.log('User_name=' + tc_fb_user.displayName);
@@ -390,7 +391,7 @@ export const firebase_read_object = (sub_ref, callbak_func) => { //sub_ref MUST 
 	});
 }
 
-export const firebase_sign_out = () => {
+export async function firebase_sign_out(){
 	init_mod_vars();
 	if(tc_fb_user == null){ return; }
 	if(tc_fb_app == null){ tc_fb_app = md_app.initializeApp(firebase_config); }
@@ -398,9 +399,66 @@ export const firebase_sign_out = () => {
 	
 	tc_fb_user = null;
 	//const tc_fb_auth = md_auth.getAuth();
-	md_auth.signOut(tc_fb_auth);
+	await md_auth.signOut(tc_fb_auth);
 	console.log('signed out');
 }
 
 // TO GET KEYS USE: "//" as an ending of the path
+
+
+export function firebase_email_login(num_test_user){
+	if(DEBUG_FB_LOGIN){ 
+		console.log("firebase_email_login. CALLED. "); 
+	}
+	init_mod_vars();
+	if(tc_fb_user != null){
+		return new Promise((resolve, reject) => {
+			resolve('database != null');
+		});
+	}
+	
+	const uemail = "user" + num_test_user + "@sibiblia.com";
+	const upsswd = "Password_user" + num_test_user;
+	
+	// user1@sibiblia.com
+	// Password_user1
+	
+	// Initialize Firebase
+	if(tc_fb_app == null){ tc_fb_app = md_app.initializeApp(firebase_config); }
+	else if(DEBUG_FB_LOGIN){
+		console.log("tc_fb_app=");
+		console.log(tc_fb_app);
+	}
+	
+	tc_fb_auth = md_auth.getAuth(tc_fb_app);
+	if(DEBUG_FB_LOGIN){
+		console.log("tc_fb_auth=");
+		console.log(tc_fb_auth);
+	}
+	
+	return md_auth.signInWithEmailAndPassword(tc_fb_auth, uemail, upsswd).then((result) => {
+		tc_fb_user = result.user;
+		
+		if(DEBUG_FB_LOGIN){
+			console.log('user=' + JSON.stringify(tc_fb_user));
+			console.log('User_id=' + tc_fb_user.uid);
+			console.log('User_name=' + tc_fb_user.displayName);
+			console.log("User_email=" + tc_fb_user.email);
+			console.log("User_emailVerified=" + tc_fb_user.emailVerified);
+			console.log("User_photoURL=" + tc_fb_user.photoURL);
+			console.log('finished_EMAIL_login');
+		}
+		
+		firebase_write_user_id();
+		
+	}).catch((error) => {
+		const errorCode = error.code;
+		const errorMessage = error.message;
+		const email = error.customData.email;
+		
+		console.log('errorCode=' + errorCode);
+		console.log('errorMessage=' + errorMessage);
+	});      
+	
+}
 

@@ -13,7 +13,7 @@ import { get_user_href,
 
 import { add_to_pending, get_pending_qid, init_all_context, } from './bq_contexts.js';
 import { toggle_user_info, } from './bq_user_info.js';
-import { toggle_admin_opers, } from './bq_admin.js';
+import { toggle_admin_opers, toggle_test_logins, } from './bq_admin.js';
 import { load_qmodu, set_fini_qmodu, is_fini_qmodu, load_next_qmodu, } from './bq_module_mgr.js';
 
 //import "./qrcode.js";
@@ -40,6 +40,7 @@ const DEBUG_UPDATE_OBSERV = false;
 const DEBUG_FB_WRITE_RESULTS = true;
 const DEBUG_SHOW_RESULTS = true;
 const DEBUG_SCROLL = false;
+const DEBUG_SHOW_TEST_USERS = true;
 
 const MIN_ANSW_SHOW_INVERT = 3;
 
@@ -1592,14 +1593,25 @@ function pop_menu_handler(){
 	}
 	
 	if((fb_mod != null) && (fb_mod.tc_fb_is_admin)){
-		const op = document.createElement("div");
+		let op = document.createElement("div");
 		op.classList.add("exam");
 		op.classList.add("is_block");
+		op.classList.add("big_item");
 		op.innerHTML = "ADMIN";
 		op.addEventListener('click', toggle_admin_opers);
 		dv_pop_men.appendChild(op);
 	}
-	
+
+	if((fb_mod != null) && DEBUG_SHOW_TEST_USERS){
+		let op = document.createElement("div");
+		op.classList.add("exam");
+		op.classList.add("is_block");
+		op.classList.add("big_item");
+		op.innerHTML = "TEST_USERS";
+		op.addEventListener('click', toggle_test_logins);
+		dv_pop_men.appendChild(op);
+	}
+
 	scroll_to_top(dv_pop_men);
 }
 
@@ -2901,6 +2913,10 @@ export function fill_div_user(){
 		return;
 	}
 	const the_usr = fb_mod.tc_fb_user;
+	let usernam = the_usr.displayName;
+	if((usernam == null) || (usernam.length == 0)){
+		usernam = the_usr.email.split("@")[0];
+	}
 		
 	const dv_user_qr = document.getElementById(id_dv_user_qrcod);
 	if(dv_user_qr != null){
@@ -2911,7 +2927,7 @@ export function fill_div_user(){
 		the_qr_maker.makeCode(get_user_href(the_usr));
 	}
 
-	if(dv_user_nam != null){ dv_user_nam.innerHTML = the_usr.displayName; }
+	if(dv_user_nam != null){ dv_user_nam.innerHTML = usernam; }
 	
 	const dv_img = document.getElementById(id_dv_user_image);
 	if(dv_img != null){ dv_img.innerHTML = `<img class="img_observ" src="${the_usr.photoURL}">`; }
@@ -2919,7 +2935,7 @@ export function fill_div_user(){
 	if(img_top != null){ img_top.src = the_usr.photoURL; }
 	
 	const dv_nom = document.getElementById(id_dv_user_name);
-	if(dv_nom != null){ dv_nom.innerHTML = the_usr.displayName; } // THIS LINE AVOIDS OpaqueResponseBlocking ERROR !!!
+	if(dv_nom != null){ dv_nom.innerHTML = usernam; } // THIS LINE AVOIDS OpaqueResponseBlocking ERROR !!!
 }
 
 function get_sat_conj_qids(qid){
@@ -3008,10 +3024,10 @@ function update_observation(qid, all_to_act){
 
 // CODE_FOR __________________
 
-export function user_logout(){
+export async function user_logout(){
 	close_pop_menu();
 	if(fb_mod != null){
-		fb_mod.firebase_sign_out();
+		await fb_mod.firebase_sign_out();
 		fill_div_user();
 	}
 }

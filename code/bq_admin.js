@@ -6,7 +6,7 @@ import { gvar, get_qid_base, bib_defaults, is_observation
 } from './bq_tools.js';
 
 import { start_qmodu, 
-	fb_mod, close_pop_menu, id_pop_menu_sele, toggle_verse_ed, get_default_verse_obj, get_bibref_in, 
+	fb_mod, close_pop_menu, id_pop_menu_sele, toggle_verse_ed, get_default_verse_obj, get_bibref_in, user_logout, 
 } from './bq_quest_mgr.js';
 
 import { load_qmodu, load_next_qmodu, } from './bq_module_mgr.js';
@@ -98,11 +98,26 @@ function do_selec(val_sel_w){
 	}
 }
 
+export function toggle_test_logins(){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	
+	const dv_upper = document.getElementById("id_admin_ops_sec");
+	let ii = 0;
+	const test_users = {};
+	for(ii = 1; ii < 10; ii++){
+		test_users["user" + ii] = ii;
+	}
+	const all_vals = Object.keys(test_users);
+	toggle_select_option(dv_upper, id_pop_menu_sele, all_vals, async function(dv_ret_w, dv_ops_w, val_sel_w, idx_sel_w){
+		await user_logout();
+		fb_mod.firebase_email_login(test_users[val_sel_w]);
+	});
+	
+	scroll_to_top(dv_upper);
+}
+
 export function toggle_admin_opers(fb_usr){
-	let lbl = null;
-	let fld = null;
-	
-	
 	const dv_upper = document.getElementById("id_admin_ops_sec");
 	const all_vals = Object.values(admin_ops);
 	toggle_select_option(dv_upper, id_pop_menu_sele, all_vals, function(dv_ret_w, dv_ops_w, val_sel_w, idx_sel_w){
@@ -655,8 +670,8 @@ async function update_user_referrer(fb_database, the_uid){
 }
 
 function get_server_timestamp(){
-	if(fb_mod == null){ console.error("get_server_timestamp. fb_mod == null."); return; }
-	if(fb_mod.tc_fb_app == null){ console.error("get_server_timestamp. fb_mod.tc_fb_app == null.");  return; }
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 
 	//console.log(fb_mod.md_db);
@@ -676,8 +691,8 @@ function get_server_timestamp(){
 }
 
 function delete_all_strong(){
-	if(fb_mod == null){ console.error("get_server_timestamp. fb_mod == null."); return; }
-	if(fb_mod.tc_fb_app == null){ console.error("get_server_timestamp. fb_mod.tc_fb_app == null.");  return; }
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	const pth3 = "bib_codes/word_code";
 	
