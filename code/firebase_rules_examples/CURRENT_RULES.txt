@@ -2,9 +2,6 @@
 	"rules": {
 		".read": false,
 		".write": false,
-		"test_read": {
-			".read": true,
-		},
 		"bib_quest": {
 			".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 			".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
@@ -16,7 +13,7 @@
 				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 			},
 			"modules": {
-				".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+				".read": "!(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 				"$module_name": {
 					"$observation_qid": {
@@ -26,8 +23,12 @@
 					},
 				},
 			},
+			"scores": {
+				".read": "!(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+			},
 			"pstats": { 
-				".read": "true",
+				".read": true,
 				".write": "newData.exists()",
 				"last_check": { 
 					".validate": "newData.isString() && (newData.val().length < 25)",
@@ -51,7 +52,7 @@
 				},
 			},
 			"stats": { 
-				".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+				".read": "!(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 				"last_check": { 
 					".validate": "newData.isString() && (newData.val().length < 25)",
@@ -167,6 +168,7 @@
 							},
 						},
 						"confirmed": {
+							".read": "!(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 							".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 							"$referrer_uid": {
 								".validate": "root.child('bib_quest').child('users').child('list').child($referrer_uid).exists()",
@@ -174,6 +176,7 @@
 						},
 					},
 					"referrer_of": {
+						".read": "!(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 						".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 						"$referred_uid": {
 							".validate": "root.child('bib_quest').child('users').child('list').child($referred_uid).exists()",
@@ -224,13 +227,9 @@
 				},
 			},
 		},
-		"bib_codes": {
-			".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+		"test_data": {
 			".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
-		},
-		"bib_trans": {
-			".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
-			".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+			".read": true,
 		},
 	},
 }

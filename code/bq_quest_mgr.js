@@ -2112,8 +2112,7 @@ function write_fb_qmodu_presults(obj, dt){
 	if(fb_mod.tc_fb_app == null){ console.error("write_fb_qmodu_presults. fb_mod.tc_fb_app == null. "); return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	
-	const pstats_path = fb_mod.firebase_bib_quest_path + "pstats/";
-	const module_pth = pstats_path + gvar.current_qmonam;
+	const module_pth = gvar.current_qmonam;
 	
 	const suf_id_results = gvar.current_qmonam + SUF_ID_PSTATS_RESULTS;
 	on_stats_change_show_results(suf_id_results, "PSTATS", module_pth, obj);
@@ -2123,11 +2122,9 @@ function write_fb_qmodu_presults(obj, dt){
 		return;
 	}
 	
-	
-	let db_ref = null;
 	const wr_data = {};
 	
-	wr_data[pstats_path + 'last_check'] = dt;
+	wr_data['last_check'] = dt;
 	
 	const all_qids = Object.keys(obj);
 	for(const qid of all_qids){
@@ -2140,7 +2137,8 @@ function write_fb_qmodu_presults(obj, dt){
 	
 	set_fb_Pstat();
 	
-	const db_pref = fb_mod.md_db.ref(fb_database);
+	const pstats_path = fb_mod.firebase_bib_quest_path + "pstats/";
+	const db_pref = fb_mod.md_db.ref(fb_database, pstats_path);
 	fb_mod.md_db.update(db_pref, wr_data).catch((error) => { 
 		console.error("write_fb_qmodu_presults." + error); 
 		reset_fb_Pstat();

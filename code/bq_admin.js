@@ -40,6 +40,8 @@ const admin_ops = {
 	//show_server_timestamp:"Show server timestamp",
 	test_jdpdf:"test_jdpdf",
 	//delete_all_strong:"delete_all_strong",
+	add_big_test_data:"add_big_test_data",
+	remove_big_test_data:"remove_big_test_data",
 };
 
 const id_admin_ops = "id_admin_ops";
@@ -71,6 +73,12 @@ function do_selec(val_sel_w){
 	}
 	if(val_sel_w == admin_ops.test_jdpdf){
 		test_pdf();
+	}
+	if(val_sel_w == admin_ops.add_big_test_data){
+		add_big_test_data();
+	}
+	if(val_sel_w == admin_ops.remove_big_test_data){
+		remove_big_test_data();
 	}
 	if(val_sel_w == admin_ops.delete_all_strong){
 		delete_all_strong();
@@ -706,5 +714,80 @@ function delete_all_strong(){
 	});	
 	
 	//fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });	
+}
+
+function gen_cad(lng){
+	let ii = 0;
+	
+	let min = 65;
+	let max = 90;
+	let cad = "";
+	for(ii = 0; ii < lng; ii++){
+		const cod_asc = Math.floor(Math.random() * (max - min + 1)) + min;
+		cad += String.fromCharCode(cod_asc);
+	}
+	return cad;
+}
+
+async function add_big_test_data(){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	const pth3 = "bib_quest/test_data";
+	
+	let db_ref = fb_mod.md_db.ref(fb_database, pth3);
+	let obj = {};
+	
+	let ii = 0;
+	let jj = 0;
+	for(ii = 0; ii < 100; ii++){
+		const cad1 = gen_cad(30);
+		obj[cad1] = {};
+		let kk0 = 0;
+		for(kk0 = 0; kk0 < 100; kk0++){
+			const cad2 = gen_cad(30);
+			obj[cad1][cad2] = {};
+			let kk1 = 0;
+			for(kk1 = 0; kk1 < 100; kk1++){
+				const cad3 = gen_cad(30);
+				obj[cad1][cad2][cad3] = {};
+				let kk2 = 0;
+				for(kk2 = 0; kk2 < 100; kk2++){
+					const cad4 = gen_cad(30);
+					obj[cad1][cad2][cad3][cad4] = {};
+					let kk3 = 0;
+					for(kk3 = 0; kk3 < 100; kk3++){
+						const cad5 = gen_cad(30);
+						const cad6 = gen_cad(50);
+						obj[cad1][cad2][cad3][cad4][cad5] = cad6;
+					}
+				}
+			}
+		}
+	}
+	await fb_mod.md_db.set(db_ref, obj).catch((error) => { 
+		console.error(error); 
+	});
+	
+	close_pop_menu();
+}
+
+async function remove_big_test_data(){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	const pth3 = "bib_quest/test_data";
+	
+	let db_ref = fb_mod.md_db.ref(fb_database, pth3);
+	let cond1 = fb_mod.md_db.limitToFirst(10000);
+	let db_qry = fb_mod.md_db.query(db_ref, cond1);
+	fb_mod.md_db.get(db_qry).then((snapshot) => {
+		snapshot.forEach((chd) => {
+			fb_mod.md_db.remove(chd.ref);
+		});
+	});	
+	
+	//fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });	
+	close_pop_menu();
 }
 
