@@ -729,6 +729,25 @@ function gen_cad(lng){
 	return cad;
 }
 
+async function remove_big_test_data(){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	const pth3 = "bib_quest/test_data";
+	
+	let db_ref = fb_mod.md_db.ref(fb_database, pth3);
+	let cond1 = fb_mod.md_db.limitToFirst(10000);
+	let db_qry = fb_mod.md_db.query(db_ref, cond1);
+	fb_mod.md_db.get(db_qry).then((snapshot) => {
+		snapshot.forEach((chd) => {
+			fb_mod.md_db.remove(chd.ref);
+		});
+	});	
+	
+	//fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });	
+	close_pop_menu();
+}
+
 async function add_big_test_data(){
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
@@ -754,40 +773,17 @@ async function add_big_test_data(){
 				let kk2 = 0;
 				for(kk2 = 0; kk2 < 100; kk2++){
 					const cad4 = gen_cad(30);
-					obj[cad1][cad2][cad3][cad4] = {};
-					let kk3 = 0;
-					for(kk3 = 0; kk3 < 100; kk3++){
-						const cad5 = gen_cad(30);
-						const cad6 = gen_cad(50);
-						obj[cad1][cad2][cad3][cad4][cad5] = cad6;
-					}
+					const cad5 = gen_cad(50);
+					obj[cad1][cad2][cad3][cad4] = cad5;
 				}
 			}
 		}
 	}
+	
 	await fb_mod.md_db.set(db_ref, obj).catch((error) => { 
 		console.error(error); 
-	});
-	
-	close_pop_menu();
-}
-
-async function remove_big_test_data(){
-	if(fb_mod == null){ console.error("fb_mod == null."); return; }
-	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
-	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
-	const pth3 = "bib_quest/test_data";
-	
-	let db_ref = fb_mod.md_db.ref(fb_database, pth3);
-	let cond1 = fb_mod.md_db.limitToFirst(10000);
-	let db_qry = fb_mod.md_db.query(db_ref, cond1);
-	fb_mod.md_db.get(db_qry).then((snapshot) => {
-		snapshot.forEach((chd) => {
-			fb_mod.md_db.remove(chd.ref);
-		});
 	});	
 	
-	//fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });	
 	close_pop_menu();
 }
 
