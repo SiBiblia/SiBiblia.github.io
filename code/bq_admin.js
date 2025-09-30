@@ -740,11 +740,11 @@ async function add_big_test_data(){
 	
 	let ii = 0;
 	let jj = 0;
-	for(ii = 0; ii < 100; ii++){
+	for(ii = 0; ii < 10; ii++){
 		const cad1 = gen_cad(30);
 		obj[cad1] = {};
 		let kk0 = 0;
-		for(kk0 = 0; kk0 < 100; kk0++){
+		for(kk0 = 0; kk0 < 10; kk0++){
 			const cad2 = gen_cad(30);
 			obj[cad1][cad2] = {};
 			let kk1 = 0;
