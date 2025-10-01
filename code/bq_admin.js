@@ -767,7 +767,7 @@ async function add_big_test_data(){
 			const cad2 = gen_cad(30);
 			obj[cad1][cad2] = {};
 			let kk1 = 0;
-			for(kk1 = 0; kk1 < 100; kk1++){
+			for(kk1 = 0; kk1 < 50; kk1++){
 				const cad3 = gen_cad(30);
 				obj[cad1][cad2][cad3] = {};
 				let kk2 = 0;
