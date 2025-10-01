@@ -2,7 +2,7 @@
 import { get_new_dv_under, scroll_to_top, toggle_select_option, 
 } from './bq_select_option_mgr.js';
 
-import { gvar, get_qid_base, bib_defaults, is_observation
+import { gvar, get_qid_base, bib_defaults, is_observation, get_date_and_time, 
 } from './bq_tools.js';
 
 import { start_qmodu, 
@@ -19,7 +19,7 @@ const DEBUG_ADMIN_OPS = false;
 const DEBUG_UPDATE_STATS = true;
 
 const admin_ops = {
-	up_all:"Update ALL to Update",
+	//up_all:"Update ALL to Update",
 	up_referrers:"Update ALL referrers",
 	up_stats:"Update ALL stats",
 	up_mods:"Update ALL module observations",
@@ -35,13 +35,14 @@ const admin_ops = {
 	//prt_tots:`print_totals()`,
 	//prt_fl_tot:"print_file_totals()",
 	//ini_atots:"init_ascii_totals()",
-	get_verse:"get bible verse",
+	//get_verse:"get bible verse",
 	//is_google_user:"Check if google signed-in",
 	//show_server_timestamp:"Show server timestamp",
 	test_jdpdf:"test_jdpdf",
 	//delete_all_strong:"delete_all_strong",
-	add_big_test_data:"add_big_test_data",
-	remove_big_test_data:"remove_big_test_data",
+	//add_big_test_data:"add_big_test_data",
+	//remove_big_test_data:"remove_big_test_data",
+	//test_small_root_update: "test_small_root_update",
 };
 
 const id_admin_ops = "id_admin_ops";
@@ -80,6 +81,10 @@ function do_selec(val_sel_w){
 	if(val_sel_w == admin_ops.remove_big_test_data){
 		remove_big_test_data();
 	}
+	if(val_sel_w == admin_ops.test_small_root_update){
+		test_small_root_update();
+	}
+	
 	if(val_sel_w == admin_ops.delete_all_strong){
 		delete_all_strong();
 	}
@@ -228,6 +233,14 @@ function update_user_module_stats(fb_database, the_uid, qmonam){
 			update_user_module_in_stats(fb_database, the_uid, qmonam, all_obs);
 		} else {
 			console.log("update_user_module_stats. No path_found. PATH=" + path);
+			
+			const wr_data = {};
+			const to_upd_pth = fb_mod.firebase_bib_quest_path + 'to_update/' + qmonam + '/' + the_uid;
+			wr_data[to_upd_pth] = {};			
+			const db_ref = fb_mod.md_db.ref(fb_database);
+			fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });	
+			
+			console.log("update_user_module_stats. DELETING path=" + to_upd_pth);
 		}
 	}).catch((error) => {
 		console.error("update_user_module_stats. get failed. path = " + path);
@@ -729,25 +742,6 @@ function gen_cad(lng){
 	return cad;
 }
 
-async function remove_big_test_data(){
-	if(fb_mod == null){ console.error("fb_mod == null."); return; }
-	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
-	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
-	const pth3 = "bib_quest/test_data";
-	
-	let db_ref = fb_mod.md_db.ref(fb_database, pth3);
-	let cond1 = fb_mod.md_db.limitToFirst(10000);
-	let db_qry = fb_mod.md_db.query(db_ref, cond1);
-	fb_mod.md_db.get(db_qry).then((snapshot) => {
-		snapshot.forEach((chd) => {
-			fb_mod.md_db.remove(chd.ref);
-		});
-	});	
-	
-	//fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });	
-	close_pop_menu();
-}
-
 async function add_big_test_data(){
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
@@ -757,33 +751,85 @@ async function add_big_test_data(){
 	let db_ref = fb_mod.md_db.ref(fb_database, pth3);
 	let obj = {};
 	
-	let ii = 0;
-	let jj = 0;
-	for(ii = 0; ii < 10; ii++){
-		const cad1 = gen_cad(30);
-		obj[cad1] = {};
-		let kk0 = 0;
-		for(kk0 = 0; kk0 < 10; kk0++){
-			const cad2 = gen_cad(30);
-			obj[cad1][cad2] = {};
-			let kk1 = 0;
-			for(kk1 = 0; kk1 < 50; kk1++){
-				const cad3 = gen_cad(30);
-				obj[cad1][cad2][cad3] = {};
-				let kk2 = 0;
-				for(kk2 = 0; kk2 < 100; kk2++){
-					const cad4 = gen_cad(30);
-					const cad5 = gen_cad(50);
-					obj[cad1][cad2][cad3][cad4] = cad5;
+	let hh1 = 0;
+	for(hh1 = 0; hh1 < 1000; hh1++){
+		const dt = get_date_and_time(true);
+		obj[dt] = {};
+		
+		let kk1 = 0;
+		for(kk1 = 0; kk1 < 10; kk1++){
+			const cad1 = gen_cad(30);
+			obj[dt][cad1] = {};
+			let kk2 = 0;
+			for(kk2 = 0; kk2 < 10; kk2++){
+				const cad2 = gen_cad(30);
+				obj[dt][cad1][cad2] = {};
+				let kk3 = 0;
+				for(kk3 = 0; kk3 < 10; kk3++){
+					const cad3 = gen_cad(30);
+					obj[dt][cad1][cad2][cad3] = {};
+					let kk4 = 0;
+					for(kk4 = 0; kk4 < 10; kk4++){
+						const cad4 = gen_cad(30);
+						const cad5 = gen_cad(50);
+						obj[dt][cad1][cad2][cad3][cad4] = cad5;
+					}
 				}
 			}
 		}
+		
+		await fb_mod.md_db.set(db_ref, obj).catch((error) => { 
+			console.error(error); 
+		});	
+		
+		console.log("WROTE OBJ " + hh1 + " date=" + dt);
+		
 	}
 	
-	await fb_mod.md_db.set(db_ref, obj).catch((error) => { 
-		console.error(error); 
-	});	
+	close_pop_menu();
+}
+
+function test_small_root_update(){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	const pth1 = "bib_quest/test_area";
+	const pth2 = "bib_quest/scores";
+
+
+	const wr_data = {};
+	wr_data[pth1 + '/val001'] = "THIS_IS_VAL001";
+	wr_data[pth2 + '/val002'] = "THIS_IS_VAL002";
+	const db_ref = fb_mod.md_db.ref(fb_database);
+	fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });	
+}
+
+async function remove_big_test_data(){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	const pth3 = "bib_quest/test_data";
 	
+	let db_ref = fb_mod.md_db.ref(fb_database, pth3);
+	const pg_sz = 100;
+	let curr_pg = 1;
+	
+	for(curr_pg = 1; curr_pg < 100; curr_pg++){
+		const st_at = (curr_pg - 1) * pg_sz;
+		
+		let cond1 = fb_mod.md_db.orderByKey();
+		let cond2 = fb_mod.md_db.startAt(st_at.toString());
+		let cond3 = fb_mod.md_db.limitToFirst(pg_sz);
+		let db_qry = fb_mod.md_db.query(db_ref, cond1, cond2, cond3);
+		fb_mod.md_db.get(db_qry).then((snapshot) => {
+			snapshot.forEach((chd) => {
+				fb_mod.md_db.remove(chd.ref);
+			});
+		});	
+		console.log("REMOVED OBJS IN PAGE " + curr_pg);
+	}
+	
+	//fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });	
 	close_pop_menu();
 }
 

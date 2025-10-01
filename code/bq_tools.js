@@ -711,14 +711,22 @@ export function get_resp_for(qid, cit_obj){
 	return resp;
 }
 
-export function get_date_and_time(){ 
+export function get_date_and_time(is_field){ 
 	const currentdate = new Date(); 
-	const datetime = currentdate.getFullYear() + "/"
+	let datetime = currentdate.getFullYear() + "/"
 					+ (currentdate.getMonth()+1)  + "/"
 					+ currentdate.getDate() + "@"
 					+ currentdate.getHours() + ":"
 					+ currentdate.getMinutes() + ":"
 					+ currentdate.getSeconds();
+	if(is_field){
+		datetime = "date_" + currentdate.getFullYear() + "_"
+						+ (currentdate.getMonth()+1)  + "_"
+						+ currentdate.getDate() + "_"
+						+ currentdate.getHours() + "_"
+						+ currentdate.getMinutes() + "_"
+						+ currentdate.getSeconds();
+	}
 	return datetime;
 }
 

@@ -226,10 +226,10 @@
 					".validate": "newData.isNumber() && (newData.val() === 1)",
 				},
 			},
-		},
-		"test_data": {
-			".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
-			".read": true,
+			"test_data": {
+				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+				".read": true,
+			},
 		},
 	},
 }
