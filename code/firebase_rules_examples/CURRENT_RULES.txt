@@ -18,7 +18,7 @@
 				"$module_name": {
 					"$observation_qid": {
 						"$val": {
-							".validate": "newData.isNumber() && (newData.val() === 1)",
+							".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() <= 1)",
 						},
 					},
 				},

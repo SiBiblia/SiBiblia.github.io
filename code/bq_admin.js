@@ -148,12 +148,12 @@ function get_module_observations_obj(){
 
 function update_current_module_observations(){
 	if(gvar.current_qmonam == null){
-		console.error("update_current_module_observations. gvar.current_qmonam == null");
+		console.error("gvar.current_qmonam == null");
 		return;
 	}
 	
-	if(fb_mod == null){ console.error("update_current_module_observations. fb_mod == null."); return; }
-	if(fb_mod.tc_fb_app == null){ console.error("update_current_module_observations. fb_mod.tc_fb_app == null.");  return; }
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	
 	const ref_path = fb_mod.firebase_bib_quest_path + "modules/" + gvar.current_qmonam;

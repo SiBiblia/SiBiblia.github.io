@@ -31,7 +31,7 @@ const ___final_observation_name = "___final_observation_name";
 
 const DEBUG_QNUMS = true;
 const DEBUG_PENDING = false;
-const DEBUG_POP_MENU = true;
+const DEBUG_POP_MENU = false;
 const DEBUG_FB_WRITE = false;
 const DEBUG_STO_RW = false;
 const DEBUG_INIT_ANSW = false;
@@ -39,8 +39,9 @@ const DEBUG_SHOW_OBSERV = false;
 const DEBUG_UPDATE_OBSERV = false;
 const DEBUG_FB_WRITE_RESULTS = true;
 const DEBUG_SHOW_RESULTS = true;
-const DEBUG_SCROLL = false;
 const DEBUG_SHOW_TEST_USERS = true;
+const DEBUG_OBSERV_SCORE = false;
+const DEBUG_SCROLL = false;
 
 const MIN_ANSW_SHOW_INVERT = 3;
 
@@ -2300,6 +2301,35 @@ function is_valid_observ(qid){
 	return true;
 } 
 
+function fix_deci(num, num_deci){
+	const pp = Math.pow(10, num_deci);
+	return (Math.floor(num * pp) / pp);
+}
+
+function set_observations_score_weight(all_obs){
+	const all_qids = Object.keys(all_obs);
+	const lng = all_qids.length;
+	const ww0 = (1 / lng);
+	const num_deci = 4;
+	const def_ww = fix_deci(ww0, num_deci);
+	let sum = 0;
+	for(const qid of all_qids){
+		const quest = gvar.glb_poll_db[qid];
+		if(quest == null){ console.error("quest == null"); continue; }
+		let ww = quest.score_weight;
+		if(ww == null){ ww = def_ww; } else { ww = fix_deci(ww, num_deci); }
+		if((ww >= 0) && (ww <= 1) && ((sum + ww) <= 1)){
+			sum += ww;
+			all_obs[qid] = ww;
+		}
+	}
+	
+	if(DEBUG_OBSERV_SCORE){
+		console.log("AL_OBS=");
+		console.log(all_obs);
+	}
+}
+
 function init_DAG_func(){
 	console.log("init_DAG_func.CALLED.");
 	init_all_context();
@@ -2311,16 +2341,18 @@ function init_DAG_func(){
 	const all_qids = Object.keys(gvar.glb_poll_db);
 	for(const qid of all_qids){
 		if(is_valid_observ(qid)){
-			all_obs[qid] = 1;
+			all_obs[qid] = 0;
 		}
 		init_signals_for(qid);
 	}
 	
 	if(db.FINAL_OBSERVATION__ == null){
 		db.FINAL_OBSERVATION__ = get_final_obs();
-		all_obs.FINAL_OBSERVATION__	= 1;
+		all_obs.FINAL_OBSERVATION__	= 0;
 		
 	}
+	
+	set_observations_score_weight(all_obs);
 }
 
 function init_signals_for(qid){
