@@ -86,6 +86,8 @@ const LNK_HREF_IDX = 1;
 const MIN_DATE = -7000;
 const MAX_DATE = -5000;
 
+const MAX_SCORE_WEIGHT_DECI = 4;
+
 const SUF_USR_IMG = "_img";
 const SUF_USR_NAM = "_nam";
 
@@ -2306,11 +2308,13 @@ function fix_deci(num, num_deci){
 	return (Math.floor(num * pp) / pp);
 }
 
-function set_observations_score_weight(all_obs){
+function set_observations_score_weight(num_wei, sum_wei, all_obs){
+	if((sum_wei < 0) || (sum_wei > 1)){ console.error(`invalid sum_wei (${sum_wei}). Assuming cero.`); num_wei = 0; sum_wei = 0; }
+	
 	const all_qids = Object.keys(all_obs);
-	const lng = all_qids.length;
-	const ww0 = (1 / lng);
-	const num_deci = 4;
+	const rest = all_qids.length - num_wei;
+	const ww0 = ((1 - sum_wei)/ rest);
+	const num_deci = MAX_SCORE_WEIGHT_DECI;
 	const def_ww = fix_deci(ww0, num_deci);
 	let sum = 0;
 	for(const qid of all_qids){
@@ -2338,10 +2342,17 @@ function init_DAG_func(){
 	gvar.all_observations = {};
 	const all_obs = gvar.all_observations;
 	
+	const num_deci = MAX_SCORE_WEIGHT_DECI;
+	let num_wei = 0;
+	let sum_wei = 0;
+	
 	const all_qids = Object.keys(gvar.glb_poll_db);
 	for(const qid of all_qids){
+		const quest = gvar.glb_poll_db[qid];
 		if(is_valid_observ(qid)){
 			all_obs[qid] = 0;
+			const ww = quest.score_weight;
+			if(ww != null){ sum_wei += fix_deci(ww, num_deci); num_wei++; }
 		}
 		init_signals_for(qid);
 	}
@@ -2352,7 +2363,7 @@ function init_DAG_func(){
 		
 	}
 	
-	set_observations_score_weight(all_obs);
+	set_observations_score_weight(num_wei, sum_wei, all_obs);
 }
 
 function init_signals_for(qid){
