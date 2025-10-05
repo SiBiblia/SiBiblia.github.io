@@ -13,7 +13,7 @@ import { get_user_href,
 
 import { add_to_pending, get_pending_qid, init_all_context, } from './bq_contexts.js';
 import { toggle_user_info, } from './bq_user_info.js';
-import { toggle_admin_opers, toggle_test_logins, } from './bq_admin.js';
+import { toggle_admin_opers, toggle_test_logins, toggle_test_opers, } from './bq_admin.js';
 import { load_qmodu, set_fini_qmodu, is_fini_qmodu, load_next_qmodu, } from './bq_module_mgr.js';
 
 //import "./qrcode.js";
@@ -1613,6 +1613,14 @@ function pop_menu_handler(){
 		op.innerHTML = "TEST_USERS";
 		op.addEventListener('click', toggle_test_logins);
 		dv_pop_men.appendChild(op);
+
+		op = document.createElement("div");
+		op.classList.add("exam");
+		op.classList.add("is_block");
+		op.classList.add("big_item");
+		op.innerHTML = "TEST_OPERS";
+		op.addEventListener('click', toggle_test_opers);
+		dv_pop_men.appendChild(op);
 	}
 
 	scroll_to_top(dv_pop_men);
@@ -2152,7 +2160,7 @@ function write_fb_qmodu_results(obj, dt){
 	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_fb_qmodu_results. CALLED. "); }
 	if(fb_mod == null){ console.error("fb_mod == null"); return; }
 
-	if(fb_mod.tc_fb_app == null){ console.error("write_fb_qmodu_results. fb_mod.tc_fb_app == null. "); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null. "); return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	
 	const module_pth = 'stats/to_add/' + gvar.current_qmonam;
@@ -2161,7 +2169,7 @@ function write_fb_qmodu_results(obj, dt){
 	on_stats_change_show_results(suf_id_results, "USTATS", module_pth, obj);
 
 	if(in_fb_Ustat()){ 
-		console.log("write_fb_qmodu_results. ALREADY in Ustat. "); 
+		console.error("ALREADY in Ustat. "); 
 		return;
 	}
 	
@@ -2172,7 +2180,7 @@ function write_fb_qmodu_results(obj, dt){
 	wr_data[results_module_pth] = obj;
 
 	const finished_module_pth = 'finished/' + gvar.current_qmonam;
-	wr_data[finished_module_pth] = 1;
+	wr_data[finished_module_pth] = fb_mod.md_db.serverTimestamp();
 	
 	const all_qids = Object.keys(obj);
 	for(const qid of all_qids){
@@ -2188,13 +2196,13 @@ function write_fb_qmodu_results(obj, dt){
 	const usr_path = fb_mod.firebase_get_user_path();
 	db_ref = fb_mod.md_db.ref(fb_database, usr_path);
 	fb_mod.md_db.update(db_ref, wr_data).catch((error) => { 
-		console.error("write_fb_qmodu_results." + error); 
+		console.error(error); 
 		reset_fb_Ustat();
 	});
 	
 	const path_flag = get_to_update_module_user_path();
 	db_ref = fb_mod.md_db.ref(fb_database, path_flag);
-	fb_mod.md_db.set(db_ref, 1).catch((error) => { console.error("write_fb_qmodu_results." + error); });
+	fb_mod.md_db.set(db_ref, 1).catch((error) => { console.error(error); });
 	
 }
 

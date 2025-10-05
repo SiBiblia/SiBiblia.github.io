@@ -18,6 +18,19 @@ import { test_pdf } from './bq_pdf_mgr.js'
 const DEBUG_ADMIN_OPS = false;
 const DEBUG_UPDATE_STATS = true;
 
+const test_ids = {
+	"user9" : "2s9VD9GYUYTAABs10uTc4ffPjIl1",
+	"user8" : "aEGcnW9mryNAZXjdlo4dKLajiZj1",
+	"user7" : "zRaEatJMbJbYMefNXjS8zTVtD5k1",
+	"user6" : "2uRMCFlCeZQ4f4OwJc2Puas8zY73",
+	"user5" : "sPh7cf5NvqTVkPZzPpWBcSH7tGc2",
+	"user4" : "REAFsHwfknZupnUjCMjbaHoHDV13",
+	"user3" : "AYIKhJkFuOXB01qAwzswq0mNdP73",
+	"user2" : "0pm1Ys62dMc1Taz1gqDRMjA23Ex2",
+	"user1" : "026iih43UqXvDQFsdFNhiTedtvB2",
+	"admin" : "N5zHMUNEmXVEebV7CrevjAgys2R2",
+};
+
 const admin_ops = {
 	//up_all:"Update ALL to Update",
 	up_referrers:"Update ALL referrers",
@@ -43,6 +56,24 @@ const admin_ops = {
 	//add_big_test_data:"add_big_test_data",
 	//remove_big_test_data:"remove_big_test_data",
 	//test_small_root_update: "test_small_root_update",
+};
+
+const test_ops = {
+	set_write_once_field:"set_write_once_field",
+	try_update_write_once_field:"try_update_write_once_field",
+	try_delete_write_once_field:"try_delete_write_once_field",
+	
+	set_cannot_del_field:"set_cannot_del_field",
+	try_update_cannot_del_field:"try_update_cannot_del_field",
+	try_delete_cannot_del_field:"try_delete_cannot_del_field",
+	
+	set_cannot_update_field:"set_cannot_update_field",
+	try_update_cannot_update_field:"try_update_cannot_update_field",
+	try_delete_cannot_update_field:"try_delete_cannot_update_field",
+	
+	set_can_del_field:"set_can_del_field",
+	try_update_can_del_field:"try_update_can_del_field",
+	try_delete_can_del_field:"try_delete_can_del_field",
 };
 
 const id_admin_ops = "id_admin_ops";
@@ -214,7 +245,7 @@ function get_user_stats_module_path(the_uid, qmonam){
 }
 
 function update_user_module_stats(fb_database, the_uid, qmonam){
-	if(fb_mod == null){ console.error("update_user_module_stats. fb_mod == null."); return; }
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(DEBUG_UPDATE_STATS){ console.log("update_user_module_stats. Updating user " + the_uid + " | qmonam " + qmonam); }
 	
 	let path = null;
@@ -243,7 +274,7 @@ function update_user_module_stats(fb_database, the_uid, qmonam){
 			console.log("update_user_module_stats. DELETING path=" + to_upd_pth);
 		}
 	}).catch((error) => {
-		console.error("update_user_module_stats. get failed. path = " + path);
+		console.error("get failed. path = " + path);
 		console.error(error);
 	});
 	
@@ -263,6 +294,8 @@ function update_module_stats(qmonam){
 	//const ref_path = "users/list";
 	const ref_path = fb_mod.firebase_bib_quest_path + "to_update/" + qmonam;
 	const db_ref = fb_mod.md_db.ref(fb_database, ref_path);
+	
+	// TODO: fix to a paged update. NOT all users at the same time.
 	
 	fb_mod.md_db.get(db_ref).then((snapshot) => {
 		if (snapshot.exists()) {
@@ -832,4 +865,132 @@ async function remove_big_test_data(){
 	//fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });	
 	close_pop_menu();
 }
+
+export function toggle_test_opers(){
+	const dv_upper = document.getElementById("id_admin_ops_sec");
+	const all_vals = Object.values(test_ops);
+	toggle_select_option(dv_upper, id_pop_menu_sele, all_vals, function(dv_ret_w, dv_ops_w, val_sel_w, idx_sel_w){
+		do_test_oper(val_sel_w, null);
+	});
+	
+	scroll_to_top(dv_upper);
+}
+
+function do_test_oper(oper, user_nam){
+	if(oper == test_ops.set_write_once_field){
+		set_field(user_nam, "write_once", "VAL_INI");
+	}
+	if(oper == test_ops.try_update_write_once_field){
+		set_field(user_nam, "write_once", "VAL_UPDATE");
+	}
+	if(oper == test_ops.try_delete_write_once_field){
+		set_field(user_nam, "write_once", null);
+	}
+	
+	if(oper == test_ops.set_cannot_del_field){
+		set_field(user_nam, "cannot_del", "VAL_INI");
+	}
+	if(oper == test_ops.try_update_cannot_del_field){
+		set_field(user_nam, "cannot_del", "VAL_UPDATE");
+	}
+	if(oper == test_ops.try_delete_cannot_del_field){
+		set_field(user_nam, "cannot_del", null);
+	}
+
+	if(oper == test_ops.set_cannot_update_field){
+		set_field(user_nam, "cannot_update", "VAL_INI");
+	}
+	if(oper == test_ops.try_update_cannot_update_field){
+		set_field(user_nam, "cannot_update", "VAL_UPDATE");
+	}
+	if(oper == test_ops.try_delete_cannot_update_field){
+		set_field(user_nam, "cannot_update", null);
+	}
+
+	if(oper == test_ops.set_can_del_field){
+		set_field(user_nam, "can_del", "VAL_INI");
+	}
+	if(oper == test_ops.try_update_can_del_field){
+		set_field(user_nam, "can_del", "VAL_UPDATE");
+	}
+	if(oper == test_ops.try_delete_can_del_field){
+		set_field(user_nam, "can_del", null);
+	}
+
+	close_pop_menu();
+}
+
+function set_write_once_field(nw_val){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	const user_id = fb_mod.tc_fb_user.uid;
+	const pth_test = "bib_quest/test_area";
+	const sub_pth = '/users/' + user_id + "/write_once/campo_001";
+	
+	if(nw_val != null){	
+		const wr_data = {};
+		wr_data[sub_pth] = nw_val;
+		
+		const db_ref = fb_mod.md_db.ref(fb_database, pth_test);
+		fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });		
+	} else {
+		const dpth = pth_test + sub_pth;
+		console.log("TRYING DELETE path=" + dpth);
+		const db_ref = fb_mod.md_db.ref(fb_database, dpth);
+		fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });		
+	}
+}
+
+function set_cannot_del_field(nw_val){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	const user_id = fb_mod.tc_fb_user.uid;
+	
+	const pth_test = "bib_quest/test_area";
+	const sub_pth = '/users/' + user_id + "/cannot_del/campo_001";
+	
+	if(nw_val != null){	
+		const db_ref = fb_mod.md_db.ref(fb_database, pth_test);
+		const wr_data = {};
+		wr_data[sub_pth] = nw_val;
+		fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });		
+	} else {
+		const db_ref = fb_mod.md_db.ref(fb_database, pth_test + sub_pth);
+		fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });		
+	}
+	
+}
+
+function set_field(user_nam, fld_type, nw_val){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	let user_id = fb_mod.tc_fb_user.uid;
+	if(user_nam != null){
+		user_id = test_ids[user_nam];
+	}
+	
+	const pth_test = "bib_quest/test_area";
+	const sub_pth = '/users/' + user_id + `/${fld_type}/campo_001`;
+	
+	if(nw_val != null){	
+		const db_ref = fb_mod.md_db.ref(fb_database, pth_test);
+		const wr_data = {};
+		wr_data[sub_pth] = nw_val;
+		fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });		
+	} else {
+		const db_ref = fb_mod.md_db.ref(fb_database, pth_test + sub_pth);
+		fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });		
+	}
+	
+}
+
+
+
+
 
