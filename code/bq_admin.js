@@ -17,6 +17,7 @@ import { test_pdf } from './bq_pdf_mgr.js'
 
 const DEBUG_ADMIN_OPS = false;
 const DEBUG_UPDATE_STATS = true;
+const DEBUG_UPDATE_REFERRERS = true;
 
 const test_ids = {
 	"user9" : "2s9VD9GYUYTAABs10uTc4ffPjIl1",
@@ -206,7 +207,8 @@ function update_user_module_in_stats(fb_database, the_uid, qmonam, all_obs){
 	
 	const usr_path = fb_mod.firebase_get_user_path(the_uid);
 	const old_stat_pth = usr_path + '/stats/to_add/' + qmonam;
-	const in_stat_pth = usr_path + '/stats/in_stats/' + qmonam;
+	//const in_stat_pth = usr_path + '/stats/in_stats/' + qmonam;
+	const in_stat_pth = fb_mod.firebase_bib_quest_path + 'admin_data/in_stats/' + the_uid + '/' + qmonam;
 	const glb_stat_pth = fb_mod.firebase_bib_quest_path + 'stats/' + qmonam;	
 	const to_upd_pth = fb_mod.firebase_bib_quest_path + 'to_update/' + qmonam + '/' + the_uid;
 	const old_last_ck = all_obs.last_check;
@@ -222,9 +224,9 @@ function update_user_module_in_stats(fb_database, the_uid, qmonam, all_obs){
 		wr_data[glb_stat_pth + '/' + qid] = fb_mod.md_db.increment(inc_val);
 	}
 	
-	//wr_data[in_stat_pth + '/last_check'] = old_last_ck;	
+	//wr_data[in_stat_pth + '/last_check'] = fb_mod.md_db.serverTimestamp();;
 	wr_data[in_stat_pth + '/num_checks'] = fb_mod.md_db.increment(old_num_ck);
-	//wr_data[glb_stat_pth + '/last_check'] = old_last_ck;	
+	//wr_data[glb_stat_pth + '/last_check'] = fb_mod.md_db.serverTimestamp();;
 	wr_data[glb_stat_pth + '/num_checks'] = fb_mod.md_db.increment(old_num_ck);
 	
 	wr_data[old_stat_pth] = {};
@@ -686,40 +688,64 @@ async function update_ALL_referrers(){
 
 async function update_user_referrer(fb_database, the_uid){
 	const db = fb_database;
-	const upd_path = fb_mod.firebase_bib_quest_path + "to_update/referred_by/" + the_uid;
 	
+	const upd_path = fb_mod.firebase_bib_quest_path + "to_update/referred_by/" + the_uid;	
 	const usr_path = fb_mod.firebase_get_user_path(the_uid);
-	const rf_by_path = usr_path + "/referrer_by";
-	const cand_path = rf_by_path + "/cand";
-	const confir_path = rf_by_path + "/confirmed";
+	const usr_rfr_pth = usr_path + "/referred_by";
+	const old_rfr_pth = fb_mod.firebase_bib_quest_path + 'admin_data/all_referred_by/' + the_uid;
 
-	const db_base_ref = fb_mod.md_db.ref(db);
+	if(DEBUG_UPDATE_REFERRERS){
+		console.log("upd_path=" + upd_path);
+		console.log("usr_path=" + usr_path);
+		console.log("usr_rfr_pth=" + usr_rfr_pth);
+		console.log("old_rfr_pth=" + old_rfr_pth);
+	}
+
+	let nw_cand = null;
+	let adm_rf_by = null; 
+	let adm_nw_rf_of = null; 
+	let adm_old_rf_of = null; 
+	let db_ref = null;
+	
+	db_ref = fb_mod.md_db.ref(db, usr_rfr_pth);
+	const snapshot = await fb_mod.md_db.get(db_ref);
+	if(snapshot.exists()) {
+		nw_cand = snapshot.val();
+		if((nw_cand != null) && (nw_cand.cand != null)){
+			adm_rf_by = fb_mod.firebase_bib_quest_path + 'admin_data/all_referred_by/' + the_uid + '/referred_by';
+			adm_nw_rf_of = fb_mod.firebase_bib_quest_path + 'admin_data/all_referrer_of/' + nw_cand.cand + '/referrer_of/' + the_uid;
+		} else {
+			console.error(nw_cand);
+		}
+	} else {
+		console.error("INEXISTANT PATH=" + usr_rfr_pth);
+	}
+	
+	db_ref = fb_mod.md_db.ref(db, old_rfr_pth);
+	const snapshot2 = await fb_mod.md_db.get(db_ref);
+	if(snapshot2.exists()) {
+		const old_rfr = snapshot2.val();
+		if((old_rfr != null) && (old_rfr.referred_by != null)){
+			adm_old_rf_of = fb_mod.firebase_bib_quest_path + 'admin_data/all_referrer_of/' + old_rfr.referred_by + '/referrer_of/' + the_uid;
+		} else {
+			console.error(old_rfr);
+		}
+	} else {
+		console.error("INEXISTANT PATH=" + old_rfr_pth);
+	}
+	
 	const wr_data = {};
 	wr_data[upd_path] = {};
-	
-	let rf_by = null;
-	let usr2_path = null;
-	let rf_of_path = null;
-	
-	const db_rf_by = fb_mod.md_db.ref(db, rf_by_path);
-	const snapshot = await fb_mod.md_db.get(db_rf_by);
-	if(snapshot.exists()) {
-		rf_by = snapshot.val();
-	} 
-	
-	if((rf_by != null) && (rf_by.cand != null)){
-		wr_data[cand_path] = {};
-		wr_data[confir_path] = rf_by.cand;
-		usr2_path = fb_mod.firebase_get_user_path(rf_by.confirmed);
-		rf_of_path = usr2_path + "/referrer_of/" + the_uid;
-		wr_data[rf_of_path] = 1;
-	}
-	if((rf_by != null) && (rf_by.confirmed != null)){
-		usr2_path = fb_mod.firebase_get_user_path(rf_by.confirmed);
-		rf_of_path = usr2_path + "/referrer_of/" + the_uid;
-		wr_data[rf_of_path] = {};
+	if((adm_rf_by != null) && (adm_nw_rf_of != null)){
+		wr_data[usr_rfr_pth] = {};
+		wr_data[adm_rf_by] = nw_cand.cand;
+		wr_data[adm_nw_rf_of] = 1;
+		if(adm_old_rf_of != null){
+			wr_data[adm_old_rf_of] = {};
+		}
 	}
 	
+	const db_base_ref = fb_mod.md_db.ref(db);	
 	fb_mod.md_db.update(db_base_ref, wr_data).catch((error) => { console.error(error); });	
 }
 

@@ -1,6 +1,24 @@
 
 import { gvar, } from './bq_tools.js';
 
+// http://localhost/JOSE/SiBiblia.github.io/es/module_questions.html?DELETE_CAND_REFERRER=true
+// http://localhost/JOSE/SiBiblia.github.io/es/module_questions.html?referrer=REAFsHwfknZupnUjCMjbaHoHDV13
+
+/*
+const test_ids = {
+	"user9" : "2s9VD9GYUYTAABs10uTc4ffPjIl1",
+	"user8" : "aEGcnW9mryNAZXjdlo4dKLajiZj1",
+	"user7" : "zRaEatJMbJbYMefNXjS8zTVtD5k1",
+	"user6" : "2uRMCFlCeZQ4f4OwJc2Puas8zY73",
+	"user5" : "sPh7cf5NvqTVkPZzPpWBcSH7tGc2",
+	"user4" : "REAFsHwfknZupnUjCMjbaHoHDV13",
+	"user3" : "AYIKhJkFuOXB01qAwzswq0mNdP73",
+	"user2" : "0pm1Ys62dMc1Taz1gqDRMjA23Ex2",
+	"user1" : "026iih43UqXvDQFsdFNhiTedtvB2",
+	"admin" : "N5zHMUNEmXVEebV7CrevjAgys2R2",
+};
+*/
+
 const DEBUG_REFERRER = true;
 
 const GET_var_referrer = "referrer";
@@ -40,6 +58,7 @@ export function init_loc_cand_referrer(){
 		if(delete_referrer == "true"){
 			console.log("DELETING_CAND_REFERRER");
 			window.localStorage.setItem(CAND_REFERRER, null);
+			window.localStorage.setItem(SAVED_REFERRER, null);
 		}
 	}
 	

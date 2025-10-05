@@ -155,19 +155,25 @@ async function firebase_update_user_referrer(force_it){
 	const cand = get_loc_cand_referrer();
 	const confir = get_loc_confirmed_referrer();
 	const norm = (force_it == null);
-	if(norm && (cand == null)){ return; }
-	if(norm && (confir != null)){ return; }
+	if(norm && (cand == null)){ 
+		console.error("cand == null");
+		return; 
+	}
+	if(norm && (confir != null)){ 
+		console.error("confir != null");
+		return; 
+	}
 	
-	console.log("Doing firebase_update_user_referrer.");
+	//console.log("Doing firebase_update_user_referrer.");
 	
-	if(tc_fb_app == null){ console.error("firebase_update_user_referrer. (tc_fb_app == null)");  return; }
+	if(tc_fb_app == null){ console.error("tc_fb_app == null");  return; }
 	const db = md_db.getDatabase(tc_fb_app);
 	
 	const upd_path = firebase_bib_quest_path + "to_update/referred_by/" + tc_fb_user.uid;
 	const upd_ref = md_db.ref(db, upd_path);
 	
 	const usr_path = firebase_get_user_path();
-	const referrer_path = usr_path + "/referrer_by";
+	const referrer_path = usr_path + "/referred_by";
 	const db_ref = md_db.ref(db, referrer_path);
 	
 	const wr_data = {};
@@ -175,7 +181,7 @@ async function firebase_update_user_referrer(force_it){
 	if(! snapshot.exists()) {
 		if(cand != null){
 			wr_data.cand = cand;
-			md_db.update(db_ref, wr_data).catch((error) => { console.error("firebase_update_user_referrer. " + error); });	
+			md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });	
 			md_db.set(upd_ref, 1).catch((error) => { console.error(error); });	
 		}
 		return;
@@ -192,7 +198,7 @@ async function firebase_update_user_referrer(force_it){
 	}
 	if((cand != null) && force_it){
 		wr_data.cand = cand;		
-		md_db.update(db_ref, wr_data).catch((error) => { console.error("firebase_update_user_referrer. " + error); });	
+		md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });	
 		md_db.set(upd_ref, 1).catch((error) => { console.error(error); });	
 	}
 }

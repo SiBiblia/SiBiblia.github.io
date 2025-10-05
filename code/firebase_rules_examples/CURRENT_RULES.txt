@@ -8,51 +8,6 @@
 			"ck_admin": {
 				".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 			},
-			"test_area": {
-				".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
-				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
-				"users": { 
-					"$uid": {
-						".read": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())
-									&& !(root.child('bib_quest').child('doing_stats').child(auth.uid).exists())",
-						".write": "(! data.exists()) && ($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())
-									&& !(root.child('bib_quest').child('doing_stats').child(auth.uid).exists())",
-						"finished": { 
-							".write": "newData.exists()",
-							"$module_name": {
-								".validate": "root.child('bib_quest').child('modules').child($module_name).exists()",
-								"$timeval": {
-									".validate": "newData.isNumber() && (newData.val() <= now)",
-								},
-							},
-						},
-						"write_once": { 
-							"$field": {
-							},
-						},
-						"cannot_del": { 
-							".write": "newData.exists() 
-									&& ($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())
-									&& !(root.child('bib_quest').child('doing_stats').child(auth.uid).exists())",
-							"$field": {
-							},
-						},
-						"cannot_update": { 
-							".write": "(!data.exists() || !newData.exists())
-									&& ($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())
-									&& !(root.child('bib_quest').child('doing_stats').child(auth.uid).exists())",
-							"$field": {
-							},
-						},
-						"can_del": { 
-							".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())
-									&& !(root.child('bib_quest').child('doing_stats').child(auth.uid).exists())",
-							"$field": {
-							},
-						},
-					},
-				},
-			},
 			"modules": {
 				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 				".write": "(! data.exists()) && root.child('bib_quest').child('admins').child(auth.uid).exists()",
@@ -110,6 +65,49 @@
 						".validate": "root.child('bib_quest').child('modules').child($module_name).child($observation_qid).exists()",
 						"$tot_obs_ok": {
 							".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() < 99999999999999999999)",
+						},
+					},
+				},
+			},
+			"admin_data": {
+				".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+				"in_stats": { 
+					"$uid": {
+						"$module_name": {
+							".validate": "root.child('bib_quest').child('modules').child($module_name).exists()",
+							"last_check": { 
+								".validate": "newData.isString() && (newData.val().length < 25)",
+							},
+							"num_checks": { 
+								".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() < 9999999999)",
+							},
+							"$observation_qid": {
+								".validate": "root.child('bib_quest').child('modules').child($module_name).child($observation_qid).exists()",
+								"$tot_obs_ok": {
+									".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() < 9999999999)",
+								},
+							},
+						},
+					},
+				},
+				"all_referred_by": {
+					"$referred_uid": {
+						".validate": "root.child('bib_quest').child('users').child('list').child($referred_uid).exists()",
+						"referred_by": {
+							"$referrer_uid": {
+								".validate": "root.child('bib_quest').child('users').child('list').child($referrer_uid).exists()",
+							},
+						},
+					},
+				},
+				"all_referrer_of": {
+					"$referrer_uid": {
+						".validate": "root.child('bib_quest').child('users').child('list').child($referrer_uid).exists()",
+						"referrer_of": {
+							"$referred_uid": {
+								".validate": "root.child('bib_quest').child('users').child('list').child($referred_uid).exists()",
+							},
 						},
 					},
 				},
@@ -173,7 +171,6 @@
 						},
 					},
 					"results": { 
-						".write": "! data.exists()",
 						"$module_name": {
 							".validate": "root.child('bib_quest').child('modules').child($module_name).exists()",
 							"$observation_qid": {
@@ -185,7 +182,6 @@
 						},
 					},
 					"finished": { 
-						".write": "! data.exists()",
 						"$module_name": {
 							".validate": "root.child('bib_quest').child('modules').child($module_name).exists()",
 							"$timeval": {
@@ -204,27 +200,10 @@
 							},
 						},
 					},
-					"referrer_by": {
+					"referred_by": {
 						"cand": {
 							"$cand_ref_uid": {
 								".validate": "root.child('bib_quest').child('users').child('list').child($cand_ref_uid).exists()",
-							},
-						},
-						"confirmed": {
-							".read": "!(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
-							".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
-							"$referrer_uid": {
-								".validate": "root.child('bib_quest').child('users').child('list').child($referrer_uid).exists()",
-							},
-						},
-					},
-					"referrer_of": {
-						".read": "!(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
-						".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
-						"$referred_uid": {
-							".validate": "root.child('bib_quest').child('users').child('list').child($referred_uid).exists()",
-							"$val": {
-								".validate": "newData.isNumber() && (newData.val() === 1)",
 							},
 						},
 					},
@@ -268,10 +247,6 @@
 				"$user_id": {
 					".validate": "newData.isNumber() && (newData.val() === 1)",
 				},
-			},
-			"test_data": {
-				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
-				".read": true,
 			},
 		},
 	},
