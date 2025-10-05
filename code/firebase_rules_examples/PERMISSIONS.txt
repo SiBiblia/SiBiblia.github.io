@@ -1,3 +1,13 @@
+									".validate": "newData.isString() && (newData.val().length < 25)",
+
+
+							".validate": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+
+
+					"$other": { ".validate": false,	},
+
+
+
 			"test_area": {
 				".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
@@ -43,3 +53,25 @@
 					},
 				},
 			},
+
+
+
+				"in_stats": { 
+					"$uid": {
+						"$module_name": {
+							".validate": "root.child('bib_quest').child('modules').child($module_name).exists()",
+							"last_check": { 
+								".validate": "newData.isNumber() && (newData.val() <= now)",
+							},
+							"num_checks": { 
+								".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() < 9999999999)",
+							},
+							"$observation_qid": {
+								".validate": "root.child('bib_quest').child('modules').child($module_name).child($observation_qid).exists()",
+								"$tot_obs_ok": {
+									".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() < 9999999999)",
+								},
+							},
+						},
+					},
+				},
