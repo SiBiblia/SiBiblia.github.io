@@ -7,6 +7,7 @@ import { get_bib_verse, } from './bq_bible_mgr.js';
 // ENGLISH IS THE DEFAULT LANGUAGE.
 // SO THIS FILE WORKS TOGETHER WITH '../quest_conf/bq_lang_en.js';
 
+const DEBUG_INITS = false;
 const DEBUG_REPLACE_BIBREFS = false;
 
 const INVALID_MESSAGE = "INVALID_MESSAGE";
@@ -374,6 +375,7 @@ export function init_poll_glb(polldb){
 	if(db.qmodu_state == null){ db.qmodu_state = {}; }
 	db.qmodu_state.qmonam = gvar.current_qmonam;
 	console.log("Called init_poll_glb");
+	if(DEBUG_INITS){ console.trace(); }
 }
 
 export function fill_all_strongrefs_href(){

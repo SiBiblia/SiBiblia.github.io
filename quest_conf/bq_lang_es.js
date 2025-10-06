@@ -7,6 +7,8 @@ import { init_get_msg, fill_reversed_object, bib_defaults, fill_bibrefs_href,
 
 // ===============================
 
+const DEBUG_INITS = false;
+
 const all_es_msg = {};
 const book_es_hrefs = {};
 const all_es_bibrefs = {};
@@ -456,6 +458,7 @@ function init_es_module(all_vars){
 	init_es_basic_msg();
 	
 	console.log("Called init_es_module");
+	if(DEBUG_INITS){ console.trace(); }
 	
 	init_get_msg(all_es_poll_txt);
 	init_es_bibrefs();

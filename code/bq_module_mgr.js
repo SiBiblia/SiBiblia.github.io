@@ -10,6 +10,8 @@ import { init_loc_cand_referrer,
 import { init_qmodu_info, } from '../quest_conf/bq_modules.js';
 
 const PERSISTANT_STATE = true;
+
+const DEBUG_INITS = false;
 const DEBUG_LOADER = true;
 
 const INVALID_MONAM = "INVALID_MONAM";
@@ -237,7 +239,8 @@ function get_save_name(){
 
 async function init_current_qmodu(){
 	const qmonam = get_storage_current_qmonam();
-	console.log("init_current_qmodu. qmonam = " + qmonam);
+	console.log("Called init_current_qmodu. qmonam = " + qmonam);
+	if(DEBUG_INITS){ console.trace(); }
 	await load_qmodu(qmonam, 2);
 	fill_div_user();
 }

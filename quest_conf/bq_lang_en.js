@@ -8,6 +8,7 @@ import { init_get_msg, fill_reversed_object, bib_defaults, fill_bibrefs_href,
 // ENGLISH IS THE DEFAULT LANGUAGE.
 // SO THIS FILE WORKS TOGETHER WITH '../code/bq_tools.js';
 
+const DEBUG_INITS = false;
 
 const all_en_msg = {};
 const book_en_hrefs = {};
@@ -457,6 +458,7 @@ export function init_en_module(all_vars){
 	init_en_basic_msg();
 	
 	console.log("Called init_en_module");
+	if(DEBUG_INITS){ console.trace(); }
 
 	init_get_msg(all_en_poll_txt);
 	init_en_bibrefs();

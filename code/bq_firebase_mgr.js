@@ -27,7 +27,8 @@ import * as MOD_AUTH from "https://www.gstatic.com/firebasejs/11.1.0/firebase-au
 import * as MOD_DB from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
 const DEBUG_FB_LOGIN = false;
-const DEBUG_FB_CHECK = false;
+const DEBUG_FB_CHECK1 = false;
+const DEBUG_FB_CHECK2 = true;
 const DEBUG_FB_ADMIN = true;
 const DEBUG_FB_finished_qmodu = false;
 
@@ -256,14 +257,14 @@ export async function firebase_check_user(callbk){
 		const db = md_db.getDatabase(tc_fb_app);
 		if(db == null){ return; }
 		
-		if(DEBUG_FB_CHECK){
+		if(DEBUG_FB_CHECK1){
 			const cn_ref = md_db.ref(db, ".info/connected");
 			if(cn_ref == null){ return; }
 			md_db.onValue(cn_ref, (snap) => {
 				if (snap.val() === true) {
-					console.log("WAS CONNECTED TO FIREBASE !!!");				
+					console.error("WAS CONNECTED TO FIREBASE !!!");				
 				} else {
-					console.log("WAS NOT connected to firebase !!!");
+					console.error("WAS NOT connected to firebase !!!");
 				}
 			});
 		}
@@ -271,9 +272,15 @@ export async function firebase_check_user(callbk){
 		md_auth.onAuthStateChanged(tc_fb_auth, (user) => {
 			if (user) {
 				tc_fb_user = user;
+				
+				if(DEBUG_FB_CHECK2){
+					console.log("GOT USER");
+					console.trace();
+					//console.log(tc_fb_user);
+				}
 				// User is signed in, see docs for a list of available properties
 				// https://firebase.google.com/docs/reference/js/auth.user
-				if(DEBUG_FB_CHECK){
+				if(DEBUG_FB_CHECK1){
 					console.log('User_id=' + tc_fb_user.uid);
 					console.log('User_name=' + tc_fb_user.displayName);
 					console.log("User_email=" + tc_fb_user.email);
@@ -287,13 +294,16 @@ export async function firebase_check_user(callbk){
 				firebase_get_user_finished_qmodules();
 				if(callbk != null){ callbk(tc_fb_user); }
 			} else {
+				if(DEBUG_FB_CHECK2){
+					console.log("NO USER YET !!!");
+					console.trace();
+				}
 				tc_fb_user = null;
-				if(DEBUG_FB_CHECK){ console.log("User is signed out"); }
+				if(DEBUG_FB_CHECK1){ console.log("User is signed out"); }
 				if(callbk != null){ callbk(tc_fb_user); }
 			}
 		});			
 	} catch(error){
-		console.error("ERROR in firebase_check_user.");
 		console.error(error);
 		tc_fb_user = null;
 		if(callbk != null){ callbk(tc_fb_user); }

@@ -29,6 +29,7 @@ const NO_MORE_QUEST_COND = "NO_QUESTIONS_LEFT";
 const ___final_observation_html = "___final_observation_html";
 const ___final_observation_name = "___final_observation_name";
 
+const DEBUG_INITS = false;
 const DEBUG_QNUMS = true;
 const DEBUG_PENDING = false;
 const DEBUG_POP_MENU = false;
@@ -1400,6 +1401,7 @@ function reset_page(){
 
 export function init_page_exam(){
 	console.log("Called init_page_exam");
+	if(DEBUG_INITS){ console.trace(); }
 
 	reset_page();
 	update_qmodu_title("Loading");
@@ -2343,7 +2345,8 @@ function set_observations_score_weight(num_wei, sum_wei, all_obs){
 }
 
 function init_DAG_func(){
-	console.log("init_DAG_func.CALLED.");
+	console.log("Called init_DAG_func");
+	if(DEBUG_INITS){ console.trace(); }
 	init_all_context();
 
 	const db = gvar.glb_poll_db;
