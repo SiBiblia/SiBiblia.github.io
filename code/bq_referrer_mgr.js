@@ -1,5 +1,5 @@
 
-import { gvar, } from './bq_tools.js';
+import { gvar, find_GET_parameter, } from './bq_tools.js';
 
 // http://localhost/JOSE/SiBiblia.github.io/es/module_questions.html?DELETE_CAND_REFERRER=true
 // http://localhost/JOSE/SiBiblia.github.io/es/module_questions.html?referrer=REAFsHwfknZupnUjCMjbaHoHDV13
@@ -27,25 +27,16 @@ const GET_var_delete_cand_referrer = "DELETE_CAND_REFERRER";
 const CAND_REFERRER = "candidate_referref";
 const SAVED_REFERRER = "saved_referref";
 
+export function is_null_storage(the_val){
+	return ((the_val == null) || (the_val == "null")); // CAREFUL TRICKY FIRST CONDITION. CAN BE A STRING !!!
+}
+
 export function get_user_href(the_usr){
 	//const qr_href = window.location.href + "?" + GET_var_referrer + "=" + the_usr.uid;
 	//const loc = window.location;
 	const loc = document.location;
 	const qr_href = loc.origin + loc.pathname + "?" + GET_var_referrer + "=" + the_usr.uid;
 	return qr_href;
-}
-
-function find_GET_parameter(prm_nm) {
-	let result = null,
-	tmp = [];
-	location.search
-		.substr(1)
-		.split("&")
-		.forEach(function (item) {
-			tmp = item.split("=");
-			if(tmp[0] === prm_nm){ result = decodeURIComponent(tmp[1]); }
-		});
-	return result;
 }
 
 export function init_loc_cand_referrer(){
@@ -63,7 +54,8 @@ export function init_loc_cand_referrer(){
 	}
 	
 	const rf1 = window.localStorage.getItem(CAND_REFERRER);
-	if((rf1 == "null") && (pm_rf != null)){  // CAREFUL TRICKY FIRST CONDITION. IT IS A STRING !!!
+	if(DEBUG_REFERRER && ! is_null_storage(rf1)){ console.log("HAS_CAND_REFERRER=" + rf1); }
+	if(is_null_storage(rf1) && (pm_rf != null)){  // CAREFUL TRICKY FIRST CONDITION. IT IS A STRING !!!
 		if(DEBUG_REFERRER){ console.log("SETTING_CAND_REFERRER=" + pm_rf); }
 		set_loc_cand_referrer(pm_rf);
 	}
@@ -79,7 +71,7 @@ export function set_loc_confirmed_referrer(val){
 
 export function get_loc_cand_referrer(){
 	const rf1 = window.localStorage.getItem(CAND_REFERRER);
-	if(rf1 == "null"){  // CAREFUL TRICKY FIRST CONDITION. IT IS A STRING !!!
+	if(is_null_storage(rf1)){ 
 		return null;
 	}
 	return rf1;
@@ -87,7 +79,7 @@ export function get_loc_cand_referrer(){
 
 export function get_loc_confirmed_referrer(){
 	const rf1 = window.localStorage.getItem(SAVED_REFERRER);
-	if(rf1 == "null"){  // CAREFUL TRICKY FIRST CONDITION. IT IS A STRING !!!
+	if(is_null_storage(rf1)){  
 		return null;
 	}
 	return rf1;

@@ -20,6 +20,26 @@ export let gvar = {};
 
 export const abbr2num = {};
 
+export function find_GET_parameter(prm_nm) {
+	let result = null,
+	tmp = [];
+	location.search
+		.substr(1)
+		.split("&")
+		.forEach(function (item) {
+			tmp = item.split("=");
+			if(tmp[0] === prm_nm){ result = decodeURIComponent(tmp[1]); }
+		});
+	return result;
+}
+
+export function clear_local_storage(){
+	console.log("CLEARING_LOCAL_STORAGE !!!!");
+	console.log("CLEARING_LOCAL_STORAGE !!!!");
+	console.log("CLEARING_LOCAL_STORAGE !!!!");
+	window.localStorage.clear();
+}
+
 export function fill_reversed_object(orig, reverse){
 	for (const [key, value] of Object.entries(orig)) {
 		reverse[value] = key;

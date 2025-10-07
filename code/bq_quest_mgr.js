@@ -5,7 +5,7 @@ import { get_new_dv_under, scroll_to_top, toggle_select_option,
 import { get_msg, make_bible_ref, make_strong_ref, bib_defaults, refs_ids, bib_obj_to_txt, get_verse_cit_txt, bib_obj_to_cit_obj, 
 	gvar, 
 	get_qid_base, get_verse_match, get_answer_key, set_anchors_target, get_date_and_time, 
-	is_observation, qid_to_qhref, set_bibrefs, make_bibref, bibref_to_bibcit, get_bibcit_obs_stm_id, 
+	is_observation, qid_to_qhref, set_bibrefs, make_bibref, bibref_to_bibcit, get_bibcit_obs_stm_id, clear_local_storage, 
 } from './bq_tools.js';
 
 import { get_user_href, 
@@ -3079,6 +3079,9 @@ function update_observation(qid, all_to_act){
 export async function user_logout(){
 	close_pop_menu();
 	if(fb_mod != null){
+		if(DEBUG_SHOW_TEST_USERS){
+			clear_local_storage();
+		}
 		await fb_mod.firebase_sign_out();
 		fill_div_user();
 	}

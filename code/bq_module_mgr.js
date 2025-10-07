@@ -1,5 +1,5 @@
 
-import { gvar, init_glb_vars, get_qid_base, init_default_lang, } from './bq_tools.js';
+import { gvar, init_glb_vars, get_qid_base, init_default_lang, find_GET_parameter, clear_local_storage, } from './bq_tools.js';
 import { init_page_buttons, init_firebase_mgr, fb_mod, fill_div_user, init_page_exam, start_qmodu, update_qmodu_title, add_last_module_ending, 
 	write_exam_object, read_exam_object, 
 } from './bq_quest_mgr.js';
@@ -12,10 +12,13 @@ import { init_qmodu_info, } from '../quest_conf/bq_modules.js';
 const PERSISTANT_STATE = true;
 
 const DEBUG_INITS = false;
+const DEBUG_CLEAR_STORAGE = true;
 const DEBUG_LOADER = true;
 
 const INVALID_MONAM = "INVALID_MONAM";
 const INVALID_TITLE = "INVALID_TITLE";
+
+const GET_var_clear_local_storage = "CLEAR_LOCAL_STORAGE";
 
 let site_lang = "en";
 let local_conf_qmodus = null;
@@ -24,6 +27,17 @@ let bq_st_user_finished_qmodules = null;
 const STORAGE_FINI_QMODUS_ID = "STORAGE_FINI_QMODUS_ID";
 const STORAGE_CURRENT_QMONAM = "STORAGE_CURRENT_QMONAM";
 const FINISHED_QMONAM = "FINISHED_QMONAM";
+
+function check_param_clear_loc_storage(){
+	if(! DEBUG_CLEAR_STORAGE){
+		return;
+	}
+		
+	const clear_stg = find_GET_parameter(GET_var_clear_local_storage);
+	if(clear_stg == "true"){
+		clear_local_storage();
+	}
+}
 
 function read_storage_fini_qmodus(){
 	let all_fini_str = window.localStorage.getItem(STORAGE_FINI_QMODUS_ID);
@@ -248,10 +262,15 @@ async function init_current_qmodu(){
 export async function start_module_mgr(lang_md, curr_lang){	
 	md_lang = lang_md;
 	site_lang = curr_lang;
+		
 	if(PERSISTANT_STATE){ window.addEventListener('beforeunload', save_current_qmodu_hdlr); }
+
+	check_param_clear_loc_storage();
+
 	init_page_buttons();
 	init_conf_qmodus();
 	init_loc_cand_referrer();
+	
 	try {
 		await init_firebase_mgr();
 		await init_current_qmodu();

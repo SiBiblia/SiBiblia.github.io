@@ -28,7 +28,7 @@ import * as MOD_DB from "https://www.gstatic.com/firebasejs/11.1.0/firebase-data
 
 const DEBUG_FB_LOGIN = false;
 const DEBUG_FB_CHECK1 = false;
-const DEBUG_FB_CHECK2 = true;
+const DEBUG_FB_CHECK2 = false;
 const DEBUG_FB_ADMIN = true;
 const DEBUG_FB_finished_qmodu = false;
 
@@ -53,6 +53,7 @@ export const firebase_bib_quest_path = 'bib_quest/';
 export const firebase_users_path = firebase_bib_quest_path + 'users/';
 export const firebase_users_list_path = firebase_users_path + 'list/';
 export const firebase_ck_admin_path = firebase_bib_quest_path + 'ck_admin/';
+export const firebase_current_cicle_path = firebase_bib_quest_path + 'current_cicle/';
 
 //let analytics = getAnalytics(tc_fb_app);
 export let tc_fb_app = null;
@@ -60,6 +61,7 @@ export let tc_fb_auth = null;
 //export let tc_fb_test_auth = null;
 export let tc_fb_user = null;
 export let tc_fb_is_admin = false;
+export let tc_fb_current_cicle = null;
 export let bq_fb_user_finished_qmodules = null;
 
 
@@ -330,8 +332,27 @@ function firebase_user_ck_is_admin(){
 		if(DEBUG_FB_ADMIN){ if(tc_fb_is_admin){ console.log("IT IS ADMIN"); } else { console.log("NOT ADMIN"); } }
 	}).catch((error) => {
 		tc_fb_is_admin = false;
-		console.error(error);
-		if(DEBUG_FB_ADMIN){ console.log("NOT ADMIN (get failed)"); }
+		if(DEBUG_FB_ADMIN){ 
+			console.error(error);
+			console.log("NOT ADMIN (get failed)"); 			
+		}
+	});
+}
+
+function firebase_read_current_cicle(){ 
+	init_mod_vars();
+	if(tc_fb_app == null){ console.log("firebase_inc_user_num_checks. tc_fb_app is NULL!!"); return; }
+	if(tc_fb_user == null){ console.log("firebase_inc_user_num_checks. tc_fb_user is NULL!!"); return; }
+	const fb_database = md_db.getDatabase(tc_fb_app);
+	const db_ref = md_db.ref(fb_database, firebase_current_cicle_path);
+	
+	tc_fb_current_cicle = null;
+	md_db.onValue(db_ref, (snapshot) => {
+		if (snapshot.exists()) {
+			const num = snapshot.val();
+			tc_fb_current_cicle = num;
+			console.log("CURRENT_CICLE=" + tc_fb_current_cicle);
+		}
 	});
 }
 
@@ -365,6 +386,7 @@ function firebase_write_user_id(){
 	init_mod_vars();
 	firebase_user_ck_is_admin();
 	firebase_write_user_id_in_list();
+	firebase_read_current_cicle();
 	
 	if(tc_fb_app == null){ console.log("firebase_write_user_id. tc_fb_app is NULL!!"); return; }
 	if(tc_fb_user == null){ console.log("firebase_write_user_id. tc_fb_user is NULL!!"); return; }
@@ -424,7 +446,7 @@ export async function firebase_sign_out(){
 
 export function firebase_email_login(num_test_user){
 	if(DEBUG_FB_LOGIN){ 
-		console.log("firebase_email_login. CALLED. "); 
+		console.log("Called firebase_email_login."); 
 	}
 	init_mod_vars();
 	if(tc_fb_user != null){
