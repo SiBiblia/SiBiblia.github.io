@@ -1,3 +1,6 @@
+(! data.exists()) && 
+
+
 									".validate": "newData.isString() && (newData.val().length < 25)",
 
 

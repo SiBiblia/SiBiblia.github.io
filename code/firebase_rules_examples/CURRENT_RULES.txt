@@ -26,7 +26,7 @@
 			},
 			"modules": {
 				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
-				".write": "(! data.exists()) && root.child('bib_quest').child('admins').child(auth.uid).exists()",
+				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 				"$module_name": {
 					"$observation_qid": {
 						"$val": {
@@ -52,13 +52,13 @@
 					},
 					"num_checks": { 
 						".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() < 99999999999999999999) &&
-								((! data.exists() && (newData.val() === 1)) || (newData.val() === (data.val() + 1)))",
+								((newData.val() === 1) || (newData.val() === (data.val() + 1)))",
 					},
 					"$observation_qid": {
 						".validate": "root.child('bib_quest').child('modules').child($module_name).child($observation_qid).exists()",
 						"$tot_obs_ok": {
 							".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() < 99999999999999999999) && 
-									((! data.exists() && (newData.val() === 1)) || (newData.val() === (data.val() + 1)))",
+									((newData.val() === 1) || (newData.val() === (data.val() + 1)))",
 						},
 					},
 				},

@@ -2118,11 +2118,11 @@ export function get_to_update_module_user_path(){
 	return path;
 }
 
-function write_fb_qmodu_presults(obj, dt){
-	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_fb_qmodu_presults. CALLED. "); }
+function write_fb_qmodu_pub_results(obj, dt){
+	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_fb_qmodu_pub_results. CALLED. "); }
 	if(fb_mod == null){ console.error("fb_mod == null"); return; }
 	
-	if(fb_mod.tc_fb_app == null){ console.error("write_fb_qmodu_presults. fb_mod.tc_fb_app == null. "); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null. "); return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	
 	const module_pth = gvar.current_qmonam;
@@ -2131,7 +2131,7 @@ function write_fb_qmodu_presults(obj, dt){
 	on_stats_change_show_results(suf_id_results, "PSTATS", module_pth, obj);
 	
 	if(in_fb_Pstat()){ 
-		console.log("write_fb_qmodu_presults. ALREADY in Pstat. "); 
+		console.error("ALREADY in Pstat."); 
 		return;
 	}
 	
@@ -2146,14 +2146,19 @@ function write_fb_qmodu_presults(obj, dt){
 	wr_data[module_pth + '/' + 'last_check'] = dt;
 	wr_data[module_pth + '/' + 'num_checks'] = fb_mod.md_db.increment(1);
 
-	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_fb_qmodu_presults. full_data=" + JSON.stringify(wr_data, null, "  ")); }
+	const pstats_path = fb_mod.firebase_bib_quest_path + "pstats/";
+	
+	if(DEBUG_FB_WRITE_RESULTS){ 
+		console.log("write_fb_qmodu_pub_results. full_data=" + JSON.stringify(wr_data, null, "  ")); 
+		console.log("path=" + pstats_path);
+		//console.trace(); 
+	}
 	
 	set_fb_Pstat();
 	
-	const pstats_path = fb_mod.firebase_bib_quest_path + "pstats/";
 	const db_pref = fb_mod.md_db.ref(fb_database, pstats_path);
 	fb_mod.md_db.update(db_pref, wr_data).catch((error) => { 
-		console.error("write_fb_qmodu_presults." + error); 
+		console.error(error); 
 		reset_fb_Pstat();
 	});	
 }
@@ -2191,11 +2196,16 @@ function write_fb_qmodu_results(obj, dt){
 	wr_data[module_pth + '/' + 'last_check'] = dt;
 	wr_data[module_pth + '/' + 'num_checks'] = fb_mod.md_db.increment(1);
 	
-	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_fb_qmodu_results. full_data=" + JSON.stringify(wr_data, null, "  ")); }
+	const usr_path = fb_mod.firebase_get_user_path();
+	
+	if(DEBUG_FB_WRITE_RESULTS){ 
+		console.log("write_fb_qmodu_results. full_data=" + JSON.stringify(wr_data, null, "  ")); 
+		console.log("path=" + usr_path); 
+		//console.trace(); 		
+	}
 
 	set_fb_Ustat();
 	
-	const usr_path = fb_mod.firebase_get_user_path();
 	db_ref = fb_mod.md_db.ref(fb_database, usr_path);
 	fb_mod.md_db.update(db_ref, wr_data).catch((error) => { 
 		console.error(error); 
@@ -2241,7 +2251,7 @@ function write_firebase_qmodu_results(force_wr){
 		return resp;
 	}	
 	
-	write_fb_qmodu_presults(resp.wr_o, dt);
+	write_fb_qmodu_pub_results(resp.wr_o, dt);
 	resp.has_usr = (fb_mod.tc_fb_user != null);
 	if(resp.has_usr){
 		write_fb_qmodu_results(resp.wr_o, dt);
@@ -2370,8 +2380,9 @@ function init_DAG_func(){
 	
 	if(db.FINAL_OBSERVATION__ == null){
 		db.FINAL_OBSERVATION__ = get_final_obs();
-		all_obs.FINAL_OBSERVATION__	= 0;
-		
+	}
+	if(all_obs.FINAL_OBSERVATION__ == null){
+		all_obs.FINAL_OBSERVATION__	= 0;		
 	}
 	
 	set_observations_score_weight(num_wei, sum_wei, all_obs);
