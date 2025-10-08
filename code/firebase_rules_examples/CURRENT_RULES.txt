@@ -95,9 +95,7 @@
 							"$referrer_uid": {
 								".validate": "root.child('bib_quest').child('users').child('list').child($referrer_uid).exists()",
 								"cicle_added": {
-									"$cicle_added": {
-										".validate": "root.child('bib_quest').child('current_cicle').val() === $cicle_added",
-									},
+									".validate": "newData.val() === root.child('bib_quest').child('current_cicle').val()",
 								},
 							},
 						},
@@ -110,13 +108,30 @@
 							"$referred_uid": {
 								".validate": "root.child('bib_quest').child('users').child('list').child($referred_uid).exists()",
 								"cicle_added": {
-									"$cicle_added": {
-										".validate": "root.child('bib_quest').child('current_cicle').val() === $cicle_added",
-									},
+									".validate": "newData.val() === root.child('bib_quest').child('current_cicle').val()",
 								},
 							},
 						},
 					},
+				},
+				"all_qmodule_scores": {
+					"$uid": {
+						".validate": "root.child('bib_quest').child('users').child('list').child($uid).exists()",
+						".indexOn": ["cicle_added", "score"],
+						"$module_name": {							
+							".validate": "root.child('bib_quest').child('modules').child($module_name).exists()",
+							"$other": { ".validate": false,	},
+							"ts_reported": { 
+								".validate": "newData.isNumber() && (newData.val() <= now)",
+							},
+							"score": { 
+								".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() <= 1)",
+							},
+							"cicle_added": {
+								".validate": "newData.val() === root.child('bib_quest').child('current_cicle').val()",
+							},
+						},
+					},						
 				},
 			},
 			"users": {

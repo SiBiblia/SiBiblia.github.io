@@ -311,7 +311,8 @@ async function update_qmodule_stats(qmonam){
 			
 			for(const the_uid of all_uid){
 				await update_user_qmodule_stats(fb_database, the_uid, qmonam);
-				await remove_to_update_user_in_qmod(fb_database, the_uid, qmonam);
+				await update_user_qmodule_score(fb_database, the_uid, qmonam);
+				//await remove_to_update_user_in_qmod(fb_database, the_uid, qmonam);
 			}
 		} else {
 			console.log("update_qmodule_stats. No user list for " + ref_path);
@@ -1089,13 +1090,6 @@ function set_user_in_stats(nw_val){
 	}
 }
 
-function get_user_qmod_results_path(the_uid, qmonam){
-	if(fb_mod == null){ return ""; }
-	if(qmonam == null){ return ""; }
-	const path = fb_mod.firebase_users_path + the_uid + '/results/' + qmonam + "/";
-	return path;
-}
-
 async function read_user_qmod_results(fb_database, the_uid, qmonam){
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(DEBUG_UPDATE_SCORES){ console.log("read_user_qmod_results. Updating user " + the_uid + " | qmonam " + qmonam); }
@@ -1103,7 +1097,7 @@ async function read_user_qmod_results(fb_database, the_uid, qmonam){
 	let db_ref = null;
 	let obj = null;
 	
-	const results_pth = get_user_qmod_results_path(the_uid, qmonam);
+	const results_pth = fb_mod.firebase_users_path + the_uid + '/results/' + qmonam + "/";
 	db_ref = fb_mod.md_db.ref(fb_database, results_pth);
 	
 	const snapshot = await fb_mod.md_db.get(db_ref);
@@ -1111,7 +1105,10 @@ async function read_user_qmod_results(fb_database, the_uid, qmonam){
 	let usr_resul = null;
 	if (snapshot.exists()) {
 		usr_resul = snapshot.val();
+	} else {
+		console.error("! snapshot.exists()");
 	}
+	
 	return usr_resul;
 }
 
@@ -1151,21 +1148,69 @@ async function get_qmodule_score_weights(fb_database, qmonam){
 	let qmod_scow = null;
 	if (snapshot.exists()) {
 		qmod_scow = snapshot.val();
+	} else {
+		console.error("! snapshot.exists()");
 	}
 	
 	gvar.all_qmod_weights[qmonam] = qmod_scow;
 	return qmod_scow;
 }
 
+function calc_user_qmodule_score(qmod_scow, usr_resul){
+	let bad_score = 0;
+	
+	const all_qids = Object.keys(usr_resul);
+	for(const qid of all_qids){
+		if(qmod_scow[qid] == null){
+			console.error("qmod_scow[qid] == null");
+			continue;
+		}
+		const qid_scow = qmod_scow[qid];
+		bad_score += qid_scow;
+	}
+	
+	let score = (1 - bad_score);
+	if(score < 0){ score = 0; }
+	if(score > 1){ score = 1; }
+	
+	return score;
+}
+
 async function update_user_qmodule_score(fb_database, the_uid, qmonam){
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	if(DEBUG_UPDATE_SCORES){ console.log("update_user_qmodule_score. user_id=" + the_uid + " | qmonam " + qmonam); }
 	
-	let qmod_scow = await get_qmodule_score_weights(fb_database, qmonam);
-	let usr_resul = await read_user_qmod_results(fb_database, the_uid, qmonam);
+	const curr_ci = fb_mod.tc_fb_current_cicle;
+	let qmod_scow = null;
+	let usr_resul = null;
 	
-	//let usr_qmod_scores
+	try {
+		qmod_scow = await get_qmodule_score_weights(fb_database, qmonam);
+		usr_resul = await read_user_qmod_results(fb_database, the_uid, qmonam);
+	} catch (error){
+		console.error(error); 
+		return;
+	}
 	
+	let usr_score = calc_user_qmodule_score(qmod_scow, usr_resul.observ);
+	
+	const score_pth = fb_mod.firebase_bib_quest_path + 'score_data/all_qmodule_scores/' + the_uid + '/' + qmonam + '/';
+
+	const wr_data = {};
+	wr_data[score_pth] = {
+		ts_reported : usr_resul.ts_reported,
+		cicle_added : curr_ci,
+		score: usr_score,
+	};
+
+	const to_upd_pth = fb_mod.firebase_bib_quest_path + 'to_update/' + qmonam + '/' + the_uid;
+	wr_data[to_upd_pth] = {};
+
+	if(DEBUG_UPDATE_SCORES){ console.log("update_user_qmodule_score. wr_data=" + JSON.stringify(wr_data, null, " ")); }
+	
+	const db_base_ref = fb_mod.md_db.ref(fb_database);
+	fb_mod.md_db.update(db_base_ref, wr_data).catch((error) => { console.error(error); });	
 };
 
 

@@ -2111,13 +2111,6 @@ function calc_exam_results_object(){
 	return all_obs;
 }
 
-export function get_to_update_module_user_path(){
-	if(fb_mod == null){ console.error("fb_mod == null"); return ""; }
-	if(gvar.current_qmonam == null){ return ""; }
-	const path = fb_mod.firebase_bib_quest_path + "to_update/" + gvar.current_qmonam + "/" + fb_mod.tc_fb_user.uid;
-	return path;
-}
-
 function write_fb_qmodu_pub_results(obj, dt){
 	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_fb_qmodu_pub_results. CALLED. "); }
 	if(fb_mod == null){ console.error("fb_mod == null"); return; }
@@ -2170,7 +2163,10 @@ function write_fb_qmodu_results(obj, dt){
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null. "); return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	
-	const module_pth = 'stats/to_add/' + gvar.current_qmonam;
+	const usr_path = fb_mod.firebase_get_user_path();  // has NO slash at the end
+	const module_pth = usr_path + '/stats/to_add/' + gvar.current_qmonam;
+	const results_pth = usr_path + '/results/' + gvar.current_qmonam;
+	const usr_qmod_up_path = fb_mod.firebase_bib_quest_path + "to_update/" + gvar.current_qmonam + "/" + fb_mod.tc_fb_user.uid;
 	
 	const suf_id_results = gvar.current_qmonam + SUF_ID_USTATS_RESULTS;
 	on_stats_change_show_results(suf_id_results, "USTATS", module_pth, obj);
@@ -2183,11 +2179,8 @@ function write_fb_qmodu_results(obj, dt){
 	let db_ref = null;	
 	const wr_data = {};
 	
-	const results_module_pth = 'results/' + gvar.current_qmonam + '/observ/';
-	wr_data[results_module_pth] = obj;
-
-	const finished_module_pth = 'results/' + gvar.current_qmonam + '/ts_reported/';
-	wr_data[finished_module_pth] = fb_mod.md_db.serverTimestamp();
+	wr_data[results_pth + '/observ/'] = obj;
+	wr_data[results_pth + '/ts_reported/'] = fb_mod.md_db.serverTimestamp();	
 	
 	const all_qids = Object.keys(obj);
 	for(const qid of all_qids){
@@ -2196,26 +2189,19 @@ function write_fb_qmodu_results(obj, dt){
 	wr_data[module_pth + '/' + 'last_check'] = dt;
 	wr_data[module_pth + '/' + 'num_checks'] = fb_mod.md_db.increment(1);
 	
-	const usr_path = fb_mod.firebase_get_user_path();
+	wr_data[usr_qmod_up_path] = 1;
 	
 	if(DEBUG_FB_WRITE_RESULTS){ 
 		console.log("write_fb_qmodu_results. full_data=" + JSON.stringify(wr_data, null, "  ")); 
-		console.log("path=" + usr_path); 
-		//console.trace(); 		
 	}
 
 	set_fb_Ustat();
 	
-	db_ref = fb_mod.md_db.ref(fb_database, usr_path);
+	db_ref = fb_mod.md_db.ref(fb_database);
 	fb_mod.md_db.update(db_ref, wr_data).catch((error) => { 
 		console.error(error); 
 		reset_fb_Ustat();
-	});
-	
-	const path_flag = get_to_update_module_user_path();
-	db_ref = fb_mod.md_db.ref(fb_database, path_flag);
-	fb_mod.md_db.set(db_ref, 1).catch((error) => { console.error(error); });
-	
+	});	
 }
 
 function write_firebase_qmodu_results(force_wr){
