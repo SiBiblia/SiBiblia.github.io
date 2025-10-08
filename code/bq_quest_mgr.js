@@ -2183,10 +2183,10 @@ function write_fb_qmodu_results(obj, dt){
 	let db_ref = null;	
 	const wr_data = {};
 	
-	const results_module_pth = 'results/' + gvar.current_qmonam;
+	const results_module_pth = 'results/' + gvar.current_qmonam + '/observ/';
 	wr_data[results_module_pth] = obj;
 
-	const finished_module_pth = 'finished/' + gvar.current_qmonam;
+	const finished_module_pth = 'results/' + gvar.current_qmonam + '/ts_reported/';
 	wr_data[finished_module_pth] = fb_mod.md_db.serverTimestamp();
 	
 	const all_qids = Object.keys(obj);

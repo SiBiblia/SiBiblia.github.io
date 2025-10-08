@@ -1108,8 +1108,8 @@ async function update_user_module_results(fb_database, the_uid, qmonam){
 	const snapshot = await fb_mod.md_db.get(db_ref);
 
 	if (snapshot.exists()) {
-		const all_obs = snapshot.val();
-		await update_user_module_score(fb_database, the_uid, qmonam, all_obs);
+		const resul_obj = snapshot.val();
+		await update_user_module_score(fb_database, the_uid, qmonam, resul_obj);
 	}	
 }
 
@@ -1123,7 +1123,7 @@ async function remove_to_update_user_in_module(fb_database, the_uid, qmonam){
 	console.log("remove_to_update_user_in_module. DELETING path=" + to_upd_pth);
 }
 
-async function update_user_module_score(fb_database, the_uid, qmonam, all_obs){
+async function update_user_module_score(fb_database, the_uid, qmonam, resul_obj){
 	
 };
 
