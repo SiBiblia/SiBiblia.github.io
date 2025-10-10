@@ -43,6 +43,7 @@ const DEBUG_SHOW_RESULTS = true;
 const DEBUG_SHOW_TEST_USERS = true;
 const DEBUG_OBSERV_SCORE = false;
 const DEBUG_SCROLL = false;
+const DEBUG_UPDATE_SCORES = false;
 
 const MIN_ANSW_SHOW_INVERT = 3;
 
@@ -2156,24 +2157,83 @@ function write_fb_qmodu_pub_stats(obj, dt){
 	});	
 }
 
+export async function get_qmodule_score_weights(fb_database, qmonam){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(DEBUG_UPDATE_SCORES){ console.log("get_qmodule_score_weights." + " qmonam " + qmonam); }
+
+	if(gvar.all_qmod_weights == null){ gvar.all_qmod_weights = {}; }
+	if(gvar.all_qmod_weights[qmonam] != null){ 
+		return gvar.all_qmod_weights[qmonam];
+	}
+	
+	let db_ref = null;
+	let obj = null;
+	
+	const qmonam_pth = fb_mod.firebase_bib_quest_path + 'modules/' + qmonam + '/';
+	db_ref = fb_mod.md_db.ref(fb_database, qmonam_pth);
+	
+	const snapshot = await fb_mod.md_db.get(db_ref);
+
+	let qmod_scow = null;
+	if (snapshot.exists()) {
+		qmod_scow = snapshot.val();
+	} else {
+		console.error("! snapshot.exists()");
+	}
+	
+	gvar.all_qmod_weights[qmonam] = qmod_scow;
+	return qmod_scow;
+}
+
+export function calc_user_qmodule_score(qmod_scow, usr_resul){
+	let bad_score = 0;
+	
+	const all_qids = Object.keys(usr_resul);
+	for(const qid of all_qids){
+		if(qmod_scow[qid] == null){
+			console.error("qmod_scow[qid] == null");
+			continue;
+		}
+		const qid_scow = qmod_scow[qid];
+		bad_score += qid_scow;
+	}
+	
+	let score = (1 - bad_score);
+	if(score < 0){ score = 0; }
+	if(score > 1){ score = 1; }
+	
+	return score;
+}
+
 function write_fb_user_qmodu_results(obj){
 	if(fb_mod == null){ console.error("fb_mod == null"); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null. "); return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 
+	const curr_ci = fb_mod.tc_fb_current_cicle;
+	const qmonam = gvar.current_qmonam;
 	const usr_path = fb_mod.firebase_get_user_path();  // has NO slash at the end
-	const results_pth = usr_path + '/results/' + gvar.current_qmonam;
-	const usr_qmod_up_path = fb_mod.firebase_bib_quest_path + "to_update/results/" + gvar.current_qmonam + "/" + fb_mod.tc_fb_user.uid;
-	const wr_data = {};
+	const results_pth = usr_path + '/results/' + qmonam;
+	const usr_qmod_up_path = fb_mod.firebase_bib_quest_path + "to_update/results/" + qmonam + "/" + fb_mod.tc_fb_user.uid;
 	
-	wr_data[results_pth + '/observ/'] = obj;
-	wr_data[results_pth + '/ts_reported/'] = fb_mod.md_db.serverTimestamp();
-	wr_data[usr_qmod_up_path] = 1;
+	get_qmodule_score_weights(fb_database, qmonam).then((qmod_scow) => {
+		if(DEBUG_UPDATE_SCORES){ console.log("get_qmodule_score_weights." + " qmonam " + qmonam + " weights=" + JSON.stringify(qmod_scow)); }
+		const usr_score = calc_user_qmodule_score(qmod_scow, obj);
+		
+		const wr_data = {};
+		
+		wr_data[results_pth + '/observ/'] = obj;
+		wr_data[results_pth + '/ts_reported/'] = fb_mod.md_db.serverTimestamp();
+		wr_data[results_pth + '/score/'] = usr_score;
+		wr_data[results_pth + '/cicle_added/'] = curr_ci;
+		
+		wr_data[usr_qmod_up_path] = 1;
 
-	const db_ref = fb_mod.md_db.ref(fb_database);
-	fb_mod.md_db.update(db_ref, wr_data).catch((error) => { 
-		console.error(error); 
-	});	
+		const db_ref = fb_mod.md_db.ref(fb_database);
+		fb_mod.md_db.update(db_ref, wr_data).catch((error) => { 
+			console.error(error); 
+		});	
+	});
 }
 
 function write_fb_user_qmodu_stats(obj, dt){

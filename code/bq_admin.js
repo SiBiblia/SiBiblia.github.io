@@ -6,7 +6,8 @@ import { gvar, get_qid_base, bib_defaults, is_observation, get_date_and_time, cl
 } from './bq_tools.js';
 
 import { start_qmodu, 
-	fb_mod, close_pop_menu, id_pop_menu_sele, toggle_verse_ed, get_default_verse_obj, get_bibref_in, user_logout, 
+	fb_mod, close_pop_menu, id_pop_menu_sele, toggle_verse_ed, get_default_verse_obj, get_bibref_in, user_logout, calc_user_qmodule_score, 
+	get_qmodule_score_weights, 
 } from './bq_quest_mgr.js';
 
 import { load_qmodu, load_next_qmodu, } from './bq_module_mgr.js';
@@ -1103,60 +1104,6 @@ async function remove_to_update_user_in_qmod(fb_database, the_uid, qmonam){
 	await fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });	
 	
 	console.log("remove_to_update_user_in_qmod. DELETING path=" + to_upd_pth);
-}
-
-function get_qmod_score_weights_path(qmonam){
-	if(fb_mod == null){ console.error("fb_mod == null."); return; }
-	const qmod_pth = fb_mod.firebase_bib_quest_path + 'modules/' + qmonam + '/';
-	return qmod_pth;
-}
-
-async function get_qmodule_score_weights(fb_database, qmonam){
-	if(fb_mod == null){ console.error("fb_mod == null."); return; }
-	if(DEBUG_UPDATE_SCORES){ console.log("get_qmodule_score_weights." + " qmonam " + qmonam); }
-
-	if(gvar.all_qmod_weights == null){ gvar.all_qmod_weights = {}; }
-	if(gvar.all_qmod_weights[qmonam] != null){ 
-		return gvar.all_qmod_weights[qmonam];
-	}
-	
-	let db_ref = null;
-	let obj = null;
-	
-	const qmonam_pth = get_qmod_score_weights_path(qmonam);
-	db_ref = fb_mod.md_db.ref(fb_database, qmonam_pth);
-	
-	const snapshot = await fb_mod.md_db.get(db_ref);
-
-	let qmod_scow = null;
-	if (snapshot.exists()) {
-		qmod_scow = snapshot.val();
-	} else {
-		console.error("! snapshot.exists()");
-	}
-	
-	gvar.all_qmod_weights[qmonam] = qmod_scow;
-	return qmod_scow;
-}
-
-function calc_user_qmodule_score(qmod_scow, usr_resul){
-	let bad_score = 0;
-	
-	const all_qids = Object.keys(usr_resul);
-	for(const qid of all_qids){
-		if(qmod_scow[qid] == null){
-			console.error("qmod_scow[qid] == null");
-			continue;
-		}
-		const qid_scow = qmod_scow[qid];
-		bad_score += qid_scow;
-	}
-	
-	let score = (1 - bad_score);
-	if(score < 0){ score = 0; }
-	if(score > 1){ score = 1; }
-	
-	return score;
 }
 
 async function update_user_qmodule_score(fb_database, the_uid, qmonam){
