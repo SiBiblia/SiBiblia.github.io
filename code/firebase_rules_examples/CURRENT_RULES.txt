@@ -150,14 +150,16 @@
 					".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())
 								&& !(root.child('bib_quest').child('doing_stats').child(auth.uid).exists())",
 					"$other": { ".validate": false,	},
-					"stats": { 
-						"$other": { ".validate": false,	},
-						"last_check": { 
+					"visits": {
+						"last_visit": { 
 							".validate": "newData.exists() && newData.isString() && (newData.val().length < 25)",
 						},
-						"num_checks": { 
+						"num_visits": { 
 							".validate": "newData.exists() && newData.isNumber() && (newData.val() >= 0) && (newData.val() < 9999999999)",
 						},
+					},
+					"stats": { 
+						"$other": { ".validate": false,	},
 						"to_add": {
 							"$module_name": {
 								".validate": "root.child('bib_quest').child('modules').child($module_name).exists()",
@@ -209,6 +211,12 @@
 									},
 								},
 							},
+							"score": { 
+								".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() <= 1)",
+							},
+							"cicle_added": {
+								".validate": "newData.val() === root.child('bib_quest').child('current_cicle').val()",
+							},
 						},
 					},
 					"user_info": {
@@ -236,14 +244,29 @@
 			"to_update": {
 				".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
-				"$module_name": {
-					".validate": "root.child('bib_quest').child('modules').child($module_name).exists()",
-					"$uid": {
-						".read": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
-						".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())
-									&& !(root.child('bib_quest').child('doing_stats').child(auth.uid).exists())",
-						"$val": {
-							".validate": "newData.isNumber() && (newData.val() === 1)",
+				"stats": {
+					"$module_name": {
+						".validate": "root.child('bib_quest').child('modules').child($module_name).exists()",
+						"$uid": {
+							".read": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+							".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())
+										&& !(root.child('bib_quest').child('doing_stats').child(auth.uid).exists())",
+							"$val": {
+								".validate": "newData.isNumber() && (newData.val() === 1)",
+							},
+						},
+					},
+				},
+				"results": {
+					"$module_name": {
+						".validate": "root.child('bib_quest').child('modules').child($module_name).exists()",
+						"$uid": {
+							".read": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+							".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())
+										&& !(root.child('bib_quest').child('doing_stats').child(auth.uid).exists())",
+							"$val": {
+								".validate": "newData.isNumber() && (newData.val() === 1)",
+							},
 						},
 					},
 				},

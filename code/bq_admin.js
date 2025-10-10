@@ -36,14 +36,14 @@ const test_ids = {
 const admin_ops = {
 	//up_all:"Update ALL to Update",
 	up_referrers:"Update ALL referrers",
-	up_stats:"Update ALL stats",
-	up_mods:"Update ALL module observations",
-	up_qmodu_observ:"Update current module observations",
-	up_qmodu_ustats:"Update current module to update user stats",
+	up_stats:"Update ALL stats and results",
+	up_qmodu_ustats:"Update pending stats and results for current module",
 	show_user_list:"Show user list",
 	block_user:"Block user",
 	unblock_user:"Unblock user",
 	download_db:"Download Database",
+	up_qmodu_observ:"Update current module observations",
+	up_mods:"Update ALL module observations",
 	//upload_index_W:`upload_index("W")`,
 	//upload_index_S:`upload_index("S")`,
 	//upload_index_A:`upload_index("A")`,
@@ -92,13 +92,14 @@ async function do_selec(val_sel_w){
 		update_ALL_qmodule_observations();
 	}
 	if(val_sel_w == admin_ops.up_stats){
-		await update_ALL_stats();
+		await update_ALL_stats_and_results();
 	}
 	if(val_sel_w == admin_ops.up_qmodu_observ){
 		update_current_qmodule_observations();
 	}
 	if(val_sel_w == admin_ops.up_qmodu_ustats){
 		await update_qmodule_stats(gvar.current_qmonam);
+		await update_qmodule_results(gvar.current_qmonam);
 	}
 	if(val_sel_w == admin_ops.download_db){
 		//test_php();
@@ -146,6 +147,8 @@ async function do_selec(val_sel_w){
 	if(val_sel_w == admin_ops.show_server_timestamp){
 		get_server_timestamp();
 	}
+	
+	close_pop_menu();
 }
 
 export function toggle_test_logins(){
@@ -204,9 +207,7 @@ function update_current_qmodule_observations(){
 	console.log("update_current_qmodule_observations. db_ref = " + db_ref);
 	fb_mod.md_db.set(db_ref, obj).catch((error) => { 
 		console.error(error); 
-	});
-	
-	close_pop_menu();
+	});	
 }
 
 async function update_user_qmodule_in_stats(fb_database, the_uid, qmonam, all_obs){
@@ -216,7 +217,7 @@ async function update_user_qmodule_in_stats(fb_database, the_uid, qmonam, all_ob
 	const old_stat_pth = usr_path + '/stats/to_add/' + qmonam;
 	const in_stat_pth = usr_path + '/stats/in_stats/' + qmonam;
 	const glb_stat_pth = fb_mod.firebase_bib_quest_path + 'stats/' + qmonam;	
-	//const to_upd_pth = fb_mod.firebase_bib_quest_path + 'to_update/' + qmonam + '/' + the_uid;
+	const to_upd_pth = fb_mod.firebase_bib_quest_path + 'to_update/stats/' + qmonam + '/' + the_uid;
 	const old_last_ck = all_obs.last_check;
 	const old_num_ck = all_obs.num_checks;
 	
@@ -237,7 +238,7 @@ async function update_user_qmodule_in_stats(fb_database, the_uid, qmonam, all_ob
 	
 	wr_data[old_stat_pth] = {};
 	
-	//wr_data[to_upd_pth] = {};
+	wr_data[to_upd_pth] = {};
 	
 	if(DEBUG_ADMIN_OPS){ console.log("update_user_qmodule_in_stats. full_data=" + JSON.stringify(wr_data, null, "  ")); }
 	
@@ -277,7 +278,15 @@ async function update_user_qmodule_stats(fb_database, the_uid, qmonam){
 	await fb_mod.md_db.remove(lok_ref);
 }
 
-async function update_qmodule_stats(qmonam){	
+async function update_qmodule_stats(qmonam){
+	update_qmodule_repots_for(qmonam, "stats");
+}
+
+async function update_qmodule_results(qmonam){
+	update_qmodule_repots_for(qmonam, "results");
+}
+
+async function update_qmodule_repots_for(qmonam, report){
 	if(qmonam == null){
 		console.error("CANNOT update_qmodule_stats. qmonam == null");
 		return;
@@ -288,52 +297,44 @@ async function update_qmodule_stats(qmonam){
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	
 	//const ref_path = "users/list";
-	const ref_path = fb_mod.firebase_bib_quest_path + "to_update/" + qmonam;
+	const ref_path = fb_mod.firebase_bib_quest_path + "to_update/" + report + "/" + qmonam;
 	const db_ref = fb_mod.md_db.ref(fb_database, ref_path);
 	
+	let func_report = update_user_qmodule_stats;
+	if(report == "results"){
+		func_report = update_user_qmodule_score;
+	}
 	
 	const pg_sz = 100;
 	let curr_pg = 1;
+	let pg_found = true;
 	
 	if(DEBUG_UPDATE_STATS){ console.log("update_qmodule_stats. Updating all users for " + ref_path); }
-	for(curr_pg = 1; curr_pg < 100; curr_pg++){
+	while(pg_found){
 		const st_at = (curr_pg - 1) * pg_sz;
+		curr_pg++;
 		
 		let cond1 = fb_mod.md_db.orderByKey();
 		let cond2 = fb_mod.md_db.startAt(st_at.toString());
 		let cond3 = fb_mod.md_db.limitToFirst(pg_sz);
 		let db_qry = fb_mod.md_db.query(db_ref, cond1, cond2, cond3);
 		let snapshot = await fb_mod.md_db.get(db_qry);
-		if (snapshot.exists()) {
+		
+		pg_found = snapshot.exists();
+		
+		if(pg_found){
 			const all_usr = snapshot.val();
 			const all_uid = Object.keys(all_usr);
 			if(DEBUG_UPDATE_STATS){ console.log("Updating users = " + JSON.stringify(all_uid)); }
 			
 			for(const the_uid of all_uid){
-				await update_user_qmodule_stats(fb_database, the_uid, qmonam);
-				await update_user_qmodule_score(fb_database, the_uid, qmonam);
-				//await remove_to_update_user_in_qmod(fb_database, the_uid, qmonam);
+				await func_report(fb_database, the_uid, qmonam);
 			}
 		} else {
 			console.log("update_qmodule_stats. No user list for " + ref_path);
+			break;
 		}
-	}
-	
-	/* OLD METHOD
-	let snapshot = await fb_mod.md_db.get(db_ref);
-	
-	if (snapshot.exists()) {
-		if(DEBUG_UPDATE_STATS){ console.log("update_qmodule_stats. Updating all users for " + ref_path); }
-		const all_usr = snapshot.val();
-		const all_uid = Object.keys(all_usr);
-		for(const the_uid of all_uid){
-			await update_user_qmodule_stats(fb_database, the_uid, qmonam);
-		}
-	} else {
-		console.log("update_qmodule_stats. No user list for " + ref_path);
-	}*/
-	
-	close_pop_menu();
+	}	
 }
 
 function test_php(){
@@ -363,7 +364,6 @@ function test_php(){
 	});
 	
 	console.log("Called test_php");
-	close_pop_menu();
 }
 
 /*
@@ -421,9 +421,7 @@ function download_database(){
 		}
 	}).catch((error) => {
 		console.error(error);
-	});
-	
-	close_pop_menu();
+	});	
 }
 
 function save_file(nam, obj){
@@ -469,9 +467,7 @@ function upload_index(kk){
 	})
 	.catch((err) => {
 		console.error(`Could NOT import ${mod_nm} err:` + err.message);
-	});
-	
-	close_pop_menu();	
+	});	
 }
 
 function print_totals(){
@@ -519,9 +515,7 @@ function print_totals(){
 	}).catch((error) => {
 		console.error("print_totals. firebase get " + pth3 + " failed. Cannot get.");
 		console.error(error);
-	});
-	
-	close_pop_menu();
+	});	
 }
 
 function init_strong_totals(){
@@ -534,8 +528,6 @@ function init_strong_totals(){
 	fb_mod.md_db.set(db_ref1, 0).catch((error) => { 
 		console.error(error); 
 	});
-
-	close_pop_menu();
 }
 
 function init_word_totals(){
@@ -548,8 +540,6 @@ function init_word_totals(){
 	fb_mod.md_db.set(db_ref2, 0).catch((error) => { 
 		console.error(error); 
 	});
-
-	close_pop_menu();
 }
 
 function init_ascii_totals(){
@@ -561,9 +551,7 @@ function init_ascii_totals(){
 	const db_ref3 = fb_mod.md_db.ref(fb_database, pth3);
 	fb_mod.md_db.set(db_ref3, 0).catch((error) => { 
 		console.error(error); 
-	});
-	
-	close_pop_menu();
+	});	
 }
 
 function get_file_total(kk){
@@ -594,9 +582,7 @@ function get_file_total(kk){
 	})
 	.catch((err) => {
 		console.error(`get_file_total. Could NOT import ${mod_nm} err:` + err.message);
-	});
-	
-	close_pop_menu();	
+	});	
 }
 
 function print_file_totals(){
@@ -654,11 +640,12 @@ async function update_ALL_qmodule_observations(){
 	await load_next_qmodu();
 }
 
-async function update_ALL_stats(){
-	if(gvar.conf_qmodus == null){ console.error("update_ALL_stats. gvar.conf_qmodus == null."); return; }
+async function update_ALL_stats_and_results(){
+	if(gvar.conf_qmodus == null){ console.error("gvar.conf_qmodus == null."); return; }
 	const all_qmonams = Object.keys(gvar.conf_qmodus.all_qmodus);
 	for(const qmonam of all_qmonams){
 		await update_qmodule_stats(qmonam);
+		await update_qmodule_results(qmonam);
 	}
 }
 
@@ -681,7 +668,6 @@ function test_get_verse(){
 
 async function update_ALL_referrers(){	
 	console.log("Called update_ALL_referrers.");
-	close_pop_menu();
 	
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
@@ -871,9 +857,7 @@ async function add_big_test_data(){
 		
 		console.log("WROTE OBJ " + hh1 + " date=" + dt);
 		
-	}
-	
-	close_pop_menu();
+	}	
 }
 
 function test_small_root_update(){
@@ -917,7 +901,6 @@ async function remove_big_test_data(){
 	}
 	
 	//fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });	
-	close_pop_menu();
 }
 
 export function toggle_test_opers(){
@@ -1204,7 +1187,7 @@ async function update_user_qmodule_score(fb_database, the_uid, qmonam){
 		score: usr_score,
 	};
 
-	const to_upd_pth = fb_mod.firebase_bib_quest_path + 'to_update/' + qmonam + '/' + the_uid;
+	const to_upd_pth = fb_mod.firebase_bib_quest_path + 'to_update/results/' + qmonam + '/' + the_uid;
 	wr_data[to_upd_pth] = {};
 
 	if(DEBUG_UPDATE_SCORES){ console.log("update_user_qmodule_score. wr_data=" + JSON.stringify(wr_data, null, " ")); }
@@ -1213,5 +1196,26 @@ async function update_user_qmodule_score(fb_database, the_uid, qmonam){
 	fb_mod.md_db.update(db_base_ref, wr_data).catch((error) => { console.error(error); });	
 };
 
+async function download_current_cicle_scores(){
+	if(fb_mod == null){ console.error("download_database. fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("download_database. fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	const all_cirr_scores_pth = fb_mod.firebase_bib_quest_path + 'score_data/all_qmodule_scores/';
+	const db_ref = fb_mod.md_db.ref(fb_database, all_cirr_scores_pth);
+
+	const curr_ci = fb_mod.tc_fb_current_cicle;
+	
+	let cond1 = fb_mod.md_db.orderByChild("cicle_added");
+	let cond2 = fb_mod.md_db.equalTo(curr_ci);
+	let db_qry = fb_mod.md_db.query(db_ref, cond1, cond2);
+	let snapshot = await fb_mod.md_db.get(db_qry);
+	if (snapshot.exists()) {
+		const full_db = snapshot.val();
+		save_file("CURRENT_SCORES_DOWLOADED.txt", full_db);
+	} else {
+		console.log("download_database. No database object !");
+	}
+}
 
 

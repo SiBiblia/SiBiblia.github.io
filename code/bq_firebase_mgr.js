@@ -314,8 +314,8 @@ export async function firebase_check_user(callbk){
 
 function firebase_user_ck_is_admin(){ 
 	init_mod_vars();
-	if(tc_fb_app == null){ console.log("firebase_inc_user_num_checks. tc_fb_app is NULL!!"); return; }
-	if(tc_fb_user == null){ console.log("firebase_inc_user_num_checks. tc_fb_user is NULL!!"); return; }
+	if(tc_fb_app == null){ console.error("tc_fb_app is NULL!!"); return; }
+	if(tc_fb_user == null){ console.error("tc_fb_user is NULL!!"); return; }
 	const fb_database = md_db.getDatabase(tc_fb_app);
 
 	const path_cntr = firebase_ck_admin_path;
@@ -341,8 +341,8 @@ function firebase_user_ck_is_admin(){
 
 function firebase_read_current_cicle(){ 
 	init_mod_vars();
-	if(tc_fb_app == null){ console.log("firebase_inc_user_num_checks. tc_fb_app is NULL!!"); return; }
-	if(tc_fb_user == null){ console.log("firebase_inc_user_num_checks. tc_fb_user is NULL!!"); return; }
+	if(tc_fb_app == null){ console.error("tc_fb_app is NULL!!"); return; }
+	if(tc_fb_user == null){ console.error("tc_fb_user is NULL!!"); return; }
 	const fb_database = md_db.getDatabase(tc_fb_app);
 	const db_ref = md_db.ref(fb_database, firebase_current_cicle_path);
 	
@@ -356,22 +356,10 @@ function firebase_read_current_cicle(){
 	});
 }
 
-function firebase_inc_user_num_checks(){ 
-	init_mod_vars();
-	if(tc_fb_app == null){ console.log("firebase_inc_user_num_checks. tc_fb_app is NULL!!"); return; }
-	if(tc_fb_user == null){ console.log("firebase_inc_user_num_checks. tc_fb_user is NULL!!"); return; }
-	const fb_database = md_db.getDatabase(tc_fb_app);
-
-	const path_cntr = firebase_users_path + tc_fb_user.uid + "/stats/num_checks";
-	const db_ref = md_db.ref(fb_database, path_cntr);
-
-	md_db.set(db_ref, md_db.increment(1)).catch((error) => { console.error(error); });	
-}
-
 function firebase_write_user_id_in_list(){ 
 	init_mod_vars();
-	if(tc_fb_app == null){ console.log("firebase_inc_user_num_checks. tc_fb_app is NULL!!"); return; }
-	if(tc_fb_user == null){ console.log("firebase_inc_user_num_checks. tc_fb_user is NULL!!"); return; }
+	if(tc_fb_app == null){ console.error("tc_fb_app is NULL!!"); return; }
+	if(tc_fb_user == null){ console.error("tc_fb_user is NULL!!"); return; }
 	const fb_database = md_db.getDatabase(tc_fb_app);
 
 	const db_ref = md_db.ref(fb_database, firebase_users_list_path + tc_fb_user.uid);
@@ -382,23 +370,30 @@ function firebase_write_user_id_in_list(){
 }
 
 function firebase_write_user_id(){ 
-	console.log("Called firebase_write_user_id.");
+	console.log("Called firebase_update_user_visits.");
 	init_mod_vars();
 	firebase_user_ck_is_admin();
 	firebase_write_user_id_in_list();
 	firebase_read_current_cicle();
 	
-	if(tc_fb_app == null){ console.log("firebase_write_user_id. tc_fb_app is NULL!!"); return; }
-	if(tc_fb_user == null){ console.log("firebase_write_user_id. tc_fb_user is NULL!!"); return; }
+	if(tc_fb_app == null){ console.error("tc_fb_app is NULL!!"); return; }
+	if(tc_fb_user == null){ console.error("tc_fb_user is NULL!!"); return; }
 	const fb_database = md_db.getDatabase(tc_fb_app);
-	const db_ref = md_db.ref(fb_database, firebase_users_path + tc_fb_user.uid + "/stats/last_check"); // THIS obj MUST FIT firebase rules
-	console.log("firebase_write_user_id. db_ref = " + db_ref);
-	const dt = get_date_and_time();  
-	md_db.set(db_ref, dt).catch((error) => { 
-		console.error(error); 
-	});
 	
-	firebase_inc_user_num_checks();
+	const visits_pth = firebase_users_path + tc_fb_user.uid + "/visits";
+	const dt = get_date_and_time();  
+	
+	const wr_data = {
+		last_visit : dt,
+		num_visits : md_db.increment(1),
+	};
+		
+	const db_ref = md_db.ref(fb_database, visits_pth);
+	console.log("firebase_write_user_id. visits_pth = " + visits_pth + " visits=" + JSON.stringify(wr_data));
+	
+	md_db.update(db_ref, wr_data).catch((error) => { 
+		console.error(error); 
+	});	
 }
 
 export const firebase_write_object = (sub_ref, obj, err_fn) => {  //sub_ref MUST start with '/' or be empty

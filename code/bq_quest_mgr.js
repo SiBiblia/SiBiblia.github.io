@@ -2111,8 +2111,8 @@ function calc_exam_results_object(){
 	return all_obs;
 }
 
-function write_fb_qmodu_pub_results(obj, dt){
-	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_fb_qmodu_pub_results. CALLED. "); }
+function write_fb_qmodu_pub_stats(obj, dt){
+	if(DEBUG_FB_WRITE_RESULTS){ console.log("Called write_fb_qmodu_pub_stats."); }
 	if(fb_mod == null){ console.error("fb_mod == null"); return; }
 	
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null. "); return; }
@@ -2142,7 +2142,7 @@ function write_fb_qmodu_pub_results(obj, dt){
 	const pstats_path = fb_mod.firebase_bib_quest_path + "pstats/";
 	
 	if(DEBUG_FB_WRITE_RESULTS){ 
-		console.log("write_fb_qmodu_pub_results. full_data=" + JSON.stringify(wr_data, null, "  ")); 
+		console.log("write_fb_qmodu_pub_stats. full_data=" + JSON.stringify(wr_data, null, "  ")); 
 		console.log("path=" + pstats_path);
 		//console.trace(); 
 	}
@@ -2156,17 +2156,35 @@ function write_fb_qmodu_pub_results(obj, dt){
 	});	
 }
 
-function write_fb_qmodu_results(obj, dt){
-	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_fb_qmodu_results. CALLED. "); }
+function write_fb_user_qmodu_results(obj){
 	if(fb_mod == null){ console.error("fb_mod == null"); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null. "); return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 
+	const usr_path = fb_mod.firebase_get_user_path();  // has NO slash at the end
+	const results_pth = usr_path + '/results/' + gvar.current_qmonam;
+	const usr_qmod_up_path = fb_mod.firebase_bib_quest_path + "to_update/results/" + gvar.current_qmonam + "/" + fb_mod.tc_fb_user.uid;
+	const wr_data = {};
+	
+	wr_data[results_pth + '/observ/'] = obj;
+	wr_data[results_pth + '/ts_reported/'] = fb_mod.md_db.serverTimestamp();
+	wr_data[usr_qmod_up_path] = 1;
+
+	const db_ref = fb_mod.md_db.ref(fb_database);
+	fb_mod.md_db.update(db_ref, wr_data).catch((error) => { 
+		console.error(error); 
+	});	
+}
+
+function write_fb_user_qmodu_stats(obj, dt){
+	if(DEBUG_FB_WRITE_RESULTS){ console.log("Called write_fb_user_qmodu_stats."); }
+	if(fb_mod == null){ console.error("fb_mod == null"); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null. "); return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	
 	const usr_path = fb_mod.firebase_get_user_path();  // has NO slash at the end
 	const module_pth = usr_path + '/stats/to_add/' + gvar.current_qmonam;
-	const results_pth = usr_path + '/results/' + gvar.current_qmonam;
-	const usr_qmod_up_path = fb_mod.firebase_bib_quest_path + "to_update/" + gvar.current_qmonam + "/" + fb_mod.tc_fb_user.uid;
+	const usr_qmod_up_path = fb_mod.firebase_bib_quest_path + "to_update/stats/" + gvar.current_qmonam + "/" + fb_mod.tc_fb_user.uid;
 	
 	const suf_id_results = gvar.current_qmonam + SUF_ID_USTATS_RESULTS;
 	on_stats_change_show_results(suf_id_results, "USTATS", module_pth, obj);
@@ -2176,11 +2194,7 @@ function write_fb_qmodu_results(obj, dt){
 		return;
 	}
 	
-	let db_ref = null;	
 	const wr_data = {};
-	
-	wr_data[results_pth + '/observ/'] = obj;
-	wr_data[results_pth + '/ts_reported/'] = fb_mod.md_db.serverTimestamp();	
 	
 	const all_qids = Object.keys(obj);
 	for(const qid of all_qids){
@@ -2192,29 +2206,26 @@ function write_fb_qmodu_results(obj, dt){
 	wr_data[usr_qmod_up_path] = 1;
 	
 	if(DEBUG_FB_WRITE_RESULTS){ 
-		console.log("write_fb_qmodu_results. full_data=" + JSON.stringify(wr_data, null, "  ")); 
+		console.log("write_fb_user_qmodu_stats. full_data=" + JSON.stringify(wr_data, null, "  ")); 
 	}
 
 	set_fb_Ustat();
 	
-	db_ref = fb_mod.md_db.ref(fb_database);
+	const db_ref = fb_mod.md_db.ref(fb_database);
 	fb_mod.md_db.update(db_ref, wr_data).catch((error) => { 
 		console.error(error); 
 		reset_fb_Ustat();
 	});	
 }
 
-function write_firebase_qmodu_results(force_wr){
-	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_firebase_qmodu_results. CALLED. "); }
+function write_fb_qmod_stats_and_results(force_wr){
+	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_fb_qmod_stats_and_results. CALLED. "); }
 	
 	const resp = {};
-	//if(gvar.wrote_qmodu){ return resp; }
-	//gvar.wrote_qmodu = true;
 	
 	close_pop_menu();
 	if(gvar.current_qmonam == null){
-		const msg = "write_firebase_qmodu_results. gvar.current_qmonam == null.";
-		console.error(msg);
+		console.error("gvar.current_qmonam == null.");
 		return resp;
 	}
 	
@@ -2232,15 +2243,15 @@ function write_firebase_qmodu_results(force_wr){
 	}
 	
 	if(fb_mod == null){ 
-		const msg = "write_firebase_qmodu_results. fb_mod == null.";
-		console.error(msg);
+		console.error("fb_mod == null.");
 		return resp;
 	}	
 	
-	write_fb_qmodu_pub_results(resp.wr_o, dt);
+	write_fb_qmodu_pub_stats(resp.wr_o, dt);
 	resp.has_usr = (fb_mod.tc_fb_user != null);
 	if(resp.has_usr){
-		write_fb_qmodu_results(resp.wr_o, dt);
+		write_fb_user_qmodu_stats(resp.wr_o, dt);
+		write_fb_user_qmodu_results(resp.wr_o);
 	}
 	return resp;
 }
@@ -3202,7 +3213,7 @@ function read_st_qmodu_results(){
 	*/
 
 function finish_qmodu(){
-	const resp = write_firebase_qmodu_results(false);
+	const resp = write_fb_qmod_stats_and_results(false);
 	
 	const gst = gvar.glb_poll_db.qmodu_state;
 	const qid = gst.writer_qid;
