@@ -40,6 +40,8 @@ export function init_en_poll_txt(){
 	lg.q_alive_in_body_and_spirit = `${cl_jesus}${bf}is alive in his resurrected body in a celestial city.${ef}`;
 	
 	lg.q_like_jesus_body = `${cl_ours}${bf}in a physical body and spirit just like Jesus.${ef}`;
+	lg.q_memory = `${cl_ours}${bf}with memory just like Jesus resurrection.${ef}`;
+	lg.q_resemblance = `${cl_ours}${bf}with physical resemblance just like Jesus resurrection.${ef}`;
 	lg.q_for_all = `${cl_ours}${bf}for ALL people good and bad.${ef}`;
 	lg.q_not_yet = `${cl_ours}${bf}on the FINAL day. Not yet.${ef}`;
 	lg.q_new_earth = `${cl_ours}${bf}in a NEW earth with a new heavens.${ef}`;
@@ -48,20 +50,46 @@ export function init_en_poll_txt(){
 	lg.o_is_about_bible_nm = `About The Bible`;
 	
 	const cl_denial_bib_claim = `You seem to be in denial of what the bible claims about `;
+	const cl_accepting_bib_claim = `You seem are ACCEPTING what the bible claims about `;
+	const cl_denial_our_bib_claim = `${cl_denial_bib_claim} our future resurrection `;
+	const cl_accepting_our_bib_claim = `${cl_accepting_bib_claim} our future resurrection `;
+	
 	lg.o_denial_physical_resu = `${cl_denial_bib_claim} Jesus resurrecting in a physical body.`;
 	lg.o_denial_physical_resu_nm = `No physical body`;
+	lg.o_accepting_physical_resu = `${cl_accepting_bib_claim} Jesus resurrecting in a physical body.`;
+	lg.o_accepting_physical_resu_nm = `Physical body`;
 	lg.o_denial_die_again = `${cl_denial_bib_claim} Jesus resurrecting to NOT die again.`;
 	lg.o_denial_die_again_nm = `Die again`;
+	lg.o_accepting_die_again = `${cl_accepting_bib_claim} Jesus resurrecting to NOT die again.`;
+	lg.o_accepting_die_again_nm = `Not die again`;
 	lg.o_denial_alive_in_body_and_spirit = `${cl_denial_bib_claim} Jesus being alive in his resurrected body in a celestial city.`;
-	lg.o_denial_alive_in_body_and_spirit_nm = `Alive in body and spirit`;
-	lg.o_denial_like_jesus_body = `${cl_denial_bib_claim} our future resurrection in a physical body and spirit, just like Jesus.`;
-	lg.o_denial_like_jesus_body = `Not like Jesus body`;
-	lg.o_denial_for_all = `${cl_denial_bib_claim} our future resurrection being for ALL people good and bad.`;
+	lg.o_denial_alive_in_body_and_spirit_nm = `Not body and spirit`;
+	lg.o_accepting_alive_in_body_and_spirit = `${cl_accepting_bib_claim} Jesus being alive in his resurrected body in a celestial city.`;
+	lg.o_accepting_alive_in_body_and_spirit_nm = `Body and spirit`;
+	lg.o_denial_like_jesus_body = `${cl_denial_our_bib_claim} in a physical body and spirit, just like Jesus.`;
+	lg.o_denial_like_jesus_body_nm = `Not like Jesus`;
+	lg.o_accepting_like_jesus_body = `${cl_accepting_our_bib_claim} in a physical body and spirit, just like Jesus.`;
+	lg.o_accepting_like_jesus_body_nm = `Like Jesus`;
+	lg.o_denial_memory = `${cl_denial_our_bib_claim} with memory, just like Jesus resurrection.`;
+	lg.o_denial_memory_nm = `Not memory`;
+	lg.o_accepting_memory = `${cl_accepting_our_bib_claim} with memory, just like Jesus resurrection.`;
+	lg.o_accepting_memory_nm = `Memory`;
+	lg.o_denial_resemblance = `${cl_denial_our_bib_claim} with physical resemblance, just like Jesus resurrection.`;
+	lg.o_denial_resemblance_nm = `No resemblance`;
+	lg.o_accepting_resemblance = `${cl_accepting_our_bib_claim} physical resemblance, just like Jesus resurrection.`;
+	lg.o_accepting_resemblance_nm = `Resemblance`;
+	lg.o_denial_for_all = `${cl_denial_our_bib_claim} being for ALL people good and bad.`;
 	lg.o_denial_for_all_nm = `Not for all`;
-	lg.o_denial_not_yet = `${cl_denial_bib_claim} our future resurrection being on the FINAL day. Not yet.`;
-	lg.o_denial_not_yet_nm = `Not yet`;
-	lg.o_denial_new_earth = `${cl_denial_bib_claim} our future resurrection being in a NEW earth with a new heavens.`;
-	lg.o_denial_new_earth_nm = `New Earth`;
+	lg.o_accepting_for_all = `${cl_accepting_our_bib_claim} being for ALL people good and bad.`;
+	lg.o_accepting_for_all_nm = `For all`;
+	lg.o_denial_not_yet = `${cl_denial_our_bib_claim} being on the FINAL day. Not yet.`;
+	lg.o_denial_not_yet_nm = `Yes yet`;
+	lg.o_accepting_not_yet = `${cl_accepting_our_bib_claim} being on the FINAL day. Not yet.`;
+	lg.o_accepting_not_yet_nm = `Not yet`;
+	lg.o_denial_new_earth = `${cl_denial_our_bib_claim} being in a NEW earth with a new heavens.`;
+	lg.o_denial_new_earth_nm = `Not new Earth`;
+	lg.o_accepting_new_earth = `${cl_accepting_our_bib_claim} being in a NEW earth with a new heavens.`;
+	lg.o_accepting_new_earth_nm = `New Earth`;
 
 	let bcit = null;
 	let numv = null;
@@ -254,5 +282,17 @@ export function init_en_poll_txt(){
 	lg.o_finished_resu_qmodu = "Congrats. You finished this module";
 	lg.o_module_writen_ok = "Module results saved ok in the cloud.";
 	lg.o_you_need_to_login_to_participate = "To participate you need to login.";
+
+	lg.q_beliefs = "What do you BELIEVE about resurrection?";
+	lg.b_physical_resu = "Jesus resurrected in a physical body";
+	lg.b_die_again = "Jesus will NOT die again";
+	lg.b_in_body_and_spirit = "Jesus is alive in his resurrected body in a celestial city";
+	lg.b_like_jesus = "Our resurrection is in a physical body and spirit, just like Jesus";
+	lg.b_memory = "Our resurrection is with memory, just like Jesus resurrection";
+	lg.b_resemblance = "Our resurrection is with physical resemblance, just like Jesus resurrection";
+	lg.b_for_all = "Our resurrection is for ALL people, good and bad";
+	lg.b_not_yet = "Our resurrection is on the FINAL day. Not yet";
+	lg.b_new_earth = "Our resurrection is in a NEW earth with a new heavens";
+	
 }
 

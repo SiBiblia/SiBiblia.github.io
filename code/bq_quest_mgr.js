@@ -2751,7 +2751,7 @@ function ask_next(){
 	}
 	let not_answ_qid = get_first_not_answered(true);
 	if(not_answ_qid != null){
-		scroll_to_qid(not_answ_qid); // dbg_scroll
+		scroll_to_qid(not_answ_qid);
 		return not_answ_qid;
 	}
 	if(DEBUG_PENDING){ console.log("ask_next. ALL_PENDING=\n" + JSON.stringify(db.qmodu_state.pending_qids, null, "  ")); }
@@ -2774,7 +2774,8 @@ function ask_next(){
 		console.log("Question " + qid + " could NOT be added to page during ask_next [1] !!!");
 		return null;
 	}
-	scroll_to_qid(qid); // dbg_scroll
+	//scroll_to_qid(qid);
+	scroll_to_qid(get_first_not_answered());
 	return qid;
 }
 
@@ -2985,7 +2986,7 @@ function add_observation_ok(qid){
 		if(is_wrter){
 			load_next_qmodu();
 		} else {
-			scroll_to_qid(get_first_not_answered()); // dbg_scroll
+			scroll_to_qid(get_first_not_answered());
 		}
 		return;
 	});		
