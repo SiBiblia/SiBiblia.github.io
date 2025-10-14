@@ -201,6 +201,32 @@ export function init_en_poll_txt(){
 	set_href_bibcit(`q7_1__verse${numv}_href`, bcit);
 	lg.q7_1__verse6_should = "The raised body is IMPERISHABLE";
 	
+	lg.q7_2__memory_sec = `<a class='exam_ref exam_title' href='${hb.href_like_jesus_resu}'>With memory, like Jesus</a>`;
+	lg.q7_2__memory = `Select all verses that support a <a class='exam_ref' href='${hb.href_resurrection}'>resurrection</a> of the dead that is with memory, like Jesus <a class='exam_ref' href='${hb.href_resurrection}'>resurrection</a>`;
+	add_verse("q7_2", "1", "1Co_15_20", ["raised", "first", "asleep.", ], "He is the first. Our resurrection is like Jesus resurrection");
+	add_verse("q7_2", "2", "Rev_20_12", ["judged", "according", "works.", ], "THe resurrected people are judged for works that they remember");
+	add_verse("q7_2", "3", "Luk_24_45", ["opened", "minds,", "Scriptures", ], "If you EXPLAIN something, you remember it");
+	add_verse("q7_2", "4", "Jhn_21_15", [`“Simon,`, "son", "Jonah,", ], "If you call someone by his name, you remember it");
+	add_verse("q7_2", "5", "Jhn_11_11", ["awake", ], "When you wake up, you remember all before been asleep.");
+	add_verse("q7_2", "6", "Jhn_21_17", ["third", "time,", ], "If you recall a situation, you remember it");
+	add_verse("q7_2", "7", "Jhn_12_10", ["put", "death", "Lazarus", ], "Lazarus was example of resurrection, he would not be if he did not remember anything");
+	/*
+	add_verse("q7_2", "6", "Jhn_11_4", ["no", "muerte,", "glorificado", ], "Lazaro no muere mas de cuatro dias, lo que implica que Lazaro recordaría");
+	add_verse("q7_2", "8", "Jhn_12_9", ["ver", "Lázaro,", ], "Lázaro era famoso por haber resucitado, esto implica que sus facultades eran optimas");
+	add_verse("q7_2", "3", "Luk_24_27", ["explained", "Scriptures", ], "If you EXPLAIN something, you remember it");
+	add_verse("q7_2", "5", "Jhn_21_6", ["said", "them,", ], "If you say the same you had said before, you remember it");
+	*/
+
+	lg.q7_3__resemblance_sec = `<a class='exam_ref exam_title' href='${hb.href_like_jesus_resu}'>With resemblance, like Jesus</a>`;
+	lg.q7_3__resemblance = `Select all verses that support a <a class='exam_ref' href='${hb.href_resurrection}'>resurrection</a> of the dead that is with physical resemblance, like Jesus <a class='exam_ref' href='${hb.href_resurrection}'>resurrection</a>`;
+	add_verse("q7_3", "1", "1Co_15_20", ["raised", "first", "asleep.", ], "He is the first. Our resurrection is like Jesus resurrection");
+	add_verse("q7_3", "2", "Luk_24_31", ["recognized", "him;", ], "If you RECOGNIZE someone, he has resemblance to before");
+	add_verse("q7_3", "3", "Jhn_12_9", ["see", "Lázarus,", ], "Lázarus was famous for been resurrected, he looked like before dead");
+	add_verse("q7_3", "4", "Mat_27_53", ["resurrection,", "appeared", "many", ], "If resurrected people appeared to many and they gave testimony that they were dead, it is because the resurrected looked like before they were dead");
+	add_verse("q7_3", "5", "Jhn_21_12", ["knowing", "was", "Lord", ], "If you RECOGNIZE someone, he has resemblance to before");
+	add_verse("q7_3", "6", "1Co_15_53", ["put", "on", ], "When you put on clothes you do not stop resembling to before");
+	add_verse("q7_3", "7", "Luk_24_39", ["See", "Touch", "see", ], "Jesus Christ invites them to recognize him because he resembles to before death");
+	
 	lg.q8_1__for_all_sec = `<a class='exam_ref exam_title' href='${hb.href_for_all_resu}'>For All</a>`;
 	lg.q8_1__for_all = `Select all verses that support a <a class='exam_ref' href='${hb.href_resurrection}'>resurrection</a> of the dead that is for ALL people`;
 	numv = "1"; bcit = "Jhn_5_28";
@@ -293,6 +319,15 @@ export function init_en_poll_txt(){
 	lg.b_for_all = "Our resurrection is for ALL people, good and bad";
 	lg.b_not_yet = "Our resurrection is on the FINAL day. Not yet";
 	lg.b_new_earth = "Our resurrection is in a NEW earth with a new heavens";
+
 	
+}
+
+function add_verse(numq, numv, bcit, words_up, should){
+	const lg = gvar.glb_poll_txt;
+	//Call example: add_verse("q11_1", "4", "Isa_66_22", ["new", "earth,", ], "It is on a NEW EARTH with a new heavens")
+	set_stm_bibref(`${numq}__verse${numv}_str`, `BIBREF_${bcit}`, { [bcit]: words_up });
+	set_href_bibcit(`${numq}__verse${numv}_href`, bcit);
+	lg[`${numq}__verse${numv}_should`] = should;
 }
 

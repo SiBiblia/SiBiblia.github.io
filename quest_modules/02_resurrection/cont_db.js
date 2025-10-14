@@ -321,6 +321,7 @@ export function init_exam_database(){
 			q7_2__verse4_str: { rclk_href: "q7_2__verse4_href", should_on: "q7_2__verse4_should", },
 			q7_2__verse5_str: { rclk_href: "q7_2__verse5_href", should_on: "q7_2__verse5_should", },
 			q7_2__verse6_str: { rclk_href: "q7_2__verse6_href", should_on: "q7_2__verse6_should", },
+			q7_2__verse7_str: { rclk_href: "q7_2__verse7_href", should_on: "q7_2__verse7_should", },
 		},
 		activated_if: {
 			c1: { q_memory__: { a_simple_NO: "on", }, },
@@ -338,6 +339,7 @@ export function init_exam_database(){
 			c4: { ours_memory__: { q7_2__verse4_str: "off", }, },
 			c5: { ours_memory__: { q7_2__verse5_str: "off", }, },
 			c6: { ours_memory__: { q7_2__verse6_str: "off", }, },
+			c7: { ours_memory__: { q7_2__verse7_str: "off", }, },
 		},
 	};	
 
@@ -363,6 +365,7 @@ export function init_exam_database(){
 			q7_3__verse4_str: { rclk_href: "q7_3__verse4_href", should_on: "q7_3__verse4_should", },
 			q7_3__verse5_str: { rclk_href: "q7_3__verse5_href", should_on: "q7_3__verse5_should", },
 			q7_3__verse6_str: { rclk_href: "q7_3__verse6_href", should_on: "q7_3__verse6_should", },
+			q7_3__verse7_str: { rclk_href: "q7_3__verse7_href", should_on: "q7_3__verse7_should", },
 		},
 		activated_if: {
 			c1: { q_resemblance__: { a_simple_NO: "on", }, },
@@ -380,6 +383,7 @@ export function init_exam_database(){
 			c4: { ours_resemblance__: { q7_3__verse4_str: "off", }, },
 			c5: { ours_resemblance__: { q7_3__verse5_str: "off", }, },
 			c6: { ours_resemblance__: { q7_3__verse6_str: "off", }, },
+			c7: { ours_resemblance__: { q7_3__verse7_str: "off", }, },
 		},
 	};	
 
