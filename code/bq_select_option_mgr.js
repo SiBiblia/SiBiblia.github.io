@@ -80,10 +80,12 @@ export function scroll_to_top(dv_elem) {
 	
 	const dist = (rect.top - rect2.top);
 	//dv_content.scrollBy(0, dist);
-	dv_content.scrollBy({
-		top: dist,
-		left: 0,
-		behavior: "smooth",
+	window.requestAnimationFrame(() => {
+		dv_content.scrollBy({
+			top: dist,
+			left: 0,
+			behavior: "smooth",
+		});
 	});
 }
 

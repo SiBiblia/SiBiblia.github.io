@@ -265,6 +265,13 @@ export async function start_module_mgr(lang_md, curr_lang){
 		
 	if(PERSISTANT_STATE){ window.addEventListener('beforeunload', save_current_qmodu_hdlr); }
 
+	window.addEventListener('online', async () => {
+		if(fb_mod == null){
+			console.log("fb_mod == null. NO_FIREBASE CONNECTION. NOW WITH INTERNET. RELOADING PAGE.");
+			location.reload();
+		}
+	});
+
 	check_param_clear_loc_storage();
 
 	init_page_buttons();
