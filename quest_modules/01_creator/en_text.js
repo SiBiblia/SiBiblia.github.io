@@ -39,11 +39,11 @@ export function init_en_poll_txt(){
 	lg.q1_0__YES_bible = "YES, I like the Bible";
 	lg.q1_0__NO_bible = "NO, I don't like the Bible";
 
-	lg.q1_1__creator = `<span class='big_font bold_font'><a href='${hb.href_creator_tit}'>Creator</a>?</span>`;
+	lg.q1_1__creator = `<span class='big_font bold_font'>Is there a <a href='${hb.href_creator_tit}'>Creator</a>?</span>`;
 	lg.q1_1__YES_creator = "YES, there is a Creator";
 	lg.q1_1__NO_creator = "NO, there is no Creator";	
 
-	lg.q1_1_2__six_days = `<span class='big_font bold_font'>In <a href='${hb.href_creation}'>Six Days</a>?</span>`;
+	lg.q1_1_2__six_days = `<span class='big_font bold_font'>In <a href='${hb.href_creation}'>Six Days</a> of Creation?</span>`;
 	lg.q1_1_2__YES_six_days = "YES, in six days of creation";
 	lg.q1_1_2__NO_six_days = "NO, in more than six days of creation";	
 
@@ -54,7 +54,7 @@ export function init_en_poll_txt(){
 	lg.o_evolution_comm = `The question about six days refers to six rotations of the planet on its axis. Six literal days so
 	there is no time for evolution.`;
 
-	lg.q_millions_of_years = `<span class='big_font bold_font'>Millions of <a href='${hb.href_factories}'>years</a>?</span>`;
+	lg.q_millions_of_years = `<span class='big_font bold_font'><a href='${hb.href_factories}'>Millions of years</a> of evolution?</span>`;
 
 	lg.q_intelligent_design = `<span class='big_font bold_font'>Intelligent design?</span>`;
 	lg.q_about_7_thousand_years = `<span class='big_font bold_font'>One couple about 7 thousand year ago?</span>`;
