@@ -68,6 +68,7 @@ function add_option(dv_parent, id_option, label, handler, item_cls_arr){
 	return dv_opt; 
 }
 
+/*
 export function scroll_to_top(dv_elem) {
 	if(dv_elem == null){ return; }
 	const rect = dv_elem.getBoundingClientRect();
@@ -80,13 +81,26 @@ export function scroll_to_top(dv_elem) {
 	
 	const dist = (rect.top - rect2.top);
 	//dv_content.scrollBy(0, dist);
+	//window.requestAnimationFrame(() => {
+	dv_content.scrollBy({
+		top: dist,
+		left: 0,
+		behavior: "smooth",
+	});
+	//});
+}*/
+
+export function scroll_to_top(dv_elem) {
+	if(dv_elem == null){ return; }
 	window.requestAnimationFrame(() => {
-		dv_content.scrollBy({
-			top: dist,
-			left: 0,
+		dv_elem.scrollIntoView({
 			behavior: "smooth",
+			block: "start",
+			container: "all",
+			inline: "nearest",
 		});
 	});
 }
+
 
 
