@@ -2120,9 +2120,11 @@ function write_fb_qmodu_pub_stats(obj, dt){
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	
 	const module_pth = gvar.current_qmonam;
+	const pstats_path = fb_mod.firebase_bib_quest_path + "pstats/";
+	const qmod_pstats_path = pstats_path + module_pth;
 	
 	const suf_id_results = gvar.current_qmonam + SUF_ID_PSTATS_RESULTS;
-	on_stats_change_show_results(suf_id_results, "PSTATS", module_pth, obj);
+	on_stats_change_show_results(suf_id_results, "PSTATS", qmod_pstats_path, obj);
 	
 	if(in_fb_Pstat()){ 
 		console.error("ALREADY in Pstat."); 
@@ -2139,8 +2141,6 @@ function write_fb_qmodu_pub_stats(obj, dt){
 	}				
 	wr_data[module_pth + '/' + 'last_check'] = dt;
 	wr_data[module_pth + '/' + 'num_checks'] = fb_mod.md_db.increment(1);
-
-	const pstats_path = fb_mod.firebase_bib_quest_path + "pstats/";
 	
 	if(DEBUG_FB_WRITE_RESULTS){ 
 		console.log("write_fb_qmodu_pub_stats. full_data=" + JSON.stringify(wr_data, null, "  ")); 
@@ -2244,10 +2244,11 @@ function write_fb_user_qmodu_stats(obj, dt){
 	
 	const usr_path = fb_mod.firebase_get_user_path();  // has NO slash at the end
 	const module_pth = usr_path + '/stats/to_add/' + gvar.current_qmonam;
+	const qmod_usr_pth = module_pth;
 	const usr_qmod_up_path = fb_mod.firebase_bib_quest_path + "to_update/stats/" + gvar.current_qmonam + "/" + fb_mod.tc_fb_user.uid;
 	
 	const suf_id_results = gvar.current_qmonam + SUF_ID_USTATS_RESULTS;
-	on_stats_change_show_results(suf_id_results, "USTATS", module_pth, obj);
+	on_stats_change_show_results(suf_id_results, "USTATS", qmod_usr_pth, obj);
 
 	if(in_fb_Ustat()){ 
 		console.error("ALREADY in Ustat. "); 

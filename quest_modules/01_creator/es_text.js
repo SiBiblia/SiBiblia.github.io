@@ -170,9 +170,9 @@ export function init_es_poll_txt(){
 
 	lg.o_faulty_logic_comm = `Para continuar con estas preguntas ud. necesita deshacerse de este comentario porque su lógica basada en evidencia parece equivocada.`;
 	
-	lg.q_you_can_make_a_car_again = `Si ud. lo puede hacer una vez, ud. lo puede volver a hacer.`;
+	lg.q_you_can_make_a_car_again = `Si ud. lo diseñó, ud. lo puede volver a hacer.`;
 	lg.o_humans_can_re_create_their_creations = `Si los humanos saben como hacer un carro es evidente que pueden hacer mas.`;
-	lg.q_he_can_make_a_body_again = `Si El lo hiso una vez, El lo puede volver a hacer.`;
+	lg.q_he_can_make_a_body_again = `Si El Creador lo diseñó, El lo puede volver a hacer.`;
 	lg.o_the_creator_can_re_create_his_creation = `EL creador del cuerpo humano puede hacerlo de nuevo así como nosotros los humanos podemos hacer de nuevo nuestras creaciones.`;
 
 	lg.o_get_qrcode = `<span class='has_left_padding very_big_font bold_font'>Usted necesita hacer "login" (entrar) para obtener un código QR y comenzar a compartir las Buenas Nuevas y ganarse algo mientras lo hace. Por favor haga "login" (entre).</span>`;
