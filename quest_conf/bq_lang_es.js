@@ -381,6 +381,8 @@ function init_es_basic_msg(){
 		Quieres escribir de nuevo tus resultados en las estadísticas?`;
 
 	obj.msg_your_score = `Su puntaje`;
+	obj.msg_pub_score = `Puntaje promedio de anónimos`;
+	obj.msg_usr_score = `Puntaje promedio de usuarios registrados`;
 	obj.msg_score_note = `0 es el mínimo. 1 es el máximo.`;
 	
 	obj.msg_pub_results = `Ud. vs ANONIMOS`;

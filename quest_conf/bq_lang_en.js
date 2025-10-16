@@ -381,8 +381,10 @@ function init_en_basic_msg(){
 		Do you want to write your results again in the stats?`;
 
 	obj.msg_your_score = `Your score`;
-	obj.msg_score_note = `0 is lowest. 1 is maximum.`;
-		
+	obj.msg_pub_score = `Anonymous people average score`;
+	obj.msg_usr_score = `Registered users average score`;
+	obj.msg_score_note = `0 is lowest. 1 is maximum.`;		
+
 	obj.msg_pub_results = `You vs ANONYMOUS people`;
 	obj.msg_usr_results = `You vs REGISTERED users`;
 	obj.msg_green_note = `is GOOD point.`;

@@ -92,6 +92,7 @@ const MIN_DATE = -7000;
 const MAX_DATE = -5000;
 
 const MAX_SCORE_WEIGHT_DECI = 4;
+const INVALID_SCORE_WEIGHT = -1;
 
 const SUF_USR_IMG = "_img";
 const SUF_USR_NAM = "_nam";
@@ -2121,7 +2122,7 @@ function calc_exam_results_object(){
 	return all_obs;
 }
 
-function write_fb_qmodu_pub_stats(obj, dt){
+function write_fb_qmodu_pub_stats(usr_rslts, dt){
 	if(DEBUG_FB_WRITE_RESULTS){ console.log("Called write_fb_qmodu_pub_stats."); }
 	if(fb_mod == null){ console.error("fb_mod == null"); return; }
 	
@@ -2133,7 +2134,7 @@ function write_fb_qmodu_pub_stats(obj, dt){
 	const qmod_pstats_path = pstats_path + module_pth;
 	
 	const suf_id_results = gvar.current_qmonam + SUF_ID_PSTATS_RESULTS;
-	on_stats_change_show_results(suf_id_results, STATS_PUB, qmod_pstats_path, obj);
+	on_stats_change_show_results(suf_id_results, STATS_PUB, qmod_pstats_path, usr_rslts);
 	
 	if(in_fb_Pstat()){ 
 		console.error("ALREADY in Pstat."); 
@@ -2144,7 +2145,7 @@ function write_fb_qmodu_pub_stats(obj, dt){
 	
 	wr_data['last_check'] = dt;
 	
-	const all_qids = Object.keys(obj);
+	const all_qids = Object.keys(usr_rslts);
 	for(const qid of all_qids){
 		wr_data[module_pth + '/' + qid] = fb_mod.md_db.increment(1);
 	}				
@@ -2200,21 +2201,23 @@ export function calc_user_qmodule_score(qmod_scow, usr_resul){
 	const all_qids = Object.keys(usr_resul);
 	for(const qid of all_qids){
 		if(qmod_scow[qid] == null){
-			console.error("qmod_scow[qid] == null");
+			console.error(`qmod_scow[${qid}] == null`);
 			continue;
 		}
 		const qid_scow = qmod_scow[qid];
 		bad_score += qid_scow;
 	}
 	
-	let score = (1 - bad_score);
+	const num_deci = MAX_SCORE_WEIGHT_DECI;
+	let score = fix_deci((1 - bad_score), num_deci);
+	
 	if(score < 0){ score = 0; }
 	if(score > 1){ score = 1; }
 	
 	return score;
 }
 
-function write_fb_user_qmodu_results(obj){
+function write_fb_user_qmodu_results(usr_rslts){
 	if(fb_mod == null){ console.error("fb_mod == null"); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null. "); return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
@@ -2227,11 +2230,11 @@ function write_fb_user_qmodu_results(obj){
 	
 	get_qmodule_score_weights(fb_database, qmonam).then((qmod_scow) => {
 		if(DEBUG_UPDATE_SCORES){ console.log("get_qmodule_score_weights." + " qmonam " + qmonam + " weights=" + JSON.stringify(qmod_scow)); }
-		const usr_score = calc_user_qmodule_score(qmod_scow, obj);
+		const usr_score = calc_user_qmodule_score(qmod_scow, usr_rslts);
 		
 		const wr_data = {};
 		
-		wr_data[results_pth + '/observ/'] = obj;
+		wr_data[results_pth + '/observ/'] = usr_rslts;
 		wr_data[results_pth + '/ts_reported/'] = fb_mod.md_db.serverTimestamp();
 		wr_data[results_pth + '/score/'] = usr_score;
 		wr_data[results_pth + '/cicle_added/'] = curr_ci;
@@ -2245,7 +2248,7 @@ function write_fb_user_qmodu_results(obj){
 	});
 }
 
-function write_fb_user_qmodu_stats(obj, dt){
+function write_fb_user_qmodu_stats(usr_rslts, dt){
 	if(DEBUG_FB_WRITE_RESULTS){ console.log("Called write_fb_user_qmodu_stats."); }
 	if(fb_mod == null){ console.error("fb_mod == null"); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null. "); return; }
@@ -2257,7 +2260,7 @@ function write_fb_user_qmodu_stats(obj, dt){
 	const usr_qmod_up_path = fb_mod.firebase_bib_quest_path + "to_update/stats/" + gvar.current_qmonam + "/" + fb_mod.tc_fb_user.uid;
 	
 	const suf_id_results = gvar.current_qmonam + SUF_ID_USTATS_RESULTS;
-	on_stats_change_show_results(suf_id_results, STATS_USR, qmod_usr_pth, obj);
+	on_stats_change_show_results(suf_id_results, STATS_USR, qmod_usr_pth, usr_rslts);
 
 	if(in_fb_Ustat()){ 
 		console.error("ALREADY in Ustat. "); 
@@ -2266,7 +2269,7 @@ function write_fb_user_qmodu_stats(obj, dt){
 	
 	const wr_data = {};
 	
-	const all_qids = Object.keys(obj);
+	const all_qids = Object.keys(usr_rslts);
 	for(const qid of all_qids){
 		wr_data[module_pth + '/' + qid] = fb_mod.md_db.increment(1);
 	}				
@@ -2399,27 +2402,47 @@ function fix_deci(num, num_deci){
 function set_observations_score_weight(num_wei, sum_wei, all_obs){
 	if((sum_wei < 0) || (sum_wei > 1)){ console.error(`invalid sum_wei (${sum_wei}). Assuming cero.`); num_wei = 0; sum_wei = 0; }
 	
-	const all_qids = Object.keys(all_obs);
-	const rest = all_qids.length - num_wei;
-	const ww0 = ((1 - sum_wei)/ rest);
-	const num_deci = MAX_SCORE_WEIGHT_DECI;
-	const def_ww = fix_deci(ww0, num_deci);
-	let sum = 0;
-	for(const qid of all_qids){
-		const quest = gvar.glb_poll_db[qid];
-		if(quest == null){ console.error("quest == null"); continue; }
-		let ww = quest.score_weight;
-		if(ww == null){ ww = def_ww; } else { ww = fix_deci(ww, num_deci); }
-		if((ww >= 0) && (ww <= 1) && ((sum + ww) <= 1)){
-			sum += ww;
-			all_obs[qid] = ww;
-		}
+	const read_obs = JSON.parse(JSON.stringify(all_obs));
+	
+	let avg_ww = null;
+	if(num_wei > 0){
+		avg_ww = sum_wei / num_wei;
 	}
+	
+	const all_qids = Object.keys(all_obs);
+	if(avg_ww == null){
+		avg_ww = 1 / all_qids.length;
+	}
+	
+	let tot_wei = 0;
+	for(const qid of all_qids){
+		if(read_obs[qid] == INVALID_SCORE_WEIGHT){
+			read_obs[qid] = avg_ww;
+		}
+		tot_wei += read_obs[qid];
+	}
+	
+	const num_deci = MAX_SCORE_WEIGHT_DECI;
+	let sum2 = 0;
+	for(const qid of all_qids){
+		const ww = read_obs[qid] / tot_wei;
+		all_obs[qid] = fix_deci(ww, num_deci);
+		sum2 += all_obs[qid];
+	}
+	
+	if(sum2 > 1){ console.error("sum2 > 1"); }
 	
 	if(DEBUG_OBSERV_SCORE){
 		console.log("AL_OBS=");
 		console.log(all_obs);
 	}
+}
+
+function is_number(val){
+	if((typeof val === 'number') && ! isNaN(val)){
+		return true;
+	}
+	return false;
 }
 
 function init_DAG_func(){
@@ -2439,9 +2462,14 @@ function init_DAG_func(){
 	for(const qid of all_qids){
 		const quest = gvar.glb_poll_db[qid];
 		if(is_valid_observ(qid)){
-			all_obs[qid] = 0;
+			all_obs[qid] = INVALID_SCORE_WEIGHT;
 			const ww = quest.score_weight;
-			if(ww != null){ sum_wei += fix_deci(ww, num_deci); num_wei++; }
+			if((ww != null) && is_number(ww) && (ww > 0)){
+				const wei = fix_deci(ww, num_deci); 
+				all_obs[qid] = wei;
+				sum_wei += wei; 
+				num_wei++; 
+			}
 		}
 		init_signals_for(qid);
 	}
@@ -2450,7 +2478,7 @@ function init_DAG_func(){
 		db.FINAL_OBSERVATION__ = get_final_obs();
 	}
 	if(all_obs.FINAL_OBSERVATION__ == null){
-		all_obs.FINAL_OBSERVATION__	= 0;		
+		all_obs.FINAL_OBSERVATION__	= INVALID_SCORE_WEIGHT;
 	}
 	
 	set_observations_score_weight(num_wei, sum_wei, all_obs);
@@ -3531,7 +3559,7 @@ function get_grid_results(fb_stats, fb_results){
 	return dv_gr;
 }
 
-function on_stats_change_show_results(suf_id_results, stats_kind, stts_path, fb_results){
+function on_stats_change_show_results(suf_id_results, stats_kind, stts_path, usr_rslts){
 	const gst = gvar.glb_poll_db.qmodu_state;
 	const qid = gst.writer_qid;
 	const id_results = qid + suf_id_results;
@@ -3552,7 +3580,7 @@ function on_stats_change_show_results(suf_id_results, stats_kind, stts_path, fb_
 		is_nw_elem = true;;
 	}
 	
-	gvar.fb_results = fb_results;
+	//gvar.fb_results = usr_rslts;
 	
 	if(! is_nw_elem){
 		return;
@@ -3571,7 +3599,7 @@ function on_stats_change_show_results(suf_id_results, stats_kind, stts_path, fb_
 				console.log("on_stats_change_show_results. FULL_OBJ=");
 				console.log(fb_stats);
 			}
-			show_results_in_observation(dv_results, stats_kind, fb_stats);
+			show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts);
 		} else {
 			console.error("on_stats_change_show_results. No data available");
 		}
@@ -3591,24 +3619,38 @@ function get_div_title(tit_str, is_small){
 	return dv_tit;
 }
 
-function show_results_in_observation(dv_results, stats_kind, fb_stats){
+function show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts){
 	const lang = gvar.glb_curr_lang;
 	dv_results.innerHTML = "";
-	
+
+	let score_tit = lang.msg_pub_score;
 	let tit_str = lang.msg_pub_results;
 	if(stats_kind != STATS_PUB){
+		score_tit = lang.msg_usr_score;
 		tit_str = lang.msg_usr_results;
 	} 
-	const dv_tit = get_div_title(tit_str);
-	dv_results.appendChild(dv_tit);
+	
+	const dv_tit1 = get_div_title(score_tit);
+	dv_results.appendChild(dv_tit1);
+	const dv_note1 = get_div_title(lang.msg_score_note, true);
+	dv_results.appendChild(dv_note1);
+	
+	const qmod_scow = gvar.all_observations;	
+	const avg_score = calc_stats_qmodule_score(qmod_scow, fb_stats);
+	const dv_score = get_div_title(avg_score);
+	dv_results.appendChild(dv_score);
+	
+	const dv_tit2 = get_div_title(tit_str);
+	dv_results.appendChild(dv_tit2);
 	
 	const res_note = `<span class="background_green">${lang.msg_green_note}</span> 
 	<span class="background_red">${lang.msg_red_note}</span> ${lang.msg_perc_note}`;
 	
-	const dv_note = get_div_title(res_note, true);
-	dv_results.appendChild(dv_note);
+	const dv_note2 = get_div_title(res_note, true);
+	dv_results.appendChild(dv_note2);
 	
-	const grd_res = get_grid_results(fb_stats, gvar.fb_results);
+	//const grd_res = get_grid_results(fb_stats, gvar.fb_results);
+	const grd_res = get_grid_results(fb_stats, usr_rslts);
 	dv_results.appendChild(grd_res);
 }
 
@@ -3629,39 +3671,37 @@ function show_score_in_observation(qid){
 	dv_results_obs.appendChild(dv_score);
 }
 
-/*
-const element = document.getElementById('yourElementId'); // Replace 'yourElementId'
-
-// Set grid-column-start using a line number
-element.style.gridColumnStart = '2';
-
-// Set grid-column-start using a named grid line
-element.style.gridColumnStart = 'column-name';
-
-// Set grid-column-start to span a certain number of columns
-element.style.gridColumnStart = 'span 3';
-
-// Set grid-column-start to span until a named grid line
-element.style.gridColumnStart = 'span column-name';
-
-import { getDatabase, ref, onValue, off } from "firebase/database";
-
-const db = getDatabase();
-const dataRef = ref(db, 'your/data/path');
-
-// Listener function
-const valueListener = onValue(dataRef, (snapshot) => {
-  const data = snapshot.val();
-  console.log(data);
-});
-
-// Detach the specific listener
-off(dataRef, "value", valueListener);
-
-// Detach all "value" listeners at the reference
-off(dataRef, "value");
-
-// Detach all listeners at the reference
-off(dataRef);
-*/
+export function calc_stats_qmodule_score(qmod_scow, fb_stats){
+	let bad_score = 0;
+	const tot = fb_stats.num_checks;
+	const num_deci = MAX_SCORE_WEIGHT_DECI;
+	
+	const all_qids = Object.keys(fb_stats);
+	for(const qid of all_qids){
+		if(qmod_scow[qid] == null){
+			console.error(`qmod_scow[${qid}] == null`);
+			continue;
+		}
+		let cntr = fb_stats[qid];
+		if((cntr != null) && ((cntr <= 0) || (cntr > tot))){
+			console.error("cntr <= 0 OR cntr > tot");
+			continue;
+		}
+		if(cntr == null){
+			cntr = 0;
+		}
+		
+		const qid_scow = qmod_scow[qid] * cntr;
+		bad_score += qid_scow;
+	}
+	
+	bad_score = (bad_score / tot);
+	
+	let score = fix_deci((1 - bad_score), num_deci);
+	
+	if(score < 0){ score = 0; }
+	if(score > 1){ score = 1; }
+	
+	return score;
+}
 

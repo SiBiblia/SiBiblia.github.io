@@ -27,13 +27,6 @@
 			"modules": {
 				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
-				"$module_name": {
-					"$observation_qid": {
-						"$val": {
-							".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() <= 1)",
-						},
-					},
-				},
 			},
 			"scores": {
 				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",

@@ -263,4 +263,42 @@ set(newMessageRef, {
 });
 
 	
-	
+// ============================================================================================================================	
+// ============================================================================================================================	
+// ============================================================================================================================	
+
+const element = document.getElementById('yourElementId'); // Replace 'yourElementId'
+
+// Set grid-column-start using a line number
+element.style.gridColumnStart = '2';
+
+// Set grid-column-start using a named grid line
+element.style.gridColumnStart = 'column-name';
+
+// Set grid-column-start to span a certain number of columns
+element.style.gridColumnStart = 'span 3';
+
+// Set grid-column-start to span until a named grid line
+element.style.gridColumnStart = 'span column-name';
+
+import { getDatabase, ref, onValue, off } from "firebase/database";
+
+const db = getDatabase();
+const dataRef = ref(db, 'your/data/path');
+
+// Listener function
+const valueListener = onValue(dataRef, (snapshot) => {
+  const data = snapshot.val();
+  console.log(data);
+});
+
+// Detach the specific listener
+off(dataRef, "value", valueListener);
+
+// Detach all "value" listeners at the reference
+off(dataRef, "value");
+
+// Detach all listeners at the reference
+off(dataRef);
+
+
