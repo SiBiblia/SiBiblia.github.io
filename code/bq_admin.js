@@ -103,9 +103,6 @@ async function do_selec(val_sel_w){
 		await update_qmodule_results(gvar.current_qmonam);
 	}
 	if(val_sel_w == admin_ops.download_db){
-		//test_php();
-		//sim_download('test_sim_download_jlq.txt', 'HOLA JOSE FUNCIONO!');
-		//generate_and_download();
 		download_database();
 	}
 	if(val_sel_w == admin_ops.get_verse){
@@ -335,74 +332,6 @@ async function update_qmodule_repots_for(qmonam, report){
 		}
 	}	
 }
-
-function test_php(){
-	const obj = { 
-		campo3: "Este es el campo3",
-		campo4: "Este es el campo4",
-	};
-	const data = { 
-		file_name: "mi_nombre_de_archivo",
-		content: obj,
-	};
-	
-	const the_obj = JSON.stringify(data, null, "  ");
-	const url1 = "../backups/save.php";
-	
-	fetch(url1, {
-		method:"POST",
-		headers: {
-		   'Content-Type':'application/json',
-		},
-		body: the_obj,
-	}).then((data_recv) => {
-		console.log(data_recv);
-		data_recv.text().then((txt) => {
-			console.log(">>>>>\n" + txt + "\n<<<<<\n");
-		});
-	});
-	
-	console.log("Called test_php");
-}
-
-/*
- < *div id="id_pop_opt_sec"></div>
- <div id="id_user_info_sec"></div>
- <div id="id_admin_ops_sec"></div>
- 
- */
-
-/*
-function sim_download(filename, text) {
-	var pom = document.createElement('a');
-	pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-	pom.setAttribute('download', filename);
-	
-	if (document.createEvent) {
-		var event = document.createEvent('MouseEvents');
-		event.initEvent('click', true, true);
-		pom.dispatchEvent(event);
-	}
-	else {
-		pom.click();
-	}
-}
-
-function generate_and_download(){
-	const data = [];
-	const obj = { 
-		campo3: "Este es el campo3",
-		campo4: "Este es el campo4",
-	};
-	const the_str = JSON.stringify(obj);
-	data.push(the_str);
-	
-	const file = new File(data, "bajado.txt", {type: 'application/octet-stream'});
-	var url = URL.createObjectURL(file);
-	window.open(url);
-	URL.revokeObjectURL(url); // This seems to work here.
-}
-*/
 
 function download_database(){
 	if(fb_mod == null){ console.error("download_database. fb_mod == null."); return; }
