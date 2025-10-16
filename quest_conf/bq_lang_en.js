@@ -380,7 +380,8 @@ function init_en_basic_msg(){
 	obj.msg_rewrite_results_signed_in = `You have finished this module more than once. 
 		Do you want to write your results again in the stats?`;
 
-	obj.msg_results = `These are your results compared to others:`;
+	obj.msg_pub_results = `You vs ANONYMOUS people`;
+	obj.msg_usr_results = `You vs REGISTERED users`;
 		
 	obj.msg_change_answer = `To add answers click on the current answer and click on "${obj.msg_edit_ans}"`;
 	obj.msg_caused_by_answers = "This observation is shown due to your answer in these questions: ";

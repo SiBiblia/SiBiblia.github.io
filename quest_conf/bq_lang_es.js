@@ -380,7 +380,8 @@ function init_es_basic_msg(){
 	obj.msg_rewrite_results_signed_in = `Has terminado este modulo mas de una vez. 
 		Quieres escribir de nuevo tus resultados en las estadísticas?`;
 
-	obj.msg_results = `Estos son tus resultados comparados con otros:`;
+	obj.msg_pub_results = `Ud. vs ANONIMOS`;
+	obj.msg_usr_results = `Ud. vs usuarios REGISTRADOS`;
 		
 	obj.msg_change_answer = `Para adicionar respuestas click en la respuesta actual y click en "${obj.msg_edit_ans}"`;
 	obj.msg_caused_by_answers = "Esta observación se muestra por sus respuestas en las siguientes preguntas: ";

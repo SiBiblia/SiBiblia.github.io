@@ -50,6 +50,9 @@ const MIN_ANSW_SHOW_INVERT = 3;
 const stg_prefix = "STRONG";
 const lnk_prefix = "LINK";
 
+const STATS_PUB = "PSTATS";
+const STATS_USR = "USTATS";
+
 const LEFT_POS = "grid_item_left";
 const RIGHT_POS = "grid_item_right";
 
@@ -1608,7 +1611,7 @@ function pop_menu_handler(){
 		dv_pop_men.appendChild(op);
 	}
 
-	if((fb_mod != null) && DEBUG_SHOW_TEST_USERS){
+	if((fb_mod != null) && DEBUG_SHOW_TEST_USERS && is_localhost()){
 		let op = document.createElement("div");
 		op.classList.add("exam");
 		op.classList.add("is_block");
@@ -1627,6 +1630,12 @@ function pop_menu_handler(){
 	}
 
 	scroll_to_top(dv_pop_men);
+}
+
+function is_localhost(){
+	const nm = location.hostname;
+	const is_lh = ((nm === 'localhost') || (nm === '127.0.0.1'));
+	return is_lh;
 }
 
 function remove_all_classes(dv_elem) {
@@ -2124,7 +2133,7 @@ function write_fb_qmodu_pub_stats(obj, dt){
 	const qmod_pstats_path = pstats_path + module_pth;
 	
 	const suf_id_results = gvar.current_qmonam + SUF_ID_PSTATS_RESULTS;
-	on_stats_change_show_results(suf_id_results, "PSTATS", qmod_pstats_path, obj);
+	on_stats_change_show_results(suf_id_results, STATS_PUB, qmod_pstats_path, obj);
 	
 	if(in_fb_Pstat()){ 
 		console.error("ALREADY in Pstat."); 
@@ -2248,7 +2257,7 @@ function write_fb_user_qmodu_stats(obj, dt){
 	const usr_qmod_up_path = fb_mod.firebase_bib_quest_path + "to_update/stats/" + gvar.current_qmonam + "/" + fb_mod.tc_fb_user.uid;
 	
 	const suf_id_results = gvar.current_qmonam + SUF_ID_USTATS_RESULTS;
-	on_stats_change_show_results(suf_id_results, "USTATS", qmod_usr_pth, obj);
+	on_stats_change_show_results(suf_id_results, STATS_USR, qmod_usr_pth, obj);
 
 	if(in_fb_Ustat()){ 
 		console.error("ALREADY in Ustat. "); 
@@ -3503,7 +3512,7 @@ function get_grid_results(fb_stats, fb_results){
 	return dv_gr;
 }
 
-function on_stats_change_show_results(suf_id_results, htm_tit, stts_path, fb_results){
+function on_stats_change_show_results(suf_id_results, stats_kind, stts_path, fb_results){
 	const gst = gvar.glb_poll_db.qmodu_state;
 	const qid = gst.writer_qid;
 	const id_results = qid + suf_id_results;
@@ -3512,11 +3521,14 @@ function on_stats_change_show_results(suf_id_results, htm_tit, stts_path, fb_res
 	if(dv_results == null){	
 		const dv_results_observ = document.getElementById(qid + SUF_ID_RESULTS_OBSERVATION);
 		if(dv_results_observ == null){ console.error("dv_results_observ == null"); return; }
+		const dv_quest = document.getElementById(qid);
+		dv_quest.style.height = "auto";
 
 		dv_results = document.createElement("div");
 		dv_results.id = id_results;
 		dv_results.classList.add("exam");
 		dv_results.classList.add("observ_color");
+		dv_results.classList.add("has_margin_top");
 		dv_results_observ.appendChild(dv_results);
 		is_nw_elem = true;;
 	}
@@ -3540,15 +3552,28 @@ function on_stats_change_show_results(suf_id_results, htm_tit, stts_path, fb_res
 				console.log("on_stats_change_show_results. FULL_OBJ=");
 				console.log(fb_stats);
 			}
-			show_results_in_observation(dv_results, htm_tit, fb_stats);
+			show_results_in_observation(dv_results, stats_kind, fb_stats);
 		} else {
 			console.error("on_stats_change_show_results. No data available");
 		}
 	});
 }
 
-function show_results_in_observation(dv_results, htm_tit, fb_stats){
-	dv_results.innerHTML = "";		
+function show_results_in_observation(dv_results, stats_kind, fb_stats){
+	dv_results.innerHTML = "";
+	
+	const dv_tit = document.createElement("div");
+	//dv_tit.classList.add("exam");
+	dv_tit.classList.add("is_block");
+	dv_tit.classList.add("in_center");
+	dv_tit.classList.add("exam_title", "bold_font");
+	if(stats_kind == STATS_PUB){
+		dv_tit.innerHTML = gvar.glb_curr_lang.msg_pub_results;
+	} else {
+		dv_tit.innerHTML = gvar.glb_curr_lang.msg_usr_results;
+	}
+	dv_results.appendChild(dv_tit);
+	
 	const grd_res = get_grid_results(fb_stats, gvar.fb_results);
 	dv_results.appendChild(grd_res);
 }
