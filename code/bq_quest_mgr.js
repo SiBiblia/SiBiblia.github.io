@@ -2317,12 +2317,13 @@ function write_fb_qmod_stats_and_results(force_wr){
 		return resp;
 	}	
 	
-	write_fb_qmodu_pub_stats(resp.wr_o, dt);
 	resp.has_usr = (fb_mod.tc_fb_user != null);
 	if(resp.has_usr){
 		write_fb_user_qmodu_stats(resp.wr_o, dt);
 		write_fb_user_qmodu_results(resp.wr_o);
 	}
+	write_fb_qmodu_pub_stats(resp.wr_o, dt);
+	
 	return resp;
 }
 
@@ -3284,11 +3285,12 @@ function read_st_qmodu_results(){
 	*/
 
 function finish_qmodu(){
-	const resp = write_fb_qmod_stats_and_results(false);
-	
 	const gst = gvar.glb_poll_db.qmodu_state;
 	const qid = gst.writer_qid;
 	if(qid == null){ console.error("qid == null");  return; }
+	
+	show_score_in_observation(qid);
+	const resp = write_fb_qmod_stats_and_results(false);
 	
 	const is_write = (resp.pr_o == null);
 	const is_signed = resp.has_usr;
@@ -3384,7 +3386,9 @@ function get_grid_results(fb_stats, fb_results){
 		dv_val.style.gridRowEnd = num_row;
 		
 		dv_nam.innerHTML = nam;
-		if(fb_results[qid] != null){
+		
+		const usr_is_red = (fb_results[qid] != null);
+		if(usr_is_red){
 			sp_you.classList.add("background_red");
 		} else {
 			sp_you.classList.add("background_green");
@@ -3396,34 +3400,48 @@ function get_grid_results(fb_stats, fb_results){
 		num_row++;
 		
 		if(DEBUG_SHOW_RESULTS){ console.log("nam=" + nam + " perc_green=" + perc_green); }
-		if(perc_green > 0){
-			const dv_green = document.createElement("div");
-			dv_green.classList.add("results_data", "background_green");
-			//dv_green.classList.add("exam", "results_data", "background_green");
-			dv_green.style.gridColumnStart = 1;
-			dv_green.style.gridColumnEnd = perc_green;
-			dv_green.style.gridRowStart = num_row;
-			dv_green.style.gridRowEnd = num_row;
-			dv_green.innerHTML = perc_green + "%";
-			dv_gr.appendChild(dv_green);
+		
+		let perc_first = perc_green;
+		let color_first = "background_green";
+		let perc_second = perc_red;
+		let color_second = "background_red";
+		if(usr_is_red){
+			perc_first = perc_red;
+			color_first = "background_red";
+			perc_second = perc_green;
+			color_second = "background_green";
 		}
-		if((perc_green + 1) < 100){
-			const dv_red = document.createElement("div");
-			dv_red.classList.add("results_data", "background_red");
-			//dv_red.classList.add("exam", "results_data", "background_red");
-			dv_red.style.gridColumnStart = perc_green + 1;
-			dv_red.style.gridColumnEnd = 100;
-			dv_red.style.gridRowStart = num_row;
-			dv_red.style.gridRowEnd = num_row;
-			dv_red.innerHTML = perc_red + "%";
-			dv_gr.appendChild(dv_red);
+		
+		if(perc_first > 0){
+			const dv_first = document.createElement("div");
+			dv_first.classList.add("results_data", color_first);
+			//dv_first.classList.add("exam", "results_data", color_first);
+			dv_first.style.gridColumnStart = 1;
+			dv_first.style.gridColumnEnd = perc_first;
+			dv_first.style.gridRowStart = num_row;
+			dv_first.style.gridRowEnd = num_row;
+			dv_first.innerHTML = perc_first + "%";
+			dv_gr.appendChild(dv_first);
 		}
-
+		/*
+		if((perc_first + 1) < 100){
+			const dv_second = document.createElement("div");
+			dv_second.classList.add("results_data", color_second);
+			//dv_second.classList.add("exam", "results_data", color_second);
+			dv_second.style.gridColumnStart = perc_first + 1;
+			dv_second.style.gridColumnEnd = 100;
+			dv_second.style.gridRowStart = num_row;
+			dv_second.style.gridRowEnd = num_row;
+			dv_second.innerHTML = perc_second + "%";
+			dv_gr.appendChild(dv_second);
+		}*/
+		
 		//num_row++;
 		//const gr_rows = window.getComputedStyle(dv_gr).gridTemplateRows;;
 		//const num_rows = gr_rows.split(',').length;
 		console.log("NUM_ROWS = " + num_row);
 		
+		/*  "ALL" title
 		const dv_title = document.createElement("div");
 		dv_title.classList.add("results_title");
 		dv_title.style.backgroundColor = 'rgba(0,0,0,0)';
@@ -3433,6 +3451,7 @@ function get_grid_results(fb_stats, fb_results){
 		dv_title.style.gridRowEnd = num_row;
 		dv_title.innerHTML = gvar.glb_curr_lang.msg_all;
 		dv_gr.appendChild(dv_title);
+		*/
 		
 	}
 	
@@ -3559,23 +3578,55 @@ function on_stats_change_show_results(suf_id_results, stats_kind, stts_path, fb_
 	});
 }
 
-function show_results_in_observation(dv_results, stats_kind, fb_stats){
-	dv_results.innerHTML = "";
-	
+function get_div_title(tit_str, is_small){
 	const dv_tit = document.createElement("div");
-	//dv_tit.classList.add("exam");
 	dv_tit.classList.add("is_block");
 	dv_tit.classList.add("in_center");
-	dv_tit.classList.add("exam_title", "bold_font");
-	if(stats_kind == STATS_PUB){
-		dv_tit.innerHTML = gvar.glb_curr_lang.msg_pub_results;
+	if(is_small){ 
+		dv_tit.classList.add("small_font");
 	} else {
-		dv_tit.innerHTML = gvar.glb_curr_lang.msg_usr_results;
+		dv_tit.classList.add("big_font", "bold_font");
 	}
+	dv_tit.innerHTML = tit_str;
+	return dv_tit;
+}
+
+function show_results_in_observation(dv_results, stats_kind, fb_stats){
+	const lang = gvar.glb_curr_lang;
+	dv_results.innerHTML = "";
+	
+	let tit_str = lang.msg_pub_results;
+	if(stats_kind != STATS_PUB){
+		tit_str = lang.msg_usr_results;
+	} 
+	const dv_tit = get_div_title(tit_str);
 	dv_results.appendChild(dv_tit);
+	
+	const res_note = `<span class="background_green">${lang.msg_green_note}</span> 
+	<span class="background_red">${lang.msg_red_note}</span> ${lang.msg_perc_note}`;
+	
+	const dv_note = get_div_title(res_note, true);
+	dv_results.appendChild(dv_note);
 	
 	const grd_res = get_grid_results(fb_stats, gvar.fb_results);
 	dv_results.appendChild(grd_res);
+}
+
+function show_score_in_observation(qid){
+	const dv_results_obs = document.getElementById(qid + SUF_ID_RESULTS_OBSERVATION);
+	const lang = gvar.glb_curr_lang;
+	
+	const dv_tit = get_div_title(lang.msg_your_score);
+	dv_results_obs.appendChild(dv_tit);
+	const dv_note = get_div_title(lang.msg_score_note, true);
+	dv_results_obs.appendChild(dv_note);
+	
+	const usr_results = calc_exam_results_object();
+	const qmod_scow = gvar.all_observations;
+	
+	const usr_score = calc_user_qmodule_score(qmod_scow, usr_results);
+	const dv_score = get_div_title(usr_score);
+	dv_results_obs.appendChild(dv_score);
 }
 
 /*

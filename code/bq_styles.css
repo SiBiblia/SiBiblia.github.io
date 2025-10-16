@@ -570,6 +570,12 @@ a.exam_ref:hover {
 	font-weight: bold;
 }
 
+.small_font {
+	font-size: 0.5em;
+	//font-size: 50%;
+}
+
+
 .grid_user_info {
 	display: grid;
 	grid-template-columns: max-content repeat(10, 10fr) 0.1fr;

@@ -205,11 +205,11 @@ export function init_es_poll_txt(){
 	lg.o_clock_req_creativity_nam = `Creatividad & reloj`;
 	lg.o_phone_req_creativity_nam = `Creatividad & celula`;
 	lg.o_laptop_req_creativity_nam = `Creatividad & portatil`;
-	lg.o_complexity_with_design_is_harder_nam = `complejidad y diseño & Dificultad`;
-	lg.o_biology_is_harder_nam = `Biologico vs hecho por el hombre`;
-	lg.o_we_cannot_simulate_biology_nam = `SImulacion de la biología`;
+	lg.o_complexity_with_design_is_harder_nam = `Complejidad y diseño & Dificultad`;
+	lg.o_biology_is_harder_nam = `Biológico vs hecho por el hombre`;
+	lg.o_we_cannot_simulate_biology_nam = `Simulacion de la biología`;
 	lg.o_biology_req_creativity_nam = `Maquinaria biológica & Creatividad`;
-	lg.o_humans_can_re_create_their_creations_nam = `Re-creando de lo hecho por el hombre`;
+	lg.o_humans_can_re_create_their_creations_nam = `Re-creando lo hecho por el hombre`;
 	lg.o_the_creator_can_re_create_his_creation_nam = `Re-creando la biología`;
 	lg.o_short_end_nam = `Final corto`;
 	lg.o_long_end_nam = `Final largo`;

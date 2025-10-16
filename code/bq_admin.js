@@ -181,13 +181,7 @@ export function toggle_admin_opers(fb_usr){
 	scroll_to_top(dv_upper);
 }
 
-function get_qmodule_observations_obj(){
-	const all_obs = gvar.all_observations;
-	if(all_obs == null){ console.error("all_obs == null"); }
-	return all_obs;
-}
-
-function update_current_qmodule_observations(){
+function update_current_qmodule_observations(){ // THIS ONLY WORKS FOR CURRENT MODULE
 	if(gvar.current_qmonam == null){
 		console.error("gvar.current_qmonam == null");
 		return;
@@ -198,15 +192,19 @@ function update_current_qmodule_observations(){
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	
 	const ref_path = fb_mod.firebase_bib_quest_path + "modules/" + gvar.current_qmonam;
-	const obj = get_qmodule_observations_obj();  // THIS ONLY WORKS FOR CURRENT MODULE
+	const all_obs = gvar.all_observations;
+	if(all_obs == null){ 
+		console.error("all_obs == null"); 
+		return;
+	}
 	
 	if(DEBUG_ADMIN_OPS){ 
-		console.log("update_current_qmodule_observations. PATH=" + ref_path + " full_data=\n" + JSON.stringify(obj, null, "  ")); 
+		console.log("update_current_qmodule_observations. PATH=" + ref_path + " full_data=\n" + JSON.stringify(all_obs, null, "  ")); 
 	}
 	
 	const db_ref = fb_mod.md_db.ref(fb_database, ref_path);
 	console.log("update_current_qmodule_observations. db_ref = " + db_ref);
-	fb_mod.md_db.set(db_ref, obj).catch((error) => { 
+	fb_mod.md_db.set(db_ref, all_obs).catch((error) => { 
 		console.error(error); 
 	});	
 }
