@@ -3069,6 +3069,21 @@ function create_div_user(quest){
 	return dv_user;
 }*/
 
+function fix_user_name(usernam){
+	let fnam = usernam;
+	if(fnam.length < 10){
+		return fnam;
+	}
+	fnam = fnam.substring(0, 10);
+	const elems = fnam.split(" ");
+	const last = elems[elems.length - 1];
+	if(last.length <= 3){
+		elems.pop();
+	}
+	fnam = elems.join(" ");
+	return fnam;
+}
+
 export function fill_div_user(){
 	const dv_user_nam = document.getElementById(id_top_user_name);
 	const img_top = document.getElementById(id_top_user_picture);
@@ -3082,7 +3097,10 @@ export function fill_div_user(){
 	let usernam = the_usr.displayName;
 	if((usernam == null) || (usernam.length == 0)){
 		usernam = the_usr.email.split("@")[0];
+		//usernam = the_usr.email.split("@").join(" ");
+		//usernam = the_usr.email;
 	}
+	usernam = fix_user_name(usernam);
 		
 	const dv_user_qr = document.getElementById(id_dv_user_qrcod);
 	if(dv_user_qr != null){
