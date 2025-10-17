@@ -396,34 +396,6 @@ function firebase_write_user_id(){
 	});	
 }
 
-export const firebase_write_object = (sub_ref, obj, err_fn) => {  //sub_ref MUST start with '/' or be empty
-	init_mod_vars();
-	return firebase_check_login(err_fn).then((result) => {
-		if(tc_fb_app == null){ console.error("No firebase app in firebase_write_object !!");  return; }
-		const fb_database = md_db.getDatabase(tc_fb_app);
-		const db_ref = md_db.ref(fb_database, firebase_users_path + tc_fb_user.uid + sub_ref)
-		console.log("firebase_write_object. db_ref = " + db_ref);
-		md_db.set(db_ref, obj).catch((error) => { 
-			console.error(error); 
-			if(err_fn != null){ err_fn(error); }
-		});
-	});
-};
-
-export const firebase_read_object = (sub_ref, callbak_func) => { //sub_ref MUST start with '/' or be empty
-	init_mod_vars();
-	return firebase_check_login().then((result) => {
-		if(tc_fb_app == null){ console.error("No firebase app in firebase_write_object !!");  return; }
-		const fb_database = md_db.getDatabase(tc_fb_app);
-		const db_ref = md_db.ref(fb_database, firebase_users_path + tc_fb_user.uid + sub_ref)
-		console.log("firebase_read_object. db_ref = " + db_ref);
-		md_db.onValue(db_ref, callbak_func);
-		/*.catch((error) => {
-			console.error(error);
-		});*/
-	});
-}
-
 export async function firebase_sign_out(){
 	init_mod_vars();
 	if(tc_fb_user == null){ return; }

@@ -18,7 +18,6 @@ import { load_qmodu, set_fini_qmodu, is_fini_qmodu, load_next_qmodu, } from './b
 
 //import "./qrcode.js";
 //import { QRCode, makeCode } from './qrcode.js';
-// import { firebase_write_object, firebase_read_object, firebase_sign_out } from './bq_firebase_mgr.js'; // done dinamicly in init_exam_fb
 
 "use strict";
 
@@ -1613,7 +1612,8 @@ function pop_menu_handler(){
 		dv_pop_men.appendChild(op);
 	}
 
-	if((fb_mod != null) && DEBUG_SHOW_TEST_USERS && is_localhost()){
+	const show_test_usr = DEBUG_SHOW_TEST_USERS && (fb_mod != null) && (fb_mod.tc_fb_is_admin || is_localhost());
+	if(show_test_usr){
 		let op = document.createElement("div");
 		op.classList.add("exam");
 		op.classList.add("is_block");

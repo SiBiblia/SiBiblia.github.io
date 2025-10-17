@@ -24,6 +24,24 @@
 					".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() < 99999999999999999999)",
 				},
 			},
+			"all_alias": {
+				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+				"$user_alias": {
+					".write": "(auth != null) && (! data.exists()) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+					".validate": "!data.parent().child($user_alias).exists()",
+					"$uid": {
+						".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+						"$val": {
+							".validate": "newData.isNumber() && (newData.val() === 1)",
+						},
+					},
+				},
+			},
+			"pub_fields": {
+				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+			},
 			"modules": {
 				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
@@ -212,10 +230,20 @@
 							},
 						},
 					},
+					"pub_fields": {
+						".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+						"$user_field": {
+							".validate": "root.child('bib_quest').child('user_fields').child($user_field).exists() && newData.isNumber() && 
+							(newData.val() === 1)",
+						},
+					},
 					"user_info": {
 						"$user_field": {
 							".validate": "newData.exists() && root.child('bib_quest').child('user_fields').child($user_field).exists()",
 							"$val": {
+								".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists()) && 
+								(root.child('bib_quest').child('users').child($uid).child('pub_fields').child($user_field).exists() ||
+								root.child('bib_quest').child('pub_fields').child($user_field).exists())",
 								".validate": "
 									(newData.isNumber() && (newData.val() >= 0) && (newData.val() < 9999999999)) ||
 									(newData.isString() && newData.val().length < 200)

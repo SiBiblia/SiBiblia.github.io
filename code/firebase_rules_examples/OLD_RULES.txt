@@ -1,3 +1,22 @@
+
+
+			"all_alias": {
+				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
+				"$user_alias": {
+					".write": "(auth != null) && (! data.exists()) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+					".validate": "$user_alias.isString() && ($user_alias.length < 20)",
+					"$uid": {
+						".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+						"$val": {
+							".validate": "newData.isNumber() && (newData.val() === 1)",
+						},
+					},
+				},
+			},
+
+
+
 {
 	"rules": {
 		".read": false,

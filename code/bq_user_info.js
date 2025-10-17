@@ -32,6 +32,7 @@ const id_nequi_number = "id_ed_user_nequi_number";
 const id_paypal_email = "id_ed_user_paypal_email";
 const id_transfiya_number = "id_ed_user_transfiya_number";
 const id_url_photo = "id_ed_user_url_photo";
+const id_alias = "id_ed_user_alias";		// NEW FIELD TO MANAGE ALIASES. TODO: CODE IT
 const id_country = "id_ed_user_country";
 const id_citizen_id_lbl = "id_ed_user_citizen_id_lbl";
 const id_citizen_id = "id_ed_user_citizen_id";
@@ -49,30 +50,6 @@ const id_instagram = "id_ed_user_instagram";
 const id_youtube = "id_ed_user_youtube";
 
 const id_user_sele = "id_user_sele";
-
-/*
-function new_user_info(){
-	user_info = {};
-	user_info.nequi_num = "";
-	user_info.paypal_id = "";
-	user_info.transfiya_num = "";
-	user_info.url_photo = "";
-	user_info.country = gvar.glb_all_countries[gvar.glb_def_country];
-	user_info.citizen_id = 0;
-	user_info.birth_year = 2024;
-	user_info.birth_month = 12;
-	user_info.birth_day = 31;
-	user_info.sex = "";
-	user_info.marital_status = gvar.glb_all_marital[gvar.glb_def_marital];
-	user_info.name = "";
-	user_info.divorce_number = -1;
-	user_info.children_number = -1;
-	user_info.website = "";
-	user_info.facebook = "";
-	user_info.instagram = "";
-	user_info.youtube = "";
-	return user_info;
-}*/
 
 function add_user_info_label(htm_txt){ 
 	const inp_fld = document.createElement("div");
@@ -302,27 +279,18 @@ export function toggle_user_info(fb_usr){
 	dv_ok.classList.add("grid_item_auto_span_4");
 	dv_ok.classList.add("is_button");
 	dv_ok.innerHTML = gvar.glb_curr_lang.msg_save;
-	dv_ok.addEventListener('click', function() {
+	dv_ok.addEventListener('click', async function() {
 		gvar.current_user_info = get_user_info_object();
-		//gvar.current_user_info = id_nequi_number;
-		write_firebase_user_object((err) => {
-			console.error(err);
-		}).then((result)  => {
-			dv_edit_user.remove();
-			scroll_to_first_not_answered();
-		});
 		
+		await write_firebase_user_object();
+		
+		dv_edit_user.remove();
+		scroll_to_first_not_answered();		
 		return;
 	});
 	
 	if(fb_usr != null){
-		read_firebase_user_object().then((result) => {
-			if(DEBUG_USER_INFO){ 
-				console.log("READ=");
-				console.log(gvar.current_user_info);
-			}
-			
-		});
+		read_firebase_user_object();
 	}	
 
 	scroll_to_top(dv_edit_user);
@@ -410,34 +378,35 @@ function fill_user_info(obj){
 	set_user_field(obj, id_youtube);
 }
 
-function write_firebase_user_object(err_fn){
+async function write_firebase_user_object(){
 	if(gvar.current_user_info == null){
 		return;
 	}
-	if(fb_mod == null){
-		console.log("CANNOT write_firebase_user_object. fb_mod == null");
-		const dv_comm_info = document.getElementById(id_comm_info);
-		dv_comm_info.innerHTML = gvar.glb_curr_lang.msg_fb_no_internet;
-		return;
-	}
-	if(DEBUG_USER_INFO){ console.log("SAVING in https://todacarne-firebase-default-rtdb.firebaseio.com"); }
-	const wr_obj = JSON.parse(JSON.stringify(gvar.current_user_info));
-	return fb_mod.firebase_write_object(firebase_user_info_path, wr_obj, err_fn);
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	const user_id = fb_mod.tc_fb_user.uid;
+	if(user_id == null){ console.error("user_id == null.");  return; }
+	const usr_path = fb_mod.firebase_get_user_path(user_id);
+	const usr_info_pth = usr_path + '/user_info/';
+
+	const wr_data = JSON.parse(JSON.stringify(gvar.current_user_info));
+	const db_ref = fb_mod.md_db.ref(fb_database, usr_info_pth);
+	
+	await fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });	
 }
 
 function read_firebase_user_object(){
-	/*if(fb_mod != null){  // this was a test
-		const the_app = fb_mod.md_app.initializeApp(fb_mod.firebase_config);
-		const the_auth = fb_mod.md_auth.getAuth();
-	}*/
-	if(fb_mod == null){
-		console.log("CANNOT read_firebase_user_object. fb_mod == null");
-		const dv_comm_info = document.getElementById(id_comm_info);
-		dv_comm_info.innerHTML = gvar.glb_curr_lang.msg_fb_no_internet;
-		return;
-	}
-	if(DEBUG_USER_INFO){ console.log("LOADING from https://todacarne-firebase-default-rtdb.firebaseio.com"); }
-	return fb_mod.firebase_read_object(firebase_user_info_path, (snapshot) => {
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	const user_id = fb_mod.tc_fb_user.uid;
+	if(user_id == null){ console.error("user_id == null.");  return; }
+	const usr_path = fb_mod.firebase_get_user_path(user_id);
+	const usr_info_pth = usr_path + '/user_info/';
+
+	const db_ref = fb_mod.md_db.ref(fb_database, usr_info_pth);
+	fb_mod.md_db.onValue(db_ref, (snapshot) => {
 		if (snapshot.exists()) {
 			const rd_obj = snapshot.val();
 			gvar.current_user_info = JSON.parse(JSON.stringify(rd_obj));
@@ -447,7 +416,7 @@ function read_firebase_user_object(){
 			}
 			fill_user_info(gvar.current_user_info);
 		} else {
-			console.log("read_firebase_user_object. No data available");
+			console.error("No data available");
 		}
 	});	
 }
