@@ -335,7 +335,7 @@ a.exam_ref:hover {
 }
 
 .observ_stm {
-	margin-top: max(2vw, 2vh);
+	//margin-top: max(2vw, 2vh);
 	display: block;
 	width: 100%;
 	height: 80%;
@@ -345,7 +345,7 @@ a.exam_ref:hover {
 .observ_ok {
 	display: block;
 	width: 100%;
-	height: 13%;
+	//height: 13%;
 }
 
 .msg {
@@ -361,15 +361,24 @@ a.exam_ref:hover {
 }
 
 .is_observ {
+	//padding-top: 0.2em;
+	//padding-bottom: 0.2em;
 	margin-top: max(1vw, 1vh);
 	border: 0.5vw solid #ffff00;
-	border-radius: 1em;
-	width: 90vw;
-	height: 87vh;
+	//border-radius: 1em;
+	//width: 90vw;
+	//height: 87vh;
+}
+
+.has_round_border {
+	border-radius: 1em;	
+}
+
+.has_top_padding {
+	padding-top: 1em;
 }
 
 .observ_color {
-	padding: 0.5vw;
 	background-color: #13234c;
 	color: #ffff00;
 }

@@ -339,6 +339,7 @@ function init_en_basic_msg(){
 	obj.msg_citation_obs_html = "Bible Citation observation";
 	obj.msg_citation_obs_name = "Bible Citation observation";
 	
+	obj.msg_icon_undo = "<i class='has_icons icon-undo'></i>";	
 	obj.msg_undo = "<i class='has_icons icon-undo'></i> Ups!";	
 	
 	obj.msg_sel_cit = "SELECT FROM DB";
@@ -394,7 +395,7 @@ function init_en_basic_msg(){
 	obj.msg_change_answer = `To add answers click on the current answer and click on "${obj.msg_edit_ans}"`;
 	obj.msg_caused_by_answers = "This observation is shown due to your answer in these questions: ";
 	obj.msg_caused_by_observations = "This observation is shown due these other observations: ";
-	obj.msg_to_get_rid = `To get rid of this observation change one o more answers that are causing this observation by clicking the answer and then clicking on "${obj.msg_edit_ans}" or by clicking on "${obj.msg_undo}" until you get to the desired question`;
+	obj.msg_to_get_rid = `To get rid of this observation change one o more answers that are causing this observation by clicking the answer and then clicking on "${obj.msg_edit_ans}" or by clicking any of "${obj.msg_icon_undo}" or "${obj.msg_undo}" until you get to the desired question`;
 
 	obj.msg_dispute_rclick = "To dispute right click";
 	obj.msg_dispute_hold_click = "To dispute hold click";

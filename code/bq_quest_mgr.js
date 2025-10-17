@@ -24,6 +24,7 @@ import { load_qmodu, set_fini_qmodu, is_fini_qmodu, load_next_qmodu, } from './b
 
 const INVALID_PAGE_POS = "???";
 const TRUE_STR = "true";
+const QID_FINAL_OBSERVATION = "FINAL_OBSERVATION__";
 
 const NO_MORE_QUEST_COND = "NO_QUESTIONS_LEFT";
 const ___final_observation_html = "___final_observation_html";
@@ -2453,6 +2454,10 @@ function init_DAG_func(){
 	const db = gvar.glb_poll_db;
 	gvar.all_observations = {};
 	const all_obs = gvar.all_observations;
+
+	if(db.FINAL_OBSERVATION__ == null){
+		db.FINAL_OBSERVATION__ = get_final_obs();
+	}
 	
 	const num_deci = MAX_SCORE_WEIGHT_DECI;
 	let num_wei = 0;
@@ -2463,6 +2468,10 @@ function init_DAG_func(){
 		const quest = gvar.glb_poll_db[qid];
 		if(is_valid_observ(qid)){
 			all_obs[qid] = INVALID_SCORE_WEIGHT;
+			if(quest.calls_write_results){
+				quest.score_weight = null;
+				all_obs[qid] = 0;
+			}			
 			const ww = quest.score_weight;
 			if((ww != null) && is_number(ww) && (ww > 0)){
 				const wei = fix_deci(ww, num_deci); 
@@ -2474,11 +2483,9 @@ function init_DAG_func(){
 		init_signals_for(qid);
 	}
 	
-	if(db.FINAL_OBSERVATION__ == null){
-		db.FINAL_OBSERVATION__ = get_final_obs();
-	}
 	if(all_obs.FINAL_OBSERVATION__ == null){
-		all_obs.FINAL_OBSERVATION__	= INVALID_SCORE_WEIGHT;
+		console.error("all_obs.FINAL_OBSERVATION__ == null");
+		//all_obs.FINAL_OBSERVATION__	= INVALID_SCORE_WEIGHT;
 	}
 	
 	set_observations_score_weight(num_wei, sum_wei, all_obs);
@@ -2802,8 +2809,8 @@ function ask_next(){
 		gvar.no_more_questions = true;
 		
 		if(db.FINAL_OBSERVATION__ == null){ console.error("db.FINAL_OBSERVATION__ == null"); return null; }
-		show_observation("FINAL_OBSERVATION__", null, null);
-		if(gst.writer_qid != "FINAL_OBSERVATION__"){ console.error("gst.writer_qid != FINAL_OBSERVATION__"); return null; }
+		show_observation(QID_FINAL_OBSERVATION, null, null);
+		if(gst.writer_qid != QID_FINAL_OBSERVATION){ console.error("gst.writer_qid != FINAL_OBSERVATION__"); return null; }
 		
 		finish_qmodu();
 		return null; 
@@ -2899,7 +2906,7 @@ function show_observation(qid, all_to_act, qid_cllr){
 	dv_quest.id = qid;
 	dv_quest.classList.add("exam");
 	dv_quest.classList.add("is_observ");
-	
+		
 	let dv_lquest = get_sat_conj_last_elem(quest);
 	let dv_cquest = null;
 	if(qid_cllr != null){ dv_cquest = document.getElementById(qid_cllr); }
@@ -2963,22 +2970,19 @@ function show_observation(qid, all_to_act, qid_cllr){
 	dv_results_observ.id = qid + SUF_ID_RESULTS_OBSERVATION;
 	dv_results_observ.classList.add("exam");
 	dv_results_observ.classList.add("observ_color");
+	//dv_results_observ.classList.add("has_top_padding");
 	dv_obs_data.appendChild(dv_results_observ);
+
+	const dv_ok_observ = document.createElement("div");
+	dv_ok_observ.id = qid + SUF_ID_OK_OBSERVATION;
+	dv_obs_data.appendChild(dv_ok_observ);
 	
 	const dv_qrefs_observ = document.createElement("div");
 	dv_qrefs_observ.id = qid + SUF_ID_QREFS_OBSERVATION;
 	dv_qrefs_observ.classList.add("exam");
 	dv_qrefs_observ.classList.add("observ_color");
-	//dv_quest.append(dv_qrefs_observ);
+	dv_qrefs_observ.classList.add("small_font");
 	dv_obs_data.appendChild(dv_qrefs_observ);
-
-	const dv_ok_observ = document.createElement("div");
-	dv_ok_observ.id = qid + SUF_ID_OK_OBSERVATION;
-	dv_ok_observ.classList.add("exam");
-	dv_ok_observ.classList.add("observ_ok");
-	dv_ok_observ.classList.add("observ_color");
-	//dv_quest.append(dv_ok_observ);
-	dv_quest.appendChild(dv_ok_observ);
 
 	if(quest.calls_write_results){
 		check_if_dnf_is_sat(qid);		
@@ -2995,6 +2999,7 @@ function show_observation(qid, all_to_act, qid_cllr){
 	if(quest.calls_write_results){
 		const gst = gvar.glb_poll_db.qmodu_state;
 		gst.writer_qid = qid;
+		//dv_quest.style.height = "auto";		
 	}
 
 	return dv_quest;
@@ -3008,12 +3013,13 @@ function add_observation_ok(qid){
 	const dv_ok_observ = document.getElementById(qid + SUF_ID_OK_OBSERVATION);
 	
 	const dv_blk_ok = dv_ok_observ.appendChild(document.createElement("div"));
-	dv_blk_ok.appendChild(document.createElement("br"));
+	//dv_blk_ok.appendChild(document.createElement("br"));
 	
 	const dv_ok = document.createElement("div");
 	dv_ok.classList.add("exam");
-	dv_ok.classList.add("is_block");
 	dv_ok.classList.add("is_button");
+	dv_ok.classList.add("has_round_border");	
+	dv_ok.classList.add("big_font", "bold_font");	
 	dv_ok.innerHTML = gvar.glb_curr_lang.msg_understood;
 	dv_blk_ok.appendChild(dv_ok);
 	
@@ -3030,7 +3036,7 @@ function add_observation_ok(qid){
 		return;
 	});		
 	
-	dv_blk_ok.appendChild(document.createElement("br"));
+	//dv_blk_ok.appendChild(document.createElement("br"));
 }
 
 /*
@@ -3631,6 +3637,7 @@ function show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts
 	} 
 	
 	const dv_tit1 = get_div_title(score_tit);
+	dv_tit1.classList.add("has_top_padding");
 	dv_results.appendChild(dv_tit1);
 	const dv_note1 = get_div_title(lang.msg_score_note, true);
 	dv_results.appendChild(dv_note1);
@@ -3641,13 +3648,15 @@ function show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts
 	dv_results.appendChild(dv_score);
 	
 	const dv_tit2 = get_div_title(tit_str);
+	dv_tit2.classList.add("has_top_padding");
 	dv_results.appendChild(dv_tit2);
 	
-	const res_note = `<span class="background_green">${lang.msg_green_note}</span> 
-	<span class="background_red">${lang.msg_red_note}</span> ${lang.msg_perc_note}`;
-	
-	const dv_note2 = get_div_title(res_note, true);
+	const note2 = `<span class="background_green">${lang.msg_green_note}</span> <span class="background_red">${lang.msg_red_note}</span>`;	
+	const dv_note2 = get_div_title(note2, true);
 	dv_results.appendChild(dv_note2);
+
+	const dv_note3 = get_div_title(lang.msg_perc_note, true);
+	dv_results.appendChild(dv_note3);
 	
 	//const grd_res = get_grid_results(fb_stats, gvar.fb_results);
 	const grd_res = get_grid_results(fb_stats, usr_rslts);
@@ -3659,6 +3668,7 @@ function show_score_in_observation(qid){
 	const lang = gvar.glb_curr_lang;
 	
 	const dv_tit = get_div_title(lang.msg_your_score);
+	dv_tit.classList.add("has_top_padding");
 	dv_results_obs.appendChild(dv_tit);
 	const dv_note = get_div_title(lang.msg_score_note, true);
 	dv_results_obs.appendChild(dv_note);
