@@ -733,8 +733,11 @@ export function get_resp_for(qid, cit_obj){
 	return resp;
 }
 
-export function get_date_and_time(is_field){ 
-	const currentdate = new Date(); 
+export function get_date_and_time(is_field, timest){ 
+	let currentdate = new Date();
+	if(timest != null){
+		currentdate = new Date(timest);
+	}
 	let datetime = currentdate.getFullYear() + "/"
 					+ (currentdate.getMonth()+1)  + "/"
 					+ currentdate.getDate() + "@"

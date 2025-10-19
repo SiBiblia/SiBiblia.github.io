@@ -381,6 +381,8 @@ function init_en_basic_msg(){
 	obj.msg_rewrite_results_signed_in = `You have finished this module more than once. 
 		Do you want to write your results again in the stats?`;
 
+	obj.msg_your_first_score = `Your first score`;
+	obj.msg_registered = `Registered on`;
 	obj.msg_your_score = `Your score`;
 	obj.msg_pub_score = `Anonymous people average score`;
 	obj.msg_usr_score = `Registered users average score`;

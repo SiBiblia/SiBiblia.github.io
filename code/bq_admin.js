@@ -1010,9 +1010,9 @@ function set_user_in_stats(nw_val){
 	}
 }
 
-async function read_user_qmod_results(fb_database, the_uid, qmonam){
+export async function read_user_qmod_results(fb_database, the_uid, qmonam){
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
-	if(DEBUG_UPDATE_SCORES){ console.log("read_user_qmod_results. Updating user " + the_uid + " | qmonam " + qmonam); }
+	if(DEBUG_UPDATE_SCORES){ console.log("read_user_qmod_results. user " + the_uid + " | qmonam " + qmonam); }
 	
 	let db_ref = null;
 	let obj = null;

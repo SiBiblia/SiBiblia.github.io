@@ -61,6 +61,7 @@ export let tc_fb_auth = null;
 //export let tc_fb_test_auth = null;
 export let tc_fb_user = null;
 export let tc_fb_is_admin = false;
+export let tc_fb_is_test_user = false;
 export let tc_fb_current_cicle = null;
 export let bq_fb_user_finished_qmodules = null;
 
@@ -403,6 +404,8 @@ export async function firebase_sign_out(){
 	if(tc_fb_auth == null){ tc_fb_auth = md_auth.getAuth(); }
 	
 	tc_fb_user = null;
+	tc_fb_is_admin = false;
+	tc_fb_is_test_user = false;
 	//const tc_fb_auth = md_auth.getAuth();
 	await md_auth.signOut(tc_fb_auth);
 	console.log('signed out');
@@ -443,7 +446,7 @@ export function firebase_email_login(num_test_user){
 	
 	return md_auth.signInWithEmailAndPassword(tc_fb_auth, uemail, upsswd).then((result) => {
 		tc_fb_user = result.user;
-		
+		tc_fb_is_test_user = true;
 		if(DEBUG_FB_LOGIN){
 			console.log('user=' + JSON.stringify(tc_fb_user));
 			console.log('User_id=' + tc_fb_user.uid);

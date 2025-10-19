@@ -13,7 +13,7 @@ import { get_user_href,
 
 import { add_to_pending, get_pending_qid, init_all_context, } from './bq_contexts.js';
 import { toggle_user_info, } from './bq_user_info.js';
-import { toggle_admin_opers, toggle_test_logins, toggle_test_opers, } from './bq_admin.js';
+import { toggle_admin_opers, toggle_test_logins, toggle_test_opers, read_user_qmod_results, } from './bq_admin.js';
 import { load_qmodu, set_fini_qmodu, is_fini_qmodu, load_next_qmodu, } from './bq_module_mgr.js';
 
 //import "./qrcode.js";
@@ -67,6 +67,7 @@ const SUF_ID_DATA_OBSERVATION = "_data_observation";
 const SUF_ID_PSTATS_RESULTS = "_Pstat_results";
 const SUF_ID_USTATS_RESULTS = "_Ustat_results";
 const SUF_ID_RESULTS_OBSERVATION = "_results_observation";
+const SUF_ID_FIRST_SCORE = "_first_score";
 const SUF_ID_QREFS_OBSERVATION = "_qrefs_observation";
 const SUF_ID_USER_OBSERVATION = "_user_observation";
 const SUF_ID_OK_OBSERVATION = "_ok_observation";
@@ -230,11 +231,6 @@ function add_question(qid){
 	}
 	
 	if(quest.answers != null){
-		/*dv_qstm.addEventListener('contextmenu', (ev1) => {
-			ev1.preventDefault();
-			toggle_support_interaction(qid, SUF_ID_ANSWERS);
-			return false;				
-		});*/
 		sp_num.addEventListener('click', (ev1) => {
 			ev1.preventDefault();
 			toggle_support_interaction(qid, SUF_ID_ANSWERS);
@@ -1612,7 +1608,7 @@ function pop_menu_handler(){
 		dv_pop_men.appendChild(op);
 	}
 
-	const show_test_usr = DEBUG_SHOW_TEST_USERS && (fb_mod != null) && (fb_mod.tc_fb_is_admin || is_localhost());
+	const show_test_usr = DEBUG_SHOW_TEST_USERS && (fb_mod != null) && (fb_mod.tc_fb_is_admin || fb_mod.tc_fb_is_test_user || is_localhost());
 	if(show_test_usr){
 		let op = document.createElement("div");
 		op.classList.add("exam");
@@ -2323,8 +2319,8 @@ function write_fb_qmod_stats_and_results(force_wr){
 	
 	resp.has_usr = (fb_mod.tc_fb_user != null);
 	if(resp.has_usr){
-		write_fb_user_qmodu_stats(resp.wr_o, dt);
 		write_fb_user_qmodu_results(resp.wr_o);
+		write_fb_user_qmodu_stats(resp.wr_o, dt);
 	}
 	write_fb_qmodu_pub_stats(resp.wr_o, dt);
 	
@@ -3697,6 +3693,37 @@ function show_score_in_observation(qid){
 	const usr_score = calc_user_qmodule_score(qmod_scow, usr_results);
 	const dv_score = get_div_title(usr_score);
 	dv_results_obs.appendChild(dv_score);
+	
+	const dv_first_score = document.createElement("div");
+	//dv_first_score.id = qid + SUF_ID_FIRST_SCORE;
+	dv_results_obs.appendChild(dv_first_score);
+	
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	const qmonam = gvar.current_qmonam;
+	const the_uid = fb_mod.tc_fb_user.uid;
+	
+	read_user_qmod_results(fb_database, the_uid, qmonam).then((usr_resul) => {
+		if(usr_resul != null){
+			const dv_tit = get_div_title(lang.msg_your_first_score);
+			dv_tit.classList.add("has_top_padding");
+			dv_first_score.appendChild(dv_tit);
+			const dv_note = get_div_title(lang.msg_score_note, true);
+			dv_first_score.appendChild(dv_note);
+
+			const usr_score = calc_user_qmodule_score(qmod_scow, usr_resul.observ);
+			const dv_score = get_div_title(usr_score);
+			dv_first_score.appendChild(dv_score);
+
+			const dt = get_date_and_time(false, usr_resul.ts_reported);
+			const dv_date = get_div_title(lang.msg_registered + " " + dt, true);
+			dv_first_score.appendChild(dv_date);
+			
+		}
+	});
+	
 }
 
 export function calc_stats_qmodule_score(qmod_scow, fb_stats){
@@ -3712,7 +3739,7 @@ export function calc_stats_qmodule_score(qmod_scow, fb_stats){
 		}
 		let cntr = fb_stats[qid];
 		if((cntr != null) && ((cntr <= 0) || (cntr > tot))){
-			console.error("cntr <= 0 OR cntr > tot");
+			console.error(`${cntr} <= 0 || ${cntr} > ${tot}`);
 			continue;
 		}
 		if(cntr == null){

@@ -381,6 +381,8 @@ function init_es_basic_msg(){
 	obj.msg_rewrite_results_signed_in = `Has terminado este modulo mas de una vez. 
 		Quieres escribir de nuevo tus resultados en las estadísticas?`;
 
+	obj.msg_your_first_score = `Su primer puntaje`;
+	obj.msg_registered = `Registrado en`;
 	obj.msg_your_score = `Su puntaje`;
 	obj.msg_pub_score = `Puntaje promedio de anónimos`;
 	obj.msg_usr_score = `Puntaje promedio de usuarios registrados`;
