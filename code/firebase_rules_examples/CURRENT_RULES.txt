@@ -38,7 +38,7 @@
 					},
 				},
 			},
-			"pub_fields": {
+			"private_fields": {
 				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 			},

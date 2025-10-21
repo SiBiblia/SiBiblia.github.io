@@ -441,6 +441,7 @@ function init_es_basic_msg(){
 	obj.msg_usr_instagram = "Instagram";
 	obj.msg_usr_youtube = "Youtube";
 	
+	obj.msg_gen_cards = `GEN PDF TARJETAS`;
 }
 
 function ini_glb_vars_es(all_vars){

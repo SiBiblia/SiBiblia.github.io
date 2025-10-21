@@ -2,16 +2,30 @@
 
 "use strict";
 
+import { gvar, 
+} from './bq_tools.js';
+
+import { fb_mod, 
+} from './bq_quest_mgr.js';
+
+import { get_user_href, 
+} from './bq_referrer_mgr.js';
+
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js"></script>
 //import * as MOD_PDF from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js";
 
-export function test_pdf(){
-	
+export function gen_pdf_cards(){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(gvar.current_user_info == null){
+		console.error(gvar.current_user_info == null);
+		return;
+	}
+	const uinfo = gvar.current_user_info;
+	const fb_usr = fb_mod.tc_fb_user;
 
-	const url = "http://sebiblia.github.io/";
+	const url = get_user_href(fb_usr);
 
-	//const id = "/?u=JoseLuisQuiroga";
-	const user_id = "/?u=01234567890123456789";
+	const user_id = uinfo.id_ed_user_alias;
 	
 	const arr_txt = [
 		`Juan 1:1. En el principio ya existía la Palabra; y aquel que es la Palabra estaba con Dios y era Dios.`,
@@ -75,9 +89,6 @@ export function test_pdf(){
 	}
 	
 	doc.save("image_jspdf.pdf");	
-}
-
-function gen_pdf_dist_cards(doc, xx, yy, user_id, img_cod){
 }
 
 function add_side_1(doc, xx, yy, user_id, img_cod){

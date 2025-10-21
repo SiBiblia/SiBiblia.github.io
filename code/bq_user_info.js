@@ -13,46 +13,13 @@ import { scroll_to_first_not_answered,
 import { get_user_href, 
 } from './bq_referrer_mgr.js';
 
+import { gen_pdf_cards } from './bq_pdf_mgr.js'
+
 const DEBUG_USER_INFO = true;
 
 const SUF_FLD_VISI = "SUF_FLD_VISI";
 
 const firebase_user_info_path = "/user_info";
-
-/*
-//const id_ed_user_info = "id_ed_user_info";
-const id_comm_info = "id_ed_user_comm_info";
-
-const id_goo_name = "id_ed_user_goo_name";
-const id_goo_photo = "id_ed_user_goo_photo";
-const id_goo_email = "id_ed_user_goo_email";
-const id_sibiblia_qr = "id_ed_sibiblia_qr";
-const id_sibiblia_link = "id_ed_sibiblia_link";
-const id_sibiblia_id = "id_ed_sibiblia_id";
-//const id_sibiblia_photo = "id_ed_sibiblia_photo";
-
-const id_nequi_number = "id_ed_user_nequi_number";
-const id_paypal_email = "id_ed_user_paypal_email";
-const id_transfiya_number = "id_ed_user_transfiya_number";
-//const id_url_photo = "id_ed_user_url_photo";
-const id_alias = "id_ed_user_alias";
-const id_country = "id_ed_user_country";
-const id_citizen_id_lbl = "id_ed_user_citizen_id_lbl";
-const id_citizen_id = "id_ed_user_citizen_id";
-const id_birth_year = "id_ed_user_birth_year";
-const id_birth_month = "id_ed_user_birth_month";
-const id_birth_day = "id_ed_user_birth_day";
-const id_sex = "id_ed_user_sex";
-const id_marital_status = "id_ed_user_marital_status";
-const id_name = "id_ed_user_name";
-const id_divorce_number = "id_ed_user_divorce_number";
-const id_children_number = "id_ed_user_children_number";
-const id_website = "id_ed_user_website";
-const id_facebook = "id_ed_user_facebook";
-const id_instagram = "id_ed_user_instagram";
-const id_youtube = "id_ed_user_youtube";
-*/
-
 const id_user_sele = "id_user_sele";
 
 const fb_ids = {
@@ -225,7 +192,7 @@ export async function toggle_user_info(fb_usr){
 	const dv_logout = dv_edit_user.appendChild(document.createElement("div"));
 	dv_logout.classList.add("exam");
 	dv_logout.classList.add("grid_item_auto_span_4");
-	dv_logout.classList.add("is_logout_button");
+	dv_logout.classList.add("is_big_button");
 	dv_logout.innerHTML = ulang.msg_logout;
 	dv_logout.addEventListener('click', function() {		
 		dv_edit_user.remove();
@@ -350,7 +317,7 @@ export async function toggle_user_info(fb_usr){
 	const dv_ok = dv_edit_user.appendChild(document.createElement("div"));
 	dv_ok.classList.add("exam");
 	dv_ok.classList.add("grid_item_auto_span_4");
-	dv_ok.classList.add("is_button");
+	dv_ok.classList.add("is_big_button");
 	dv_ok.innerHTML = ulang.msg_save;
 	dv_ok.addEventListener('click', async function() {
 		gvar.current_user_info = get_user_info_object();		
@@ -365,9 +332,20 @@ export async function toggle_user_info(fb_usr){
 		return;
 	});
 	
+	const dv_cards = dv_edit_user.appendChild(document.createElement("div"));
+	dv_cards.classList.add("exam");
+	dv_cards.classList.add("grid_item_auto_span_4");
+	dv_cards.classList.add("is_big_button");
+	dv_cards.innerHTML = ulang.msg_gen_cards;
+	dv_cards.addEventListener('click', function() {
+		gen_pdf_cards();
+		return;
+	});
+	
 	if(fb_usr != null){
 		read_firebase_user_object();
 		read_firebase_user_private_fields();
+		await read_firebase_general_private_fields();
 	}	
 
 	scroll_to_top(dv_edit_user);
@@ -469,6 +447,7 @@ function fill_user_info(obj){
 
 async function write_firebase_user_object(){
 	if(gvar.current_user_info == null){
+		console.error(gvar.current_user_info == null);
 		return;
 	}
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
@@ -487,6 +466,7 @@ async function write_firebase_user_object(){
 
 async function write_firebase_user_alias(){
 	if(gvar.current_user_info == null){
+		console.error(gvar.current_user_info == null);
 		return;
 	}
 	const uinfo = gvar.current_user_info;
@@ -532,6 +512,8 @@ async function write_firebase_user_alias(){
 		await fb_mod.md_db.update(db_ref, wr_data);
 	} catch (error){
 		console.error(error);
+		const dv_als = document.getElementById(fb_ids.id_alias);
+		dv_als.classList.add("background_red");
 	}
 }
 
@@ -562,6 +544,7 @@ function read_firebase_user_object(){
 
 async function check_alias(){
 	if(gvar.current_user_info == null){
+		console.error(gvar.current_user_info == null);
 		return;
 	}
 	const uinfo = gvar.current_user_info;
@@ -628,6 +611,7 @@ function add_alias_reset(){
 	const dv_als = document.getElementById(fb_ids.id_alias);
 	dv_ck.addEventListener('click', async function() {
 		if(gvar.current_user_info == null){
+			console.error(gvar.current_user_info == null);
 			return;
 		}
 		const obj = gvar.current_user_info;
@@ -750,6 +734,62 @@ async function write_firebase_user_private_fields(){
 	const db_ref = fb_mod.md_db.ref(fb_database, usr_info_pth);
 	
 	await fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });	
+}
+
+async function read_firebase_general_private_fields(){
+	if(DEBUG_USER_INFO){ console.log("Called read_firebase_general_private_fields"); }
+	if(gvar.general_private_fields != null){
+		fill_general_private_fields(gvar.general_private_fields);
+		return;
+	}
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	const gn_private_pth = fb_mod.firebase_bib_quest_path + 'private_fields/';
+
+	if(DEBUG_USER_INFO){ console.log(`read_firebase_general_private_fields. ${gn_private_pth}`); }
+	
+	try{ 	
+		const db_ref = fb_mod.md_db.ref(fb_database, gn_private_pth);
+		const snapshot = await fb_mod.md_db.get(db_ref);
+		if (snapshot.exists()) {
+			const rd_obj = snapshot.val();
+			gvar.general_private_fields = JSON.parse(JSON.stringify(rd_obj));
+			fill_general_private_fields(gvar.general_private_fields);
+		} else {
+			console.error("No data available");
+		}	
+	} catch (error){
+		console.error(error);
+	}
+	/*
+	fb_mod.md_db.onValue(db_ref, (snapshot) => {
+		if (snapshot.exists()) {
+			const rd_obj = snapshot.val();
+			gvar.general_private_fields = JSON.parse(JSON.stringify(rd_obj));
+			fill_general_private_fields(gvar.general_private_fields);
+		} else {
+			console.error("No data available");
+		}
+	});	*/
+}
+
+function fill_general_private_fields(obj){
+	if(obj == null){
+		return;
+	}
+	if(DEBUG_USER_INFO){ 
+		console.log("fill_general_private_fields. FULL_OBJ=");
+		console.log(obj);
+	}
+	const ids = Object.keys(obj);
+	let ii = 0;
+	for(ii = 0; ii < ids.length; ii++){
+		const fld_id = ids[ii];
+		const visi_id = fld_id + SUF_FLD_VISI;
+		const dv_visi = document.getElementById(visi_id);
+		dv_visi.classList.add("is_color_grey");
+	}
 }
 
 

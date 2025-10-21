@@ -315,7 +315,7 @@ a.exam_ref:hover {
 	text-align: center;
 }
 
-.is_logout_button {
+.is_big_button {
 	border: 0.2vw solid white;
 	height: 15vh;
 	border-radius: 1em;
@@ -667,6 +667,10 @@ a.exam_ref:hover {
 	font-size:1em;
 	text-align: center;  
 	z-index: 60;
+}
+
+.is_color_grey {
+	color: #a7a7a7;
 }
 
 .background_red {

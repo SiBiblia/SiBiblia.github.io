@@ -14,7 +14,7 @@ import { load_qmodu, load_next_qmodu, } from './bq_module_mgr.js';
 
 import { get_bib_verse, } from './bq_bible_mgr.js';
 
-import { test_pdf } from './bq_pdf_mgr.js'
+import { gen_pdf_cards } from './bq_pdf_mgr.js'
 
 const DEBUG_ADMIN_OPS = true;
 const DEBUG_UPDATE_STATS = true;
@@ -111,7 +111,7 @@ async function do_selec(val_sel_w){
 		test_get_verse();
 	}
 	if(val_sel_w == admin_ops.test_jdpdf){
-		test_pdf();
+		gen_pdf_cards();
 	}
 	if(val_sel_w == admin_ops.add_big_test_data){
 		add_big_test_data();
