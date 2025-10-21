@@ -15,8 +15,11 @@ import { get_user_href,
 
 const DEBUG_USER_INFO = true;
 
+const SUF_FLD_VISI = "SUF_FLD_VISI";
+
 const firebase_user_info_path = "/user_info";
 
+/*
 //const id_ed_user_info = "id_ed_user_info";
 const id_comm_info = "id_ed_user_comm_info";
 
@@ -26,13 +29,13 @@ const id_goo_email = "id_ed_user_goo_email";
 const id_sibiblia_qr = "id_ed_sibiblia_qr";
 const id_sibiblia_link = "id_ed_sibiblia_link";
 const id_sibiblia_id = "id_ed_sibiblia_id";
-const id_sibiblia_photo = "id_ed_sibiblia_photo";
+//const id_sibiblia_photo = "id_ed_sibiblia_photo";
 
 const id_nequi_number = "id_ed_user_nequi_number";
 const id_paypal_email = "id_ed_user_paypal_email";
 const id_transfiya_number = "id_ed_user_transfiya_number";
-const id_url_photo = "id_ed_user_url_photo";
-const id_alias = "id_ed_user_alias";		// NEW FIELD TO MANAGE ALIASES. TODO: CODE IT
+//const id_url_photo = "id_ed_user_url_photo";
+const id_alias = "id_ed_user_alias";
 const id_country = "id_ed_user_country";
 const id_citizen_id_lbl = "id_ed_user_citizen_id_lbl";
 const id_citizen_id = "id_ed_user_citizen_id";
@@ -48,8 +51,43 @@ const id_website = "id_ed_user_website";
 const id_facebook = "id_ed_user_facebook";
 const id_instagram = "id_ed_user_instagram";
 const id_youtube = "id_ed_user_youtube";
+*/
 
 const id_user_sele = "id_user_sele";
+
+const fb_ids = {
+	//id_ed_user_info: "id_ed_user_info",
+	id_comm_info: "id_ed_user_comm_info",
+
+	id_goo_name: "id_ed_user_goo_name",
+	id_goo_photo: "id_ed_user_goo_photo",
+	id_goo_email: "id_ed_user_goo_email",
+	id_sibiblia_qr: "id_ed_sibiblia_qr",
+	id_sibiblia_link: "id_ed_sibiblia_link",
+	id_sibiblia_id: "id_ed_sibiblia_id",
+	//id_sibiblia_photo: "id_ed_sibiblia_photo",
+
+	id_nequi_number: "id_ed_user_nequi_number",
+	id_paypal_email: "id_ed_user_paypal_email",
+	id_transfiya_number: "id_ed_user_transfiya_number",
+	//id_url_photo: "id_ed_user_url_photo",
+	id_alias: "id_ed_user_alias",
+	id_country: "id_ed_user_country",
+	id_citizen_id_lbl: "id_ed_user_citizen_id_lbl",
+	id_citizen_id: "id_ed_user_citizen_id",
+	id_birth_year: "id_ed_user_birth_year",
+	id_birth_month: "id_ed_user_birth_month",
+	id_birth_day: "id_ed_user_birth_day",
+	id_sex: "id_ed_user_sex",
+	id_marital_status: "id_ed_user_marital_status",
+	id_name: "id_ed_user_name",
+	id_divorce_number: "id_ed_user_divorce_number",
+	id_children_number: "id_ed_user_children_number",
+	id_website: "id_ed_user_website",
+	id_facebook: "id_ed_user_facebook",
+	id_instagram: "id_ed_user_instagram",
+	id_youtube: "id_ed_user_youtube",
+};
 
 function add_user_info_label(htm_txt){ 
 	const inp_fld = document.createElement("div");
@@ -59,10 +97,25 @@ function add_user_info_label(htm_txt){
 	return inp_fld;
 }
 
-function add_user_info_end_line(){ 
+function add_user_info_end_line(fld_id){ 
 	const inp_fld = document.createElement("div");
+	inp_fld.id = fld_id + SUF_FLD_VISI;
 	inp_fld.classList.add("exam");
-	inp_fld.classList.add("grid_item_auto_rest");
+	inp_fld.classList.add("grid_item_auto_rest"); 
+	inp_fld.classList.add("medium_font");
+	inp_fld.innerHTML = `<i class="has_icons icon-eye"></i>`;
+	inp_fld.fb_visi = true;
+	
+	inp_fld.addEventListener('click', function() {
+		if(inp_fld.fb_visi){
+			inp_fld.fb_visi = false;
+			inp_fld.innerHTML = `<i class="has_icons icon-no-eye"></i>`;
+		} else {
+			inp_fld.fb_visi = true;
+			inp_fld.innerHTML = `<i class="has_icons icon-eye"></i>`;
+		}
+	});
+	
 	return inp_fld;
 }
 
@@ -91,7 +144,7 @@ function add_user_info_simple_line(dv_ed_usr, label, id, tp, sz, mx_ln, val){
 	fld = add_user_info_field(id, tp, sz, mx_ln, val, 10);
 	dv_ed_usr.appendChild(fld);
 	
-	fld = add_user_info_end_line();
+	fld = add_user_info_end_line(id);
 	dv_ed_usr.appendChild(fld);
 }
 
@@ -112,7 +165,7 @@ function add_user_info_simple_html_line(dv_ed_usr, label, id, htm_str){
 
 	const dv_info = fld;
 	
-	fld = add_user_info_end_line();
+	fld = add_user_info_end_line(id);
 	dv_ed_usr.appendChild(fld);
 	
 	return dv_info;
@@ -143,14 +196,15 @@ function add_user_info_select_line(dv_ed_usr, label, id, val, arr_ops){
 	});
 	dv_ed_usr.appendChild(fld);
 
-	fld = add_user_info_end_line();
+	fld = add_user_info_end_line(id);
 	dv_ed_usr.appendChild(fld);	
 	
 }
 
-export function toggle_user_info(fb_usr){
+export async function toggle_user_info(fb_usr){
 	let lbl = null;
 	let fld = null;
+	const ulang = gvar.glb_curr_lang;
 	
 	const dv_user_sec = document.getElementById("id_user_info_sec");
 
@@ -164,7 +218,7 @@ export function toggle_user_info(fb_usr){
 	dv_edit_user.classList.add("exam");
 
 	fld = document.createElement("div");
-	fld.id = id_comm_info;
+	fld.id = fb_ids.id_comm_info;
 	fld.classList.add("exam");
 	dv_edit_user.appendChild(fld);
 	
@@ -172,7 +226,7 @@ export function toggle_user_info(fb_usr){
 	dv_logout.classList.add("exam");
 	dv_logout.classList.add("grid_item_auto_span_4");
 	dv_logout.classList.add("is_logout_button");
-	dv_logout.innerHTML = gvar.glb_curr_lang.msg_logout;
+	dv_logout.innerHTML = ulang.msg_logout;
 	dv_logout.addEventListener('click', function() {		
 		dv_edit_user.remove();
 		user_logout();
@@ -190,15 +244,15 @@ export function toggle_user_info(fb_usr){
 	// NON EDITABLE INFO
 	
 	if(fb_usr != null){ htm_str = fb_usr.displayName; }	
-	add_user_info_simple_html_line(dv_ed_usr, gvar.glb_curr_lang.msg_google_name, id_goo_name, htm_str);
+	add_user_info_simple_html_line(dv_ed_usr, ulang.msg_google_name, fb_ids.id_goo_name, htm_str);
 	htm_str = "";
 	if(fb_usr != null){ htm_str = `<img class="img_observ" src="${fb_usr.photoURL}">`; }	
-	add_user_info_simple_html_line(dv_ed_usr, gvar.glb_curr_lang.msg_google_photo, id_goo_photo, htm_str);
+	add_user_info_simple_html_line(dv_ed_usr, ulang.msg_google_photo, fb_ids.id_goo_photo, htm_str);
 	htm_str = "";
 	if(fb_usr != null){ htm_str = fb_usr.email; }	
-	add_user_info_simple_html_line(dv_ed_usr, gvar.glb_curr_lang.msg_google_email, id_goo_email, htm_str);
+	add_user_info_simple_html_line(dv_ed_usr, ulang.msg_google_email, fb_ids.id_goo_email, htm_str);
 	htm_str = "";
-	const dv_qrcod = add_user_info_simple_html_line(dv_ed_usr, gvar.glb_curr_lang.msg_sibiblia_qr, id_sibiblia_qr, htm_str);
+	const dv_qrcod = add_user_info_simple_html_line(dv_ed_usr, ulang.msg_sibiblia_qr, fb_ids.id_sibiblia_qr, htm_str);
 	dv_qrcod.classList.add("qr_code_img");
 	let the_link = "";
 	if(fb_usr != null){ 
@@ -212,64 +266,83 @@ export function toggle_user_info(fb_usr){
 	}
 
 	if(fb_usr != null){ htm_str = the_link; }	
-	add_user_info_simple_html_line(dv_ed_usr, gvar.glb_curr_lang.msg_sibiblia_link, id_sibiblia_link, htm_str);
+	lbl = `<div style="display: flex; justify-content: space-between;"><span>${ulang.msg_sibiblia_link}</span>
+				<span id="id_copy_link"><i class="medium_font has_icons icon-copy"></i></span>
+		</div>`;
+	add_user_info_simple_html_line(dv_ed_usr, lbl, fb_ids.id_sibiblia_link, htm_str);
 	htm_str = "";
+	lbl = `<div style="display: flex; justify-content: space-between;"><span>${ulang.msg_sibiblia_id}</span>
+				<span id="id_copy_id"><i class="medium_font has_icons icon-copy"></i></span>
+		</div>`;
 	if(fb_usr != null){ htm_str = fb_usr.uid; }	
-	add_user_info_simple_html_line(dv_ed_usr, gvar.glb_curr_lang.msg_sibiblia_id, id_sibiblia_id, htm_str);
+	add_user_info_simple_html_line(dv_ed_usr, lbl, fb_ids.id_sibiblia_id, htm_str);
 	htm_str = "";
-	add_user_info_simple_html_line(dv_ed_usr, gvar.glb_curr_lang.msg_sibiblia_photo, id_sibiblia_photo, htm_str);
+	
+	add_copy_data_listener("id_copy_link", fb_ids.id_sibiblia_link);
+	add_copy_data_listener("id_copy_id", fb_ids.id_sibiblia_id);
+	
+	//add_user_info_simple_html_line(dv_ed_usr, ulang.msg_sibiblia_photo, fb_ids.id_sibiblia_photo, htm_str);
 	
 	// EDITABLE INFO
 	
-	add_user_info_simple_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_nequi, id_nequi_number, "number", 10, 10, 0);
-	add_user_info_simple_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_paypal, id_paypal_email, "text", 150, 150, "");
-	add_user_info_simple_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_transfiya, id_transfiya_number, "number", 10, 10, 0);
-	add_user_info_simple_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_url_photo, id_url_photo, "text", 150, 150, "");
+	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_nequi, fb_ids.id_nequi_number, "number", 10, 10, 0);
+	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_paypal, fb_ids.id_paypal_email, "text", 150, 150, "");
+	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_transfiya, fb_ids.id_transfiya_number, "number", 10, 10, 0);
+	//add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_url_photo, fb_ids.id_url_photo, "text", 150, 150, "");
 	
-	add_user_info_select_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_country, id_country, gvar.glb_all_countries[gvar.glb_def_country], gvar.glb_all_countries);
+	lbl = `<div style="display: flex; justify-content: space-between;"><span>${ulang.msg_usr_pub_alias}</span>
+			<div><span id="id_reset_alias"><i class="medium_font has_icons icon-undo-4"></i></span>
+				<span id="id_check_alias"><i class="medium_font has_icons icon-square-check"></i></span>
+			</div>
+		</div>`;
+	add_user_info_simple_line(dv_ed_usr, lbl, fb_ids.id_alias, "text", 150, 150, "");
+	add_alias_checker();
+	add_alias_reset();
+	
+	add_user_info_select_line(dv_ed_usr, ulang.msg_usr_country, fb_ids.id_country, gvar.glb_all_countries[gvar.glb_def_country], gvar.glb_all_countries);
 	
 	lbl = document.createElement("div");
-	lbl.id = id_citizen_id_lbl;
+	lbl.id = fb_ids.id_citizen_id_lbl;
 	lbl.innerHTML = gvar.glb_all_id_names[gvar.glb_def_country];
 	lbl.classList.add("exam", "big_font", "bold_font");
 	lbl.classList.add("grid_item_auto_auto");
 	dv_ed_usr.appendChild(lbl);
 
-	fld = add_user_info_field(id_citizen_id, "number", 15, 15, 0, 10);
+	fld = add_user_info_field(fb_ids.id_citizen_id, "number", 15, 15, 0, 10);
 	dv_ed_usr.appendChild(fld);
 	
-	fld = add_user_info_end_line();
+	fld = add_user_info_end_line(fb_ids.id_citizen_id);
 	dv_ed_usr.appendChild(fld);	
 
-	lbl = add_user_info_label(gvar.glb_curr_lang.msg_usr_birth_date);
+	lbl = add_user_info_label(ulang.msg_usr_birth_date);
 	dv_ed_usr.appendChild(lbl);
 
-	fld = add_user_info_field(id_birth_year, "number", 4, 4, 2024, 4);
+	fld = add_user_info_field(fb_ids.id_birth_year, "number", 4, 4, 2024, 4);
 	dv_ed_usr.appendChild(fld);
 	
-	fld = add_user_info_field(id_birth_month, "number", 2, 2, 12, 3);
+	fld = add_user_info_field(fb_ids.id_birth_month, "number", 2, 2, 12, 3);
 	dv_ed_usr.appendChild(fld);
 	
-	fld = add_user_info_field(id_birth_day, "number", 2, 2, 31, 3);
+	fld = add_user_info_field(fb_ids.id_birth_day, "number", 2, 2, 31, 3);
 	dv_ed_usr.appendChild(fld);
 	
-	fld = add_user_info_end_line();
+	fld = add_user_info_end_line(fb_ids.id_birth_day);
 	dv_ed_usr.appendChild(fld);	
 	
-	add_user_info_select_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_sex, id_sex, gvar.glb_all_sex["1"], gvar.glb_all_sex);
+	add_user_info_select_line(dv_ed_usr, ulang.msg_usr_sex, fb_ids.id_sex, gvar.glb_all_sex["1"], gvar.glb_all_sex);
 	
-	add_user_info_select_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_marital_status, id_marital_status, 
+	add_user_info_select_line(dv_ed_usr, ulang.msg_usr_marital_status, fb_ids.id_marital_status, 
 							  gvar.glb_all_marital[gvar.glb_def_marital], gvar.glb_all_marital);
 	
 	if(fb_usr != null){ htm_str = fb_usr.displayName; }	
-	add_user_info_simple_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_name, id_name, "text", 150, 150, htm_str);
+	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_name, fb_ids.id_name, "text", 150, 150, htm_str);
 	htm_str = "";
-	add_user_info_simple_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_divorce_num, id_divorce_number, "number", 1, 1, 123);
-	add_user_info_simple_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_children_num, id_children_number, "number", 2, 2, 123);
-	add_user_info_simple_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_website, id_website, "text", 150, 150, "");
-	add_user_info_simple_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_facebook, id_facebook, "text", 150, 150, "");
-	add_user_info_simple_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_instagram, id_instagram, "text", 150, 150, "");
-	add_user_info_simple_line(dv_ed_usr, gvar.glb_curr_lang.msg_usr_youtube, id_youtube, "text", 150, 150, "");
+	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_divorce_num, fb_ids.id_divorce_number, "number", 1, 1, 123);
+	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_children_num, fb_ids.id_children_number, "number", 2, 2, 123);
+	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_website, fb_ids.id_website, "text", 150, 150, "");
+	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_facebook, fb_ids.id_facebook, "text", 150, 150, "");
+	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_instagram, fb_ids.id_instagram, "text", 150, 150, "");
+	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_youtube, fb_ids.id_youtube, "text", 150, 150, "");
 	
 	//gvar.glb_all_countries[gvar.glb_def_country]
 	//gvar.glb_all_countries[gvar.glb_def_country]
@@ -278,11 +351,14 @@ export function toggle_user_info(fb_usr){
 	dv_ok.classList.add("exam");
 	dv_ok.classList.add("grid_item_auto_span_4");
 	dv_ok.classList.add("is_button");
-	dv_ok.innerHTML = gvar.glb_curr_lang.msg_save;
+	dv_ok.innerHTML = ulang.msg_save;
 	dv_ok.addEventListener('click', async function() {
-		gvar.current_user_info = get_user_info_object();
+		gvar.current_user_info = get_user_info_object();		
+		gvar.current_user_private_fields = get_user_private_fields();
 		
 		await write_firebase_user_object();
+		await write_firebase_user_alias();
+		await write_firebase_user_private_fields();
 		
 		dv_edit_user.remove();
 		scroll_to_first_not_answered();		
@@ -291,6 +367,7 @@ export function toggle_user_info(fb_usr){
 	
 	if(fb_usr != null){
 		read_firebase_user_object();
+		read_firebase_user_private_fields();
 	}	
 
 	scroll_to_top(dv_edit_user);
@@ -314,26 +391,27 @@ function get_user_field(obj, id_fld, get_htm){
 
 function get_user_info_object(){
 	const obj = {};
-	//get_user_field(obj, id_sibiblia_link, true);
-	//get_user_field(obj, id_sibiblia_id, true);
-	get_user_field(obj, id_nequi_number);
-	get_user_field(obj, id_paypal_email);
-	get_user_field(obj, id_transfiya_number);
-	get_user_field(obj, id_url_photo);
-	get_user_field(obj, id_country, true);
-	get_user_field(obj, id_citizen_id);
-	get_user_field(obj, id_birth_year);
-	get_user_field(obj, id_birth_month);
-	get_user_field(obj, id_birth_day);
-	get_user_field(obj, id_sex, true);
-	get_user_field(obj, id_marital_status, true);
-	get_user_field(obj, id_name);
-	get_user_field(obj, id_divorce_number);
-	get_user_field(obj, id_children_number);
-	get_user_field(obj, id_website);
-	get_user_field(obj, id_facebook);
-	get_user_field(obj, id_instagram);
-	get_user_field(obj, id_youtube);
+	//get_user_field(obj, fb_ids.id_sibiblia_link, true);
+	//get_user_field(obj, fb_ids.id_sibiblia_id, true);
+	get_user_field(obj, fb_ids.id_nequi_number);
+	get_user_field(obj, fb_ids.id_paypal_email);
+	get_user_field(obj, fb_ids.id_transfiya_number);
+	// fb_ids.id_alias is SEPARETLY
+	//get_user_field(obj, fb_ids.id_url_photo);
+	get_user_field(obj, fb_ids.id_country, true);
+	get_user_field(obj, fb_ids.id_citizen_id);
+	get_user_field(obj, fb_ids.id_birth_year);
+	get_user_field(obj, fb_ids.id_birth_month);
+	get_user_field(obj, fb_ids.id_birth_day);
+	get_user_field(obj, fb_ids.id_sex, true);
+	get_user_field(obj, fb_ids.id_marital_status, true);
+	get_user_field(obj, fb_ids.id_name);
+	get_user_field(obj, fb_ids.id_divorce_number);
+	get_user_field(obj, fb_ids.id_children_number);
+	get_user_field(obj, fb_ids.id_website);
+	get_user_field(obj, fb_ids.id_facebook);
+	get_user_field(obj, fb_ids.id_instagram);
+	get_user_field(obj, fb_ids.id_youtube);
 	
 	return obj;
 }
@@ -341,13 +419,15 @@ function get_user_info_object(){
 function set_user_field(obj, id_fld, set_htm){
 	const dv_fld = document.getElementById(id_fld);
 	if(dv_fld == null){
-		console.log("SET_user_field. No field with id = " + id_fld);
+		console.error(`dv_fld == null for ${id_fld}`);
 		return;
 	}
+	let vv = obj[id_fld];
+	if(vv == null){ vv = ""; }
 	if(set_htm){
-		dv_fld.innerHTML = obj[id_fld];
+		dv_fld.innerHTML = vv;
 	} else {
-		dv_fld.value = obj[id_fld];
+		dv_fld.value = vv;
 	}
 }
 
@@ -355,27 +435,36 @@ function fill_user_info(obj){
 	if(obj == null){
 		return;
 	}
-	//set_user_field(obj, id_sibiblia_link, true);
-	//set_user_field(obj, id_sibiblia_id, true);
-	set_user_field(obj, id_nequi_number);
-	set_user_field(obj, id_paypal_email);
-	set_user_field(obj, id_transfiya_number);
-	set_user_field(obj, id_url_photo);
-	set_user_field(obj, id_country, true);
-	set_user_field(obj, id_citizen_id_lbl);
-	set_user_field(obj, id_citizen_id);
-	set_user_field(obj, id_birth_year);
-	set_user_field(obj, id_birth_month);
-	set_user_field(obj, id_birth_day);
-	set_user_field(obj, id_sex, true);
-	set_user_field(obj, id_marital_status, true);
-	set_user_field(obj, id_name);
-	set_user_field(obj, id_divorce_number);
-	set_user_field(obj, id_children_number);
-	set_user_field(obj, id_website);
-	set_user_field(obj, id_facebook);
-	set_user_field(obj, id_instagram);
-	set_user_field(obj, id_youtube);
+	/*const dv_fld = document.getElementById(fb_ids.id_sibiblia_photo);
+	if(dv_fld != null){
+		//  OpaqueResponseBlocking from GoogleDrive
+		dv_fld.innerHTML = `<img class="img_observ" src="${obj[fb_ids.id_url_photo]}">`;
+	}*/
+	//show_photo(obj[fb_ids.id_url_photo]);
+	//show_photo2(obj[fb_ids.id_url_photo]);
+	
+	//set_user_field(obj, fb_ids.id_sibiblia_link, true);
+	//set_user_field(obj, fb_ids.id_sibiblia_id, true);
+	set_user_field(obj, fb_ids.id_nequi_number);
+	set_user_field(obj, fb_ids.id_paypal_email);
+	set_user_field(obj, fb_ids.id_transfiya_number);
+	//set_user_field(obj, fb_ids.id_url_photo);
+	set_user_field(obj, fb_ids.id_alias);
+	set_user_field(obj, fb_ids.id_country, true);
+	set_user_field(obj, fb_ids.id_citizen_id_lbl);
+	set_user_field(obj, fb_ids.id_citizen_id);
+	set_user_field(obj, fb_ids.id_birth_year);
+	set_user_field(obj, fb_ids.id_birth_month);
+	set_user_field(obj, fb_ids.id_birth_day);
+	set_user_field(obj, fb_ids.id_sex, true);
+	set_user_field(obj, fb_ids.id_marital_status, true);
+	set_user_field(obj, fb_ids.id_name);
+	set_user_field(obj, fb_ids.id_divorce_number);
+	set_user_field(obj, fb_ids.id_children_number);
+	set_user_field(obj, fb_ids.id_website);
+	set_user_field(obj, fb_ids.id_facebook);
+	set_user_field(obj, fb_ids.id_instagram);
+	set_user_field(obj, fb_ids.id_youtube);
 }
 
 async function write_firebase_user_object(){
@@ -394,6 +483,56 @@ async function write_firebase_user_object(){
 	const db_ref = fb_mod.md_db.ref(fb_database, usr_info_pth);
 	
 	await fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });	
+}
+
+async function write_firebase_user_alias(){
+	if(gvar.current_user_info == null){
+		return;
+	}
+	const uinfo = gvar.current_user_info;
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	const user_id = fb_mod.tc_fb_user.uid;
+	if(user_id == null){ console.error("user_id == null.");  return; }
+	
+	const usr_path = fb_mod.firebase_get_user_path(user_id);
+	const usr_info_pth = usr_path + '/user_info/';
+	const usr_alias_pth = usr_info_pth + fb_ids.id_alias;
+
+	const obj = {};
+	get_user_field(obj, fb_ids.id_alias);
+	let nw_alias = obj[fb_ids.id_alias];
+	let nw_fixed_alias = fix_alias(nw_alias);
+	if(nw_fixed_alias == null){
+		console.error("nw_fixed_alias == null");
+		return;
+	}
+	
+	let old_alias = uinfo[fb_ids.id_alias];
+	if(old_alias == nw_alias){
+		console.error("old_alias == nw_alias");
+		return;
+	}
+	let old_fixed_alias = fix_alias(old_alias);
+
+	let db_ref = null;
+	try{
+		const old_alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + old_fixed_alias + '/' + user_id;
+		db_ref = fb_mod.md_db.ref(fb_database, old_alias_pth);
+		await fb_mod.md_db.remove(db_ref);
+		
+		const nw_alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + nw_fixed_alias + '/' + user_id;
+		
+		const wr_data = {};
+		wr_data[nw_alias_pth] = 1;
+		wr_data[usr_alias_pth] = nw_alias;
+		
+		db_ref = fb_mod.md_db.ref(fb_database);
+		await fb_mod.md_db.update(db_ref, wr_data);
+	} catch (error){
+		console.error(error);
+	}
 }
 
 function read_firebase_user_object(){
@@ -420,6 +559,200 @@ function read_firebase_user_object(){
 		}
 	});	
 }
+
+async function check_alias(){
+	if(gvar.current_user_info == null){
+		return;
+	}
+	const uinfo = gvar.current_user_info;
+
+	let old_alias = uinfo[fb_ids.id_alias];
+	let old_fixed_alias = fix_alias(old_alias);
+	
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	const user_id = fb_mod.tc_fb_user.uid;
+	if(user_id == null){ console.error("user_id == null.");  return; }
+	
+	const obj = {};
+	get_user_field(obj, fb_ids.id_alias);
+	let nw_alias = obj[fb_ids.id_alias];
+	let nw_fixed_alias = fix_alias(nw_alias);
+	if(nw_fixed_alias == null){
+		console.error("nw_fixed_alias == null");
+		return;
+	}
+	if(old_alias == nw_alias){
+		console.error("old_alias == nw_alias");
+		return;
+	}
+	
+	const nw_alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + nw_fixed_alias;
+	
+	let db_ref = null;
+	db_ref = fb_mod.md_db.ref(fb_database, nw_alias_pth);
+	const snapshot = await fb_mod.md_db.get(db_ref);
+
+	let ck_alias = null;
+	if (snapshot.exists()) {
+		ck_alias = snapshot.val();
+		console.error(`alias ${ck_alias} ALREADY in use`);
+		const kk = Object.keys(ck_alias)[0];
+		const same = (kk == user_id);
+		if(same){
+			ck_alias = null;
+		}
+	}
+	return ck_alias;
+}
+
+function add_alias_checker(){
+	const dv_ck = document.getElementById("id_check_alias");
+	const dv_als = document.getElementById(fb_ids.id_alias);
+	dv_ck.addEventListener('click', async function() {
+		const old_alias = await check_alias();
+		if(old_alias != null){
+			dv_als.classList.add("background_red");
+			dv_als.classList.remove("background_green");
+		} else {
+			dv_als.classList.add("background_green");
+			dv_als.classList.remove("background_red");
+		}
+	});
+}
+
+function add_alias_reset(){
+	const dv_ck = document.getElementById("id_reset_alias");
+	const dv_als = document.getElementById(fb_ids.id_alias);
+	dv_ck.addEventListener('click', async function() {
+		if(gvar.current_user_info == null){
+			return;
+		}
+		const obj = gvar.current_user_info;
+		set_user_field(obj, fb_ids.id_alias);
+		
+		dv_als.classList.remove("background_red");
+		dv_als.classList.remove("background_green");
+		
+	});
+}
+
+function fix_alias(nw_alias){
+	if(nw_alias == null){ return null;}
+	if(nw_alias.length < 5){ return null;}
+	if(nw_alias.length > 18){ return null;}
+	let fx_alias = nw_alias.toLowerCase();
+	fx_alias = fx_alias.replace(/\s+/g, '_');
+	fx_alias = fx_alias.replaceAll('á', 'a');
+	fx_alias = fx_alias.replaceAll('é', 'e');
+	fx_alias = fx_alias.replaceAll('í', 'i');
+	fx_alias = fx_alias.replaceAll('ó', 'o');
+	fx_alias = fx_alias.replaceAll('ú', 'u');
+	if(DEBUG_USER_INFO){
+		console.log(`fix_alias. ${nw_alias} => ${fx_alias}`);
+	}
+	return fx_alias;
+}
+
+async function copy_in_clipboard(txt){
+	try{
+		if(txt != null){
+			await navigator.clipboard.writeText(txt);
+		}
+	} catch(err){
+		console.error(`${err}. ${txt}.`);
+	}
+}
+
+function add_copy_data_listener(id_but, id_data){
+	const dv_but = document.getElementById(id_but);
+	const dv_dat = document.getElementById(id_data);
+	dv_but.addEventListener('click', async function() {
+		await copy_in_clipboard(dv_dat.innerHTML);
+	});
+}
+
+function read_firebase_user_private_fields(){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	let user_id = fb_mod.tc_fb_user.uid;
+	if(user_id == null){ console.error("user_id == null.");  return; }
+	const usr_path = fb_mod.firebase_get_user_path(user_id);
+	const usr_private_pth = usr_path + '/private_fields/';
+
+	const db_ref = fb_mod.md_db.ref(fb_database, usr_private_pth);
+	fb_mod.md_db.onValue(db_ref, (snapshot) => {
+		if (snapshot.exists()) {
+			const rd_obj = snapshot.val();
+			gvar.current_user_private_fields = JSON.parse(JSON.stringify(rd_obj));
+			if(DEBUG_USER_INFO){ 
+				console.log("read_firebase_user_private_fields. FULL_OBJ=");
+				console.log(gvar.current_user_private_fields);
+			}
+			fill_private_info(gvar.current_user_private_fields);
+		} else {
+			console.error("No data available");
+		}
+	});	
+}
+
+function fill_private_info(obj){
+	if(obj == null){
+		return;
+	}
+	const ids = Object.keys(obj);
+	let ii = 0;
+	for(ii = 0; ii < ids.length; ii++){
+		const fld_id = ids[ii];
+		const visi_id = fld_id + SUF_FLD_VISI;
+		const dv_visi = document.getElementById(visi_id);
+		dv_visi.fb_visi = false;
+		dv_visi.innerHTML = `<i class="has_icons icon-no-eye"></i>`;
+	}
+}
+
+function get_user_private_fields(){
+	const obj = {};
+	const ids = Object.values(fb_ids);
+	let ii = 0;
+	for(ii = 0; ii < ids.length; ii++){
+		const fld_id = ids[ii];
+		const visi_id = fld_id + SUF_FLD_VISI;
+		const dv_visi = document.getElementById(visi_id);
+		if(dv_visi == null){ continue; }
+		if(dv_visi.fb_visi === false){
+			obj[fld_id] = 1;
+		}
+	}
+	if(DEBUG_USER_INFO){
+		console.log("private_info=");
+		console.log(obj);
+	}
+	return obj;
+}
+
+async function write_firebase_user_private_fields(){
+	if(gvar.current_user_private_fields == null){
+		return;
+	}
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	const user_id = fb_mod.tc_fb_user.uid;
+	if(user_id == null){ console.error("user_id == null.");  return; }
+	const usr_path = fb_mod.firebase_get_user_path(user_id);
+	const usr_info_pth = usr_path + '/private_fields/';
+
+	const wr_data = JSON.parse(JSON.stringify(gvar.current_user_private_fields));
+	const db_ref = fb_mod.md_db.ref(fb_database, usr_info_pth);
+	
+	await fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });	
+}
+
+
 
 /* 
 {

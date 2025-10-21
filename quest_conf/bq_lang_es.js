@@ -427,6 +427,7 @@ function init_es_basic_msg(){
 	obj.msg_usr_paypal = "Paypal email";
 	obj.msg_usr_transfiya = "Transfiya";
 	obj.msg_usr_url_photo = "URL a su foto";
+	obj.msg_usr_pub_alias = "Mi alias";
 	obj.msg_usr_country = "Pais";
 	obj.msg_usr_country_id = "Cedula";
 	obj.msg_usr_name = "Nombre";

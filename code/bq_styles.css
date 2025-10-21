@@ -29,7 +29,7 @@
 
 @font-face {
 	font-family: tc_icons_font;
-	src: url(../fonts/bq_icons.ttf);
+	src: url(../fonts/SiBibliaIcons.ttf);
 }
 
 .has_icons {
@@ -59,6 +59,9 @@ h1, h2, h3, h4, h5, h6 {
 	text-rendering: auto; 
 }
 
+.icon-copy::before { content: "\005E"; }
+.icon-eye::before { content: "\005F"; }
+.icon-no-eye::before { content: "\0060"; }
 .icon-side-menu::before { content: "\0061"; }
 .icon-book::before { content: "\0062"; }
 .icon-download::before { content: "\0063"; }
@@ -88,6 +91,8 @@ h1, h2, h3, h4, h5, h6 {
 .icon-undo-4::before { content: "\007B"; }
 .icon-undo-5::before { content: "\007C"; }
 .icon-logout::before { content: "\007D"; }
+.icon-square-check::before { content: "\007E"; }
+.icon-square-no-check::before { content: "\007F"; }
 
 .hebreo:lang(he) { direction: rtl; }
 .griego:lang(el) { direction: ltr; }
@@ -296,6 +301,14 @@ a.exam_ref:hover {
 	margin-bottom: 3em;
 }
 
+.is_align_right {
+	text-align: right;
+}
+
+.is_align_left {
+	text-align: left;
+}
+
 .is_button {
 	border: 0.2vw solid white;
 	background-color: #1c396f;
@@ -329,7 +342,6 @@ a.exam_ref:hover {
 }
 
 .observ_stm {
-	//margin-top: max(2vw, 2vh);
 	display: block;
 	width: 100%;
 	height: 80%;
@@ -339,7 +351,6 @@ a.exam_ref:hover {
 .observ_ok {
 	display: block;
 	width: 100%;
-	//height: 13%;
 }
 
 .msg {
@@ -355,13 +366,8 @@ a.exam_ref:hover {
 }
 
 .is_observ {
-	//padding-top: 0.2em;
-	//padding-bottom: 0.2em;
 	margin-top: max(1vw, 1vh);
 	border: 0.5vw solid #ffff00;
-	//border-radius: 1em;
-	//width: 90vw;
-	//height: 87vh;
 }
 
 .has_round_border {
@@ -580,13 +586,20 @@ a.exam_ref:hover {
 
 .small_font {
 	font-size: 0.5em;
-	//font-size: 50%;
+}
+
+.medium_font {
+	font-size: 0.8em;
+}
+
+.normal_font {
+	font-size: 1em;
 }
 
 
 .grid_user_info {
 	display: grid;
-	grid-template-columns: max-content repeat(10, 10fr) 0.1fr;
+	grid-template-columns: max-content repeat(10, 10fr) 5fr;
 	grid-auto-rows: auto;
 	border: 1px solid white;
 	gap: 1vh;

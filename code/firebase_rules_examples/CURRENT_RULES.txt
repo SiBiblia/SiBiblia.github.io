@@ -230,11 +230,11 @@
 							},
 						},
 					},
-					"pub_fields": {
+					"private_fields": {
 						".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 						"$user_field": {
-							".validate": "root.child('bib_quest').child('user_fields').child($user_field).exists() && newData.isNumber() && 
-							(newData.val() === 1)",
+							".validate": "root.child('bib_quest').child('user_fields').child($user_field).exists() && 
+									newData.isNumber() && (newData.val() === 1)",
 						},
 					},
 					"user_info": {
@@ -242,8 +242,8 @@
 							".validate": "newData.exists() && root.child('bib_quest').child('user_fields').child($user_field).exists()",
 							"$val": {
 								".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists()) && 
-								(root.child('bib_quest').child('users').child($uid).child('pub_fields').child($user_field).exists() ||
-								root.child('bib_quest').child('pub_fields').child($user_field).exists())",
+								! root.child('bib_quest').child('users').child($uid).child('private_fields').child($user_field).exists() &&
+								! root.child('bib_quest').child('private_fields').child($user_field).exists()",
 								".validate": "
 									(newData.isNumber() && (newData.val() >= 0) && (newData.val() < 9999999999)) ||
 									(newData.isString() && newData.val().length < 200)

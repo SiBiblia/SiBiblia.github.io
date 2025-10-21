@@ -373,3 +373,36 @@ function generate_and_download(){
 }
 
 
+// ------------------------------------------------------------------------------
+
+function show_photo2(url_photo){
+	fetch(url_photo, {
+		mode: 'cors',
+		//mode: 'same-origin',
+		//mode: 'no-cors',
+		//mode: 'navigate',
+	   headers: {
+			//'Access-Control-Allow-Origin': 'http://localhost',
+			'Origin': 'https://drive.usercontent.google.com',
+	   },
+	}).then(rr => rr.blob()).then((blob) => {
+		console.log("Called show_photo2");
+		const uu = URL.createObjectURL(blob);
+		const im = document.createElement("img");
+		im.src = uu;
+		const dv_fld = document.getElementById(id_sibiblia_photo);
+		dv_fld.appendChild(im);
+	});
+}
+
+function show_photo(url_photo){
+	const div = document.getElementById(id_sibiblia_photo);
+	const sp = document.createElement("span");
+	const im = document.createElement("img");
+	im.classList.add("img_observ");
+	im.src = url_photo;
+	sp.appendChild(document.createTextNode("Uploading..."));
+	sp.appendChild(im);
+	div.appendChild(sp);
+}
+

@@ -1440,9 +1440,9 @@ export function init_page_buttons(){
 	dv_button = document.getElementById(id_top_user_name); // this id must be the same to the id in the HTML page.
 	clk_hdlr = user_name_button_handler;
 	if(dv_button != null){ dv_button.click_handler = clk_hdlr; dv_button.addEventListener('click', clk_hdlr); }
-	if(dv_button != null){ dv_button.addEventListener('contextmenu', (ev1) => {
+	if(dv_button != null){ dv_button.addEventListener('contextmenu', async (ev1) => {
 			ev1.preventDefault();
-			toggle_user_info(null);
+			await toggle_user_info(null);
 			return false;
 		}); 		
 	} 
@@ -1556,7 +1556,7 @@ function home_button_handler(){
 	scroll_to_qid(get_first_not_answered());
 }
 
-function user_name_button_handler(){
+async function user_name_button_handler(){
 	if(fb_mod == null){ console.error("fb_mod == null"); return; }
 	const fb_usr = fb_mod.tc_fb_user;
 	if(fb_usr == null){
@@ -1564,7 +1564,7 @@ function user_name_button_handler(){
 		close_pop_menu();
 		return;
 	}
-	toggle_user_info(fb_usr);
+	await toggle_user_info(fb_usr);
 }
 
 function pop_menu_handler(){
