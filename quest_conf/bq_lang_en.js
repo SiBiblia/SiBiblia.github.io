@@ -442,6 +442,7 @@ function init_en_basic_msg(){
 	obj.msg_usr_youtube = "Youtube";
 	
 	obj.msg_gen_cards = `GEN PDF CARDS`;
+	obj.msg_choose_verses = `Choose verses`;
 }
 
 function ini_glb_vars_en(all_vars){

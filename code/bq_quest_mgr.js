@@ -230,13 +230,13 @@ function add_question(qid){
 		set_bibrefs(dv_qstm);
 	}
 	
-	if(quest.answers != null){
+	/*if(quest.answers != null){
 		sp_num.addEventListener('click', (ev1) => {
 			ev1.preventDefault();
 			toggle_support_interaction(qid, SUF_ID_ANSWERS);
 			return false;				
 		});
-	}
+	}*/
 	
 	init_answers(qid);
 
@@ -896,7 +896,7 @@ function toggle_support_interaction(qid){
 	const id_dv_support = qid + SUF_ID_ANSWERS;
 	const dv_support = document.getElementById(id_dv_support);
 	if(dv_support == null){
-		console.log("toggle_support_interaction (dv_support == null) !!");
+		console.error("dv_support == null");
 		return;
 	}
 	

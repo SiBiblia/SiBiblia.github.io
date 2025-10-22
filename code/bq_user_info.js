@@ -3,10 +3,10 @@
 import { get_new_dv_under, scroll_to_top, toggle_select_option, 
 } from './bq_select_option_mgr.js';
 
-import { gvar, 
+import { gvar, set_bibrefs, 
 } from './bq_tools.js';
 
-import { scroll_to_first_not_answered, 
+import { scroll_to_first_not_answered, get_bibref_in, 
 	fb_mod, id_pop_menu_sele, user_logout, 
 } from './bq_quest_mgr.js';
 
@@ -21,6 +21,7 @@ const SUF_FLD_VISI = "SUF_FLD_VISI";
 
 const firebase_user_info_path = "/user_info";
 const id_user_sele = "id_user_sele";
+const id_all_verses = "id_all_verses";
 
 const fb_ids = {
 	//id_ed_user_info: "id_ed_user_info",
@@ -54,6 +55,19 @@ const fb_ids = {
 	id_facebook: "id_ed_user_facebook",
 	id_instagram: "id_ed_user_instagram",
 	id_youtube: "id_ed_user_youtube",
+};
+
+export const default_card_verses = {
+	v1: `Juan 1:1. En el principio ya existía la Palabra; y aquel que es la Palabra estaba con Dios y era Dios.`,
+	v2: `Juan 1:2. Él estaba en el principio con Dios.`,
+	v3: `Juan 1:3. Por medio de él, Dios hizo todas las cosas; nada de lo que existe fue hecho sin él.`,
+	v4: `Juan 1:4. En él estaba la vida, y la vida era la luz de la humanidad.`,
+	v5: `Juan 1:5. Esta luz brilla en las tinieblas, y las tinieblas no han podido apagarla.`,
+	v6: `Juan 1:6. Hubo un hombre llamado Juan, a quien Dios envió`,
+	v7: `Juan 1:7. como testigo, para que diera testimonio de la luz y para que todos creyeran por lo que él decía.`,
+	v8: `Juan 1:8. Juan no era la luz, sino uno enviado a dar testimonio de la luz.`,
+	v9: `Juan 1:9. La luz verdadera que alumbra a toda la humanidad venía a este mundo.`,
+	v10: `Juan 1:10. Aquel que es la Palabra estaba en el mundo; y, aunque Dios hizo el mundo por medio de él, los que son del mundo no lo reconocieron.`,
 };
 
 function add_user_info_label(htm_txt){ 
@@ -339,6 +353,16 @@ export async function toggle_user_info(fb_usr){
 	dv_cards.innerHTML = ulang.msg_gen_cards;
 	dv_cards.addEventListener('click', function() {
 		gen_pdf_cards();
+		return;
+	});
+	
+	const dv_cho_ver = dv_edit_user.appendChild(document.createElement("div"));
+	dv_cho_ver.classList.add("exam");
+	dv_cho_ver.classList.add("grid_item_auto_span_4");
+	dv_cho_ver.classList.add("is_button");
+	dv_cho_ver.innerHTML = ulang.msg_choose_verses;
+	dv_cho_ver.addEventListener('click', function() {
+		choose_verses(dv_cho_ver);
 		return;
 	});
 	
@@ -792,7 +816,38 @@ function fill_general_private_fields(obj){
 	}
 }
 
+function choose_verses(dv_cho_ver){
+	if(gvar.card_verses == null){ gvar.card_verses = default_card_verses; }
+	const vss = gvar.card_verses;
 
+	let dv_all_vss = null;
+	dv_all_vss = get_new_dv_under(dv_cho_ver, id_all_verses);
+	if(dv_all_vss == null){
+		if(DEBUG_USER_INFO){ console.log("toggle_all_verses OFF"); }
+		return;
+	}
+	dv_all_vss.classList.add("exam", "has_margin_bot", "has_margin_top");
+	
+	const kks = Object.keys(gvar.card_verses);
+	let ii = 0;
+	for(ii = 0; ii < kks.length; ii++){
+		const kk = kks[ii];
+		const id_vs = id_all_verses + "_" + kk;
+		const dv_vs = dv_all_vss.appendChild(document.createElement("div"));
+		dv_vs.classList.add("item_can_select");
+		dv_vs.id = id_vs;
+		dv_vs.innerHTML = vss[kk];
+		dv_vs.addEventListener('click', async function() {
+			get_bibref_in(dv_vs, (dv_ed_cit, bibref) => {
+				dv_vs.innerHTML = bibref;
+				set_bibrefs(dv_vs);
+				dv_ed_cit.remove();
+			});
+		});
+		
+	}
+	
+}
 
 /* 
 {

@@ -43,6 +43,7 @@ export function toggle_select_option(dv_return, id_selec_men, all_options_arr, o
 				dv_return.innerHTML = value;
 				dv_return.selected_id = opt_idx;
 				dv_options.remove();
+				scroll_to_top(dv_return, "center");
 			}
 		});
 	});
@@ -90,15 +91,19 @@ export function scroll_to_top(dv_elem) {
 	//});
 }*/
 
-export function scroll_to_top(dv_elem) {
+export function scroll_to_top(dv_elem, valign) {
 	if(dv_elem == null){ return; }
 	window.requestAnimationFrame(() => {
-		dv_elem.scrollIntoView({
+		const ops = {
 			behavior: "smooth",
 			block: "start",
 			container: "all",
 			inline: "nearest",
-		});
+		};
+		if(valign != null){
+			ops.block = valign;
+		}
+		dv_elem.scrollIntoView(ops);
 	});
 }
 

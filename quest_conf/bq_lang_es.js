@@ -442,6 +442,7 @@ function init_es_basic_msg(){
 	obj.msg_usr_youtube = "Youtube";
 	
 	obj.msg_gen_cards = `GEN PDF TARJETAS`;
+	obj.msg_choose_verses = `Escoja versículos`;
 }
 
 function ini_glb_vars_es(all_vars){

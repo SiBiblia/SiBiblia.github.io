@@ -11,6 +11,9 @@ import { fb_mod,
 import { get_user_href, 
 } from './bq_referrer_mgr.js';
 
+import { default_card_verses, 
+} from './bq_user_info.js';
+
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js"></script>
 //import * as MOD_PDF from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js";
 
@@ -27,18 +30,8 @@ export function gen_pdf_cards(){
 
 	const user_id = uinfo.id_ed_user_alias;
 	
-	const arr_txt = [
-		`Juan 1:1. En el principio ya existía la Palabra; y aquel que es la Palabra estaba con Dios y era Dios.`,
-		`Juan 1:2. Él estaba en el principio con Dios.`,
-		`Juan 1:3. Por medio de él, Dios hizo todas las cosas; nada de lo que existe fue hecho sin él.`,
-		`Juan 1:4. En él estaba la vida, y la vida era la luz de la humanidad.`,
-		`Juan 1:5. Esta luz brilla en las tinieblas, y las tinieblas no han podido apagarla.`,
-		`Juan 1:6. Hubo un hombre llamado Juan, a quien Dios envió`,
-		`Juan 1:7. como testigo, para que diera testimonio de la luz y para que todos creyeran por lo que él decía.`,
-		`Juan 1:8. Juan no era la luz, sino uno enviado a dar testimonio de la luz.`,
-		`Juan 1:9. La luz verdadera que alumbra a toda la humanidad venía a este mundo.`,
-		`Juan 1:10. Aquel que es la Palabra estaba en el mundo; y, aunque Dios hizo el mundo por medio de él, los que son del mundo no lo reconocieron.`,
-	];
+	if(gvar.card_verses == null){ gvar.card_verses = default_card_verses; }	
+	const arr_txt = Object.values(gvar.card_verses);
 	
 	const img_cod = get_code_img(url);
 	
