@@ -313,7 +313,7 @@ function is_valid_verse(bibobj){
 	return true;
 }
 
-async function bibobj_to_bibtxt(bibobj, conv_fn){
+async function bibobj_to_bibtxt(bibobj){
 	const cit_obj = JSON.parse(JSON.stringify(bibobj));
 	cit_obj.bib_ver = "text";
 	cit_obj.site = "biblehub";
@@ -337,7 +337,7 @@ async function bibobj_to_bibtxt(bibobj, conv_fn){
 	return bibobj.vtxt;
 }
 
-async function bibcit_to_bibtxt(bcit, stm_id, cho_bref){
+async function bibcit_to_bibtxt(bcit, stm_id, cho_bref, plain_txt){
 	if(bcit == "CHOSEN"){
 		bcit = bibref_to_bibcit(cho_bref);
 		if(bcit == null){ return bcit; }
@@ -348,20 +348,16 @@ async function bibcit_to_bibtxt(bcit, stm_id, cho_bref){
 		const wds = gvar.bibrefs_upper[stm_id][bcit];
 		if(wds != null){ vtxt = uppercase_words_in_string(vtxt, wds); }
 	} 
+	if(plain_txt){
+		const ptxt = `${bibobj.vcit}\n ${vtxt}`;
+		return ptxt;
+	}
 	
 	const btxt = `<a class='exam_ref' href="${bibobj.vhref}"> ${bibobj.vcit} </a><br><b> ${vtxt} </b>`;
 	return btxt;
-	/*
-	return bibobj_to_bibtxt(bibobj, (vtxt) => {
-		if((stm_id != null) && (gvar.bibrefs_upper != null) && (gvar.bibrefs_upper[stm_id] != null)){ 
-			const wds = gvar.bibrefs_upper[stm_id][bcit];
-			if(wds != null){ vtxt = uppercase_words_in_string(vtxt, wds); }
-		} 
-		return vtxt;
-	});*/
 }
 
-async function replace_all_bibrefs(str, stm_id, cho_bref){
+async function replace_all_bibrefs(str, stm_id, cho_bref, plain_txt){
 	if(DEBUG_REPLACE_BIBREFS){ console.error("str=" + str + " stm_id=" + stm_id + " cho_bref=" + cho_bref); }
 	const words = str.split(' ');
 	if(DEBUG_REPLACE_BIBREFS){ console.error(words); }
@@ -371,7 +367,7 @@ async function replace_all_bibrefs(str, stm_id, cho_bref){
 		const bcit = bibref_to_bibcit(wrd);
 		if(DEBUG_REPLACE_BIBREFS){ console.error("wrd=" + wrd + " bcit=" + bcit); }
 		if((bcit != null) && (bcit != "")){
-			words[ii] = await bibcit_to_bibtxt(bcit, stm_id, cho_bref);
+			words[ii] = await bibcit_to_bibtxt(bcit, stm_id, cho_bref, plain_txt);
 		}
 	}
 	
@@ -394,7 +390,7 @@ export function set_anchors_target(the_div){
 }
 
 export function set_bibrefs(dv_txt){
-	replace_all_bibrefs(dv_txt.innerHTML, dv_txt.stm_id, dv_txt.cho_bref).then((resp) => {
+	replace_all_bibrefs(dv_txt.innerHTML, dv_txt.stm_id, dv_txt.cho_bref, dv_txt.plain_txt).then((resp) => {
 		if((resp == null) || (resp == "")){
 			console.error("set_bibrefs. TRYING TO SET EMPTY innerHTML after replace_all_bibrefs !!!!!. dv_txt.id=" + dv_txt.id);
 		}
@@ -824,3 +820,4 @@ export function is_bad_bibcit(bcit){
 	}
 	return null;
 }
+

@@ -447,6 +447,7 @@ function init_es_basic_msg(){
 	obj.msg_the_verse = `El versículo`;
 	obj.msg_inexistant_verse = `no existe`;
 	obj.msg_waiting_verse = `Esperando por el texto del verso`;
+	obj.msg_save_verses = `Guardar versiculos`;
 }
 
 function ini_glb_vars_es(all_vars){

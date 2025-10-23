@@ -1127,14 +1127,18 @@ export function get_bibref_in(dv_bibref, callbk){
 	dv_ok.classList.add("is_button");
 	dv_ok.classList.add("is_ed_verse");
 	dv_ok.innerHTML = gvar.glb_curr_lang.msg_ok;
-	dv_ok.addEventListener('click', function() {
-		const book_num = gvar.glb_books_nums[dvs_bibref.inp_book.innerHTML];
-		const chap_num = dvs_bibref.inp_chapter.value;
-		const vers_num = dvs_bibref.inp_verse.value;
+	dv_ok.addEventListener('click', async function() {
+		const book_num = Number(gvar.glb_books_nums[dvs_bibref.inp_book.innerHTML]);
+		const chap_num = Number(dvs_bibref.inp_chapter.value);
+		const vers_num = Number(dvs_bibref.inp_verse.value);
 		const bibref = make_bibref(book_num, chap_num, vers_num);
 		
 		if(callbk != null){ 
-			callbk(dv_ed_cit, bibref); 
+			if(callbk.constructor.name == 'AsyncFunction'){
+				await callbk(dv_ed_cit, bibref); 
+			} else {
+				callbk(dv_ed_cit, bibref); 
+			}
 			return;
 		}
 		

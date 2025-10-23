@@ -14,6 +14,8 @@ import { get_user_href,
 import { default_card_verses, 
 } from './bq_user_info.js';
 
+const DEBUG_GEN_PDF = true;
+
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js"></script>
 //import * as MOD_PDF from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js";
 
@@ -28,10 +30,21 @@ export function gen_pdf_cards(){
 
 	const url = get_user_href(fb_usr);
 
-	const user_id = uinfo.id_ed_user_alias;
+	let user_id = uinfo.id_ed_user_alias;
+	if(user_id == null){
+		user_id = "";
+	}
 	
-	if(gvar.card_verses == null){ gvar.card_verses = default_card_verses; }	
-	const arr_txt = Object.values(gvar.card_verses);
+	let all_vss = gvar.card_verses;
+	//let all_vss = null;
+	if(all_vss == null){ all_vss = default_card_verses; }	
+	if(DEBUG_GEN_PDF){
+		console.log("gen_pdf_cards. ALL_GEN_VERSES=");
+		console.log(all_vss);
+		console.log("gen_pdf_cards. user_id=" + user_id);
+	}
+	
+	const arr_txt = Object.values(all_vss);
 	
 	const img_cod = get_code_img(url);
 	

@@ -17,6 +17,8 @@ import { gen_pdf_cards } from './bq_pdf_mgr.js'
 
 const DEBUG_USER_INFO = true;
 
+const STORAGE_CARD_VERSES = "STORAGE_CARD_VERSES";
+
 const SUF_FLD_VISI = "SUF_FLD_VISI";
 
 const firebase_user_info_path = "/user_info";
@@ -183,6 +185,8 @@ function add_user_info_select_line(dv_ed_usr, label, id, val, arr_ops){
 }
 
 export async function toggle_user_info(fb_usr){
+	init_verses_loc_storage();
+	
 	let lbl = null;
 	let fld = null;
 	const ulang = gvar.glb_curr_lang;
@@ -334,7 +338,7 @@ export async function toggle_user_info(fb_usr){
 	dv_ok.classList.add("is_big_button");
 	dv_ok.innerHTML = ulang.msg_save;
 	dv_ok.addEventListener('click', async function() {
-		gvar.current_user_info = get_user_info_object();		
+		gvar.current_user_info = get_user_info_object();
 		gvar.current_user_private_fields = get_user_private_fields();
 		
 		await write_firebase_user_object();
@@ -360,6 +364,8 @@ export async function toggle_user_info(fb_usr){
 	dv_cho_ver.classList.add("exam");
 	dv_cho_ver.classList.add("grid_item_auto_span_4");
 	dv_cho_ver.classList.add("is_button");
+	dv_cho_ver.classList.add("has_margin_bot");
+	dv_cho_ver.classList.add("has_margin_top");
 	dv_cho_ver.innerHTML = ulang.msg_choose_verses;
 	dv_cho_ver.addEventListener('click', function() {
 		choose_verses(dv_cho_ver);
@@ -561,6 +567,11 @@ function read_firebase_user_object(){
 			}
 			fill_user_info(gvar.current_user_info);
 		} else {
+			gvar.current_user_info = get_user_info_object();
+			if(DEBUG_USER_INFO){ 
+				console.log("read_firebase_user_object. DEFAULT_OBJ=");
+				console.log(gvar.current_user_info);
+			}
 			console.error("No data available");
 		}
 	});	
@@ -817,8 +828,13 @@ function fill_general_private_fields(obj){
 }
 
 function choose_verses(dv_cho_ver){
-	if(gvar.card_verses == null){ gvar.card_verses = default_card_verses; }
+	init_verses_loc_storage();
 	const vss = gvar.card_verses;
+	if(DEBUG_USER_INFO){ 
+		console.log("choose_verses. ALL_VERSES=");
+		console.log(vss);
+	}
+	const ulang = gvar.glb_curr_lang;
 
 	let dv_all_vss = null;
 	dv_all_vss = get_new_dv_under(dv_cho_ver, id_all_verses);
@@ -840,14 +856,59 @@ function choose_verses(dv_cho_ver){
 		dv_vs.addEventListener('click', async function() {
 			get_bibref_in(dv_vs, (dv_ed_cit, bibref) => {
 				dv_vs.innerHTML = bibref;
+				dv_vs.plain_txt = true;
 				set_bibrefs(dv_vs);
 				dv_ed_cit.remove();
 			});
 		});
 		
 	}
+
+	const dv_ok = dv_all_vss.appendChild(document.createElement("div"));
+	dv_ok.classList.add("item_can_select");
+	//dv_ok.classList.add("is_button");
+	dv_ok.innerHTML = ulang.msg_save_verses;
+	dv_ok.addEventListener('click', async function() {
+		let ii = 0;
+		for(ii = 0; ii < kks.length; ii++){
+			const kk = kks[ii];
+			const id_vs = id_all_verses + "_" + kk;
+			const dv_vs = document.getElementById(id_vs);
+			vss[kk] = dv_vs.innerHTML;
+		}
+		write_verses_loc_storage();
+		dv_all_vss.remove();
+		scroll_to_top(dv_cho_ver, "center");
+	});
 	
 }
+
+function write_verses_loc_storage(){
+	if(gvar.card_verses == null){ gvar.card_verses = default_card_verses; }
+	const vss = gvar.card_verses;
+	window.localStorage.setItem(STORAGE_CARD_VERSES, JSON.stringify(vss));
+}
+
+function read_verses_loc_storage(){
+	let vss_str = window.localStorage.getItem(STORAGE_CARD_VERSES);
+	if(vss_str != null){
+		gvar.card_verses = JSON.parse(vss_str);
+		if(DEBUG_USER_INFO){ 
+			console.log("read_verses_loc_storage. ALL_VERSES=");
+			console.log(gvar.card_verses);
+		}
+	}	
+}
+
+function init_verses_loc_storage(){
+	if(gvar.card_verses != null){ 
+		return;
+	}
+	gvar.card_verses = default_card_verses;
+	read_verses_loc_storage();
+}
+
+
 
 /* 
 {

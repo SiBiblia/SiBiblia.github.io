@@ -447,6 +447,7 @@ function init_en_basic_msg(){
 	obj.msg_the_verse = `The verse`;
 	obj.msg_inexistant_verse = `does not exist`;
 	obj.msg_waiting_verse = `Waiting for verse text`;
+	obj.msg_save_verses = `Save verses`;
 }
 
 function ini_glb_vars_en(all_vars){

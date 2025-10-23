@@ -1,5 +1,7 @@
 
-import { gvar, init_glb_vars, get_qid_base, init_default_lang, find_GET_parameter, clear_local_storage, } from './bq_tools.js';
+import { gvar, init_glb_vars, get_qid_base, init_default_lang, find_GET_parameter, clear_local_storage, 	
+} from './bq_tools.js';
+
 import { init_page_buttons, init_firebase_mgr, fb_mod, fill_div_user, init_page_exam, start_qmodu, update_qmodu_title, add_last_module_ending, 
 	write_exam_object, read_exam_object, 
 } from './bq_quest_mgr.js';
@@ -7,7 +9,8 @@ import { init_page_buttons, init_firebase_mgr, fb_mod, fill_div_user, init_page_
 import { init_loc_cand_referrer, 
 } from './bq_referrer_mgr.js';
 
-import { init_qmodu_info, } from '../quest_conf/bq_modules.js';
+import { init_qmodu_info, 	
+} from '../quest_conf/bq_modules.js';
 
 const PERSISTANT_STATE = true;
 
@@ -273,7 +276,7 @@ export async function start_module_mgr(lang_md, curr_lang){
 	});
 
 	check_param_clear_loc_storage();
-
+	
 	init_page_buttons();
 	init_conf_qmodus();
 	init_loc_cand_referrer();
