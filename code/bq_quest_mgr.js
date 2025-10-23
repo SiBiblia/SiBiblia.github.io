@@ -4,7 +4,7 @@ import { get_new_dv_under, scroll_to_top, toggle_select_option,
 
 import { get_msg, make_bible_ref, make_strong_ref, bib_defaults, refs_ids, bib_obj_to_txt, get_verse_cit_txt, bib_obj_to_cit_obj, 
 	gvar, 
-	get_qid_base, get_verse_match, get_answer_key, set_anchors_target, get_date_and_time, 
+	get_qid_base, get_verse_match, get_answer_key, set_anchors_target, get_date_and_time, is_bad_bibcit, 
 	is_observation, qid_to_qhref, set_bibrefs, make_bibref, bibref_to_bibcit, get_bibcit_obs_stm_id, clear_local_storage, 
 } from './bq_tools.js';
 
@@ -2926,11 +2926,14 @@ function show_observation(qid, all_to_act, qid_cllr){
 	let stm_id = null;
 	let cho_bref = null;
 	let qid_bcit = null;
+	let bad_ref = null;
 	if(quest.is_bibcit_observation){
 		qid_bcit = Object.keys(quest.activated_if.c1)[0];
 		const quest_bcit = gvar.glb_poll_db[qid_bcit];
 		cho_bref = quest_bcit.answers.CHOSEN_BIBREF;
-		stm_id = get_bibcit_obs_stm_id(qid_bcit, bibref_to_bibcit(cho_bref));
+		const cho_bcit = bibref_to_bibcit(cho_bref);
+		bad_ref = is_bad_bibcit(cho_bcit);
+		stm_id = get_bibcit_obs_stm_id(qid_bcit, cho_bcit);
 	} else {
 		stm_id = quest.htm_stm;
 	}
@@ -2938,6 +2941,7 @@ function show_observation(qid, all_to_act, qid_cllr){
 	if(quest.is_bibcit_observation && (the_stm == stm_id)){
 		stm_id = get_bibcit_obs_stm_id(qid_bcit, gvar.UNKNOWN_VERSE);
 		the_stm = get_msg(stm_id);
+		if(bad_ref != null){ the_stm = bad_ref; }
 	}
 	
 	const dv_qstm = document.createElement("div");

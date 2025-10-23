@@ -443,6 +443,10 @@ function init_en_basic_msg(){
 	
 	obj.msg_gen_cards = `GEN PDF CARDS`;
 	obj.msg_choose_verses = `Choose verses`;
+
+	obj.msg_the_verse = `The verse`;
+	obj.msg_inexistant_verse = `does not exist`;
+	obj.msg_waiting_verse = `Waiting for verse text`;
 }
 
 function ini_glb_vars_en(all_vars){

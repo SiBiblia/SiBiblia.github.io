@@ -1,11 +1,23 @@
 
 import { book2num_en, all_en_poll_txt, num2book_en, init_en_module, } from '../quest_conf/bq_lang_en.js';
 import { get_bib_verse, } from './bq_bible_mgr.js';
+import { bib_chapter_sizes, } from './bq_bib_chapter_sizes.js';
 
 "use strict";
 
 // ENGLISH IS THE DEFAULT LANGUAGE.
 // SO THIS FILE WORKS TOGETHER WITH '../quest_conf/bq_lang_en.js';
+
+/*
+
+export const bib_chapter_sizes = {
+  "1": {
+    "1": "31",
+    "2": "25",
+    "3": "24",
+    "4": "26",
+*/
+
 
 const DEBUG_INITS = false;
 const DEBUG_REPLACE_BIBREFS = false;
@@ -236,10 +248,10 @@ function bibcit_to_bibobj(bcit){
 	const obj = {};
 	obj.bible = get_bible_working_version();
 	if(abbr2num == {}){ console.error("bibcit_to_bibobj. (abbr2num == {})."); }
-	if(vcit.length > 1){ obj.book = abbr2num[vcit[1]]; }
-	if(vcit.length > 2){ obj.chapter = vcit[2]; }
-	if(vcit.length > 3){ obj.verse = vcit[3]; }
-	if(vcit.length > 4){ obj.last_verse = vcit[4]; }
+	if(vcit.length > 1){ obj.book = Number(abbr2num[vcit[1]]); }
+	if(vcit.length > 2){ obj.chapter = Number(vcit[2]); }
+	if(vcit.length > 3){ obj.verse = Number(vcit[3]); }
+	if(vcit.length > 4){ obj.last_verse = Number(vcit[4]); }
 	return obj;
 }
 
@@ -264,30 +276,65 @@ export function bibcit_to_citxt(bcit){
 	return vcit;
 }
 
-export async function bibobj_to_bibtxt(bibobj, conv_fn){
+function is_valid_verse(bibobj){
+	let inv_vs = false;
+	if(bibobj.book == null){
+		inv_vs = true;
+		bibobj.book = "???";
+	}
+	if(bibobj.chapter == null){
+		inv_vs = true;
+		bibobj.chapter = "???";
+	}
+	if(bibobj.verse == null){
+		inv_vs = true;
+		bibobj.verse = "???";
+	}
+	if(inv_vs){
+		return false;
+	}
+	if(bibobj.verse < 1){
+		return false;
+	}
+	
+	const cha_sz = bib_chapter_sizes;
+	
+	if(cha_sz[bibobj.book] == null){
+		return false;
+	}
+	const num_vs = Number(cha_sz[bibobj.book][bibobj.chapter]);
+	if(num_vs == null){
+		return false;
+	}
+	if(bibobj.verse > num_vs){
+		return false;
+	}
+
+	return true;
+}
+
+async function bibobj_to_bibtxt(bibobj, conv_fn){
 	const cit_obj = JSON.parse(JSON.stringify(bibobj));
 	cit_obj.bib_ver = "text";
 	cit_obj.site = "biblehub";
-	const vhref = make_bible_ref(cit_obj);
 	
-	let vcit = "WAITING_FOR_BIBLE_TEXT";
-	let vtxt = "INVALID_BIBLE_TEXT";
-	if((bibobj.book != null) && (bibobj.chapter != null) && (bibobj.verse != null)){ 
-		vcit = get_loc_book_nam(bibobj.book) + " " + bibobj.chapter + ":" + bibobj.verse;
-		vtxt = await get_bib_verse(bibobj.bible, num2book_en[bibobj.book], bibobj.chapter, bibobj.verse);
-
-		if(conv_fn != null){
-			vtxt = conv_fn(vtxt);
-		}
-		/*
-		if((stm_id != null) && (gvar.bibrefs_upper != null) && (gvar.bibrefs_upper[stm_id] != null)){ 
-			const wds = gvar.bibrefs_upper[stm_id][bcit];
-			if(wds != null){ vtxt = uppercase_words_in_string(vtxt, wds); }
-		} */
-	}
-	if((bibobj.last_verse != null) && (bibobj.last_verse != "")){ vcit = vcit + "-" + bibobj.last_verse; }
-	const btxt = `<a class='exam_ref' href="${vhref}"> ${vcit} </a><br><b> ${vtxt} </b>`;
-	return btxt;
+	bibobj.vhref = make_bible_ref(cit_obj);	
+	
+	const m1 = gvar.glb_curr_lang.msg_the_verse;
+	const m2 = gvar.glb_curr_lang.msg_inexistant_verse;
+	
+	bibobj.vcit = get_loc_book_nam(bibobj.book) + " " + bibobj.chapter + ":" + bibobj.verse;
+	if((bibobj.last_verse != null) && (bibobj.last_verse != "")){ bibobj.vcit = bibobj.vcit + "-" + bibobj.last_verse; }
+	
+	if(! is_valid_verse(bibobj)){
+		bibobj.vtxt = `${m1} ${bibobj.vcit} ${m2}`;
+		return bibobj.vtxt;
+	}	
+	
+	bibobj.vtxt = gvar.glb_curr_lang.msg_waiting_verse;
+	bibobj.vtxt = await get_bib_verse(bibobj.bible, num2book_en[bibobj.book], bibobj.chapter, bibobj.verse);
+	
+	return bibobj.vtxt;
 }
 
 async function bibcit_to_bibtxt(bcit, stm_id, cho_bref){
@@ -296,13 +343,22 @@ async function bibcit_to_bibtxt(bcit, stm_id, cho_bref){
 		if(bcit == null){ return bcit; }
 	}
 	const bibobj = bibcit_to_bibobj(bcit);
+	let vtxt = await bibobj_to_bibtxt(bibobj);
+	if((stm_id != null) && (gvar.bibrefs_upper != null) && (gvar.bibrefs_upper[stm_id] != null)){ 
+		const wds = gvar.bibrefs_upper[stm_id][bcit];
+		if(wds != null){ vtxt = uppercase_words_in_string(vtxt, wds); }
+	} 
+	
+	const btxt = `<a class='exam_ref' href="${bibobj.vhref}"> ${bibobj.vcit} </a><br><b> ${vtxt} </b>`;
+	return btxt;
+	/*
 	return bibobj_to_bibtxt(bibobj, (vtxt) => {
 		if((stm_id != null) && (gvar.bibrefs_upper != null) && (gvar.bibrefs_upper[stm_id] != null)){ 
 			const wds = gvar.bibrefs_upper[stm_id][bcit];
 			if(wds != null){ vtxt = uppercase_words_in_string(vtxt, wds); }
 		} 
 		return vtxt;
-	});
+	});*/
 }
 
 async function replace_all_bibrefs(str, stm_id, cho_bref){
@@ -451,6 +507,8 @@ function get_book_nam(book){
 }
 
 function get_loc_book_nam(book){
+	if(book == null){ return "???";	}
+	if(book === "???"){ return book; }
 	let num = -1;
 	if(isNaN(book)){ // bibrefs references
 		num = book2num_en[book];
@@ -755,3 +813,14 @@ export function get_date_and_time(is_field, timest){
 	return datetime;
 }
 
+export function is_bad_bibcit(bcit){
+	const bibobj = bibcit_to_bibobj(bcit);
+	if(! is_valid_verse(bibobj)){
+		const m1 = gvar.glb_curr_lang.msg_the_verse;
+		const m2 = gvar.glb_curr_lang.msg_inexistant_verse;
+		const vcit = get_loc_book_nam(bibobj.book) + " " + bibobj.chapter + ":" + bibobj.verse;
+		const bad_verse = `${m1} ${vcit} ${m2}`;
+		return bad_verse;
+	}
+	return null;
+}

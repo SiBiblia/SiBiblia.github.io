@@ -443,6 +443,10 @@ function init_es_basic_msg(){
 	
 	obj.msg_gen_cards = `GEN PDF TARJETAS`;
 	obj.msg_choose_verses = `Escoja versículos`;
+
+	obj.msg_the_verse = `El versículo`;
+	obj.msg_inexistant_verse = `no existe`;
+	obj.msg_waiting_verse = `Esperando por el texto del verso`;
 }
 
 function ini_glb_vars_es(all_vars){
