@@ -59,6 +59,15 @@ h1, h2, h3, h4, h5, h6 {
 	text-rendering: auto; 
 }
 
+.icon-white-trash::before { content: "\004C"; }
+.icon-white-square-plus::before { content: "\004D"; }
+.icon-white-circle-no-check::before { content: "\004E"; }
+.icon-white-circle-check::before { content: "\004F"; }
+.icon-white-circle-check::before { content: "\004F"; }
+.icon-white-square-check::before { content: "\0050"; }
+.icon-white-eye::before { content: "\0051"; }
+.icon-white-no-eye::before { content: "\0052"; }
+.icon-white-copy-clipboard::before { content: "\0053"; }
 .icon-copy::before { content: "\005E"; }
 .icon-eye::before { content: "\005F"; }
 .icon-no-eye::before { content: "\0060"; }
@@ -717,6 +726,11 @@ a.exam_ref:hover {
 	font-size: 2vh;
 }
 
+.grid_verse {
+	display: grid;
+	grid-template-columns: 10fr 0.5fr;
+	grid-auto-rows: auto;
+}
 
 /*
 	align-content: center center;

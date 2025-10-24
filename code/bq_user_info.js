@@ -72,25 +72,25 @@ Heb, Jas, 1Pe, 2Pe, 1Jo, 2Jo, 3Jo, Jde, Rev,
 
 
 export const default_card_verses = {
-	v01: `BIBREF_Gen_1_1`,
-	v02: `BIBREF_Isa_40_28`,
-	v03: `BIBREF_Pro_3_19`,
-	v04: `BIBREF_Psa_86_15`,
-	v05: `BIBREF_Num_23_19`,
-	v06: `BIBREF_Deu_32_4`,
-	v07: `BIBREF_Psa_91_1_2`,
-	v08: `BIBREF_Psa_46_1`,
-	v09: `BIBREF_Isa_41_10`,
-	v10: `BIBREF_Jer_29_13`,
+	"1": `BIBREF_Gen_1_1`,
+	"2": `BIBREF_Isa_40_28`,
+	"3": `BIBREF_Pro_3_19`,
+	"4": `BIBREF_Psa_86_15`,
+	"5": `BIBREF_Num_23_19`,
+	"6": `BIBREF_Deu_32_4`,
+	"7": `BIBREF_Psa_91_1_2`,
+	"8": `BIBREF_Psa_46_1`,
+	"9": `BIBREF_Isa_41_10`,
+	"10": `BIBREF_Jer_29_13`,
 };
 
 /*
-	v11: `BIBREF_Jhn_1_1`,
-	v12: `BIBREF_2Pe_3_18`,
-	v13: `BIBREF_2Th_3_16`,
-	v14: `BIBREF_Heb_4_12`,
-	v15: `BIBREF_Jas_4_7`,
-	v16: `BIBREF_Phl_3_10`,
+	: `BIBREF_Jhn_1_1`,
+	: `BIBREF_2Pe_3_18`,
+	: `BIBREF_2Th_3_16`,
+	: `BIBREF_Heb_4_12`,
+	: `BIBREF_Jas_4_7`,
+	: `BIBREF_Phl_3_10`,
 */
 
 function add_user_info_label(htm_txt){ 
@@ -869,9 +869,14 @@ function choose_verses(dv_cho_ver){
 	let ii = 0;
 	for(ii = 0; ii < kks.length; ii++){
 		const kk = kks[ii];
+		
+		const dv_vs_cont = document.createElement("div");		
+		dv_vs_cont.classList.add("grid_verse");
+		
 		const id_vs = id_all_verses + "_" + kk;
-		const dv_vs = dv_all_vss.appendChild(document.createElement("div"));
+		const dv_vs = document.createElement("div");
 		dv_vs.classList.add("item_can_select");
+		dv_vs.classList.add("grid_item_auto_auto");
 		dv_vs.id = id_vs;
 		dv_vs.innerHTML = vss[kk];
 		dv_vs.addEventListener('click', async function() {
@@ -882,7 +887,26 @@ function choose_verses(dv_cho_ver){
 				dv_ed_cit.remove();
 			});
 		});
+		dv_vs_cont.appendChild(dv_vs);
+
+		const dv_oper = document.createElement("div");
+		dv_oper.classList.add("grid_item_auto_rest");
 		
+		const sp_del = document.createElement("span");
+		sp_del.innerHTML = `<i class="has_icons icon-delete"></i>`;
+		sp_del.addEventListener('click', async function() {
+			dv_vs_cont.remove();
+		});
+		dv_oper.appendChild(sp_del);
+		
+		const sp_sel = document.createElement("span");
+		sp_sel.innerHTML = `<i class="has_icons icon-square-check"></i>`;
+		sp_sel.addEventListener('click', async function() {
+		});
+		dv_oper.appendChild(sp_sel);
+		dv_vs_cont.appendChild(dv_oper);
+		
+		dv_all_vss.appendChild(dv_vs_cont);
 	}
 
 	const dv_ok = dv_all_vss.appendChild(document.createElement("div"));
