@@ -3,7 +3,7 @@
 import { get_new_dv_under, scroll_to_top, toggle_select_option, 
 } from './bq_select_option_mgr.js';
 
-import { gvar, set_bibrefs, 
+import { gvar, set_bibrefs, set_obj_bibrefs, 
 } from './bq_tools.js';
 
 import { scroll_to_first_not_answered, get_bibref_in, 
@@ -59,18 +59,39 @@ const fb_ids = {
 	id_youtube: "id_ed_user_youtube",
 };
 
+/*
+Gen, Exo, Lev, Num, Deu, 
+Jos, Jdg, Rth, 1Sa, 2Sa, 1Ki, 2Ki, 1Ch, 2Ch, 
+Ezr, Neh, Est, Job, Psa, Pro, Ecc, Sng, 
+Isa, Jer, Lam, Eze, Dan, 
+Hos, Joe, Amo, Oba, Jon, Mic, Nah, Hab, Zep, Hag, Zec, Mal, 
+Mat, Mar, Luk, Jhn, Act, 
+Rom, 1Co, 2Co, Gal, Eph, Phl, Col, 1Th, 2Th, 1Ti, 2Ti, Tit, Phm, 
+Heb, Jas, 1Pe, 2Pe, 1Jo, 2Jo, 3Jo, Jde, Rev,
+*/
+
+
 export const default_card_verses = {
-	v1: `Juan 1:1. En el principio ya existía la Palabra; y aquel que es la Palabra estaba con Dios y era Dios.`,
-	v2: `Juan 1:2. Él estaba en el principio con Dios.`,
-	v3: `Juan 1:3. Por medio de él, Dios hizo todas las cosas; nada de lo que existe fue hecho sin él.`,
-	v4: `Juan 1:4. En él estaba la vida, y la vida era la luz de la humanidad.`,
-	v5: `Juan 1:5. Esta luz brilla en las tinieblas, y las tinieblas no han podido apagarla.`,
-	v6: `Juan 1:6. Hubo un hombre llamado Juan, a quien Dios envió`,
-	v7: `Juan 1:7. como testigo, para que diera testimonio de la luz y para que todos creyeran por lo que él decía.`,
-	v8: `Juan 1:8. Juan no era la luz, sino uno enviado a dar testimonio de la luz.`,
-	v9: `Juan 1:9. La luz verdadera que alumbra a toda la humanidad venía a este mundo.`,
-	v10: `Juan 1:10. Aquel que es la Palabra estaba en el mundo; y, aunque Dios hizo el mundo por medio de él, los que son del mundo no lo reconocieron.`,
+	v01: `BIBREF_Gen_1_1`,
+	v02: `BIBREF_Isa_40_28`,
+	v03: `BIBREF_Pro_3_19`,
+	v04: `BIBREF_Psa_86_15`,
+	v05: `BIBREF_Num_23_19`,
+	v06: `BIBREF_Deu_32_4`,
+	v07: `BIBREF_Psa_91_1_2`,
+	v08: `BIBREF_Psa_46_1`,
+	v09: `BIBREF_Isa_41_10`,
+	v10: `BIBREF_Jer_29_13`,
 };
+
+/*
+	v11: `BIBREF_Jhn_1_1`,
+	v12: `BIBREF_2Pe_3_18`,
+	v13: `BIBREF_2Th_3_16`,
+	v14: `BIBREF_Heb_4_12`,
+	v15: `BIBREF_Jas_4_7`,
+	v16: `BIBREF_Phl_3_10`,
+*/
 
 function add_user_info_label(htm_txt){ 
 	const inp_fld = document.createElement("div");
@@ -904,8 +925,12 @@ function init_verses_loc_storage(){
 	if(gvar.card_verses != null){ 
 		return;
 	}
-	gvar.card_verses = default_card_verses;
+	gvar.card_verses = null;
 	read_verses_loc_storage();
+	if(gvar.card_verses == null){
+		gvar.card_verses = default_card_verses;
+		set_obj_bibrefs(gvar.card_verses);
+	}
 }
 
 

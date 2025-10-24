@@ -313,7 +313,7 @@ function is_valid_verse(bibobj){
 	return true;
 }
 
-async function bibobj_to_bibtxt(bibobj){
+async function bibobj_to_bibtxt(bibobj, plain_txt){
 	const cit_obj = JSON.parse(JSON.stringify(bibobj));
 	cit_obj.bib_ver = "text";
 	cit_obj.site = "biblehub";
@@ -323,7 +323,7 @@ async function bibobj_to_bibtxt(bibobj){
 	const m1 = gvar.glb_curr_lang.msg_the_verse;
 	const m2 = gvar.glb_curr_lang.msg_inexistant_verse;
 	
-	bibobj.vcit = get_loc_book_nam(bibobj.book) + " " + bibobj.chapter + ":" + bibobj.verse;
+	bibobj.vcit = get_loc_book_nam(bibobj.book, plain_txt) + " " + bibobj.chapter + ":" + bibobj.verse;
 	if((bibobj.last_verse != null) && (bibobj.last_verse != "")){ bibobj.vcit = bibobj.vcit + "-" + bibobj.last_verse; }
 	
 	if(! is_valid_verse(bibobj)){
@@ -343,7 +343,7 @@ async function bibcit_to_bibtxt(bcit, stm_id, cho_bref, plain_txt){
 		if(bcit == null){ return bcit; }
 	}
 	const bibobj = bibcit_to_bibobj(bcit);
-	let vtxt = await bibobj_to_bibtxt(bibobj);
+	let vtxt = await bibobj_to_bibtxt(bibobj, plain_txt);
 	if((stm_id != null) && (gvar.bibrefs_upper != null) && (gvar.bibrefs_upper[stm_id] != null)){ 
 		const wds = gvar.bibrefs_upper[stm_id][bcit];
 		if(wds != null){ vtxt = uppercase_words_in_string(vtxt, wds); }
@@ -387,6 +387,23 @@ export function set_anchors_target(the_div){
 			aa.setAttribute('target', '_blank');
 		}
 	});
+}
+
+export function set_obj_bibrefs(obj){
+	const kks = Object.keys(obj);
+	let ii = 0;
+	for(ii = 0; ii < kks.length; ii++){
+		const kk = kks[ii];
+		const vref = obj[kk];
+		replace_all_bibrefs(vref, null, null, true).then((resp) => {
+			if((resp == null) || (resp == "")){
+				console.error("GOT EMPTY TEXT after replace_all_bibrefs !!!!!");
+			}
+			if((resp != null) && (resp != "")){
+				obj[kk] = resp;
+			}
+		});
+	}
 }
 
 export function set_bibrefs(dv_txt){
@@ -502,7 +519,7 @@ function get_book_nam(book){
 	return book_nam;
 }
 
-function get_loc_book_nam(book){
+function get_loc_book_nam(book, plain_txt){
 	if(book == null){ return "???";	}
 	if(book === "???"){ return book; }
 	let num = -1;
@@ -512,6 +529,9 @@ function get_loc_book_nam(book){
 		num = Number(book);
 	}
 	let book_nam =  gvar.glb_all_books[num];  
+	if(plain_txt){
+		book_nam =  gvar.glb_all_prt_books[num];
+	}
 	return book_nam;
 }
 
