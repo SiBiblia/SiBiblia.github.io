@@ -413,7 +413,7 @@ function init_es_basic_msg(){
 	obj.msg_undo = "<i class='has_icons icon-undo'></i> Ups!";	
 
 	obj.msg_sel_cit = "ESCOGER DE BD";
-	obj.msg_add_verse = "AGREGAR VERSICULO";
+	obj.msg_add_verse = "Agregar versículo";
 	obj.msg_add_strong = "AGREGAR CODIGO STRONG";
 	obj.msg_add_link = "AGREGAR ENLACE WEB";
 	obj.msg_end_edit = "TERMINAR EDICION";

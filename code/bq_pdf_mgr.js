@@ -16,6 +16,8 @@ import { default_card_verses,
 
 const DEBUG_GEN_PDF = true;
 
+const NUM_CARDS_IN_PAGE = 10;
+
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js"></script>
 //import * as MOD_PDF from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js";
 
@@ -43,8 +45,20 @@ export function gen_pdf_cards(){
 		console.log(all_vss);
 		console.log("gen_pdf_cards. user_id=" + user_id);
 	}
+
+	let sel = Object.values(all_vss).filter((itm) => itm.sel);
+	const no_sel = Object.values(all_vss).filter((itm) => ! itm.sel);
 	
-	const arr_txt = Object.values(all_vss);
+	if(sel.length < NUM_CARDS_IN_PAGE){
+		const num_rest = NUM_CARDS_IN_PAGE - sel.length;
+		const to_add = no_sel.slice(0, num_rest);
+		sel = [...sel, ...to_add ];
+	}
+	if(sel.length > NUM_CARDS_IN_PAGE){
+		sel = sel.slice(0, NUM_CARDS_IN_PAGE);
+	}
+
+	const arr_txt = sel.map((itm) => itm.txt);
 	
 	const img_cod = get_code_img(url);
 	

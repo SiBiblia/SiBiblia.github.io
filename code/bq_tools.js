@@ -389,18 +389,18 @@ export function set_anchors_target(the_div){
 	});
 }
 
-export function set_obj_bibrefs(obj){
+export function set_cards_bibrefs(obj){
 	const kks = Object.keys(obj);
 	let ii = 0;
 	for(ii = 0; ii < kks.length; ii++){
 		const kk = kks[ii];
-		const vref = obj[kk];
+		const vref = obj[kk].txt;
 		replace_all_bibrefs(vref, null, null, true).then((resp) => {
 			if((resp == null) || (resp == "")){
 				console.error("GOT EMPTY TEXT after replace_all_bibrefs !!!!!");
 			}
 			if((resp != null) && (resp != "")){
-				obj[kk] = resp;
+				obj[kk].txt = resp;
 			}
 		});
 	}

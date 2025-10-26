@@ -413,7 +413,7 @@ function init_en_basic_msg(){
 	obj.msg_undo = "<i class='has_icons icon-undo'></i> Ups!";	
 	
 	obj.msg_sel_cit = "SELECT FROM DB";
-	obj.msg_add_verse = "ADD VERSE";
+	obj.msg_add_verse = "Add verse";
 	obj.msg_add_strong = "ADD STRONG CODE";
 	obj.msg_add_link = "ADD WEB LINK";
 	obj.msg_end_edit = "END EDIT";

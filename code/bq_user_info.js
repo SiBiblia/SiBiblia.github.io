@@ -3,7 +3,7 @@
 import { get_new_dv_under, scroll_to_top, toggle_select_option, 
 } from './bq_select_option_mgr.js';
 
-import { gvar, set_bibrefs, set_obj_bibrefs, 
+import { gvar, set_bibrefs, set_cards_bibrefs, 
 } from './bq_tools.js';
 
 import { scroll_to_first_not_answered, get_bibref_in, 
@@ -70,28 +70,26 @@ Rom, 1Co, 2Co, Gal, Eph, Phl, Col, 1Th, 2Th, 1Ti, 2Ti, Tit, Phm,
 Heb, Jas, 1Pe, 2Pe, 1Jo, 2Jo, 3Jo, Jde, Rev,
 */
 
+const NUM_CARDS_IN_PAGE = 10;
 
 export const default_card_verses = {
-	"1": `BIBREF_Gen_1_1`,
-	"2": `BIBREF_Isa_40_28`,
-	"3": `BIBREF_Pro_3_19`,
-	"4": `BIBREF_Psa_86_15`,
-	"5": `BIBREF_Num_23_19`,
-	"6": `BIBREF_Deu_32_4`,
-	"7": `BIBREF_Psa_91_1_2`,
-	"8": `BIBREF_Psa_46_1`,
-	"9": `BIBREF_Isa_41_10`,
-	"10": `BIBREF_Jer_29_13`,
+	"1": { txt: `BIBREF_Gen_1_1`, sel: true },
+	"2": { txt: `BIBREF_Isa_40_28`, sel: true },
+	"3": { txt: `BIBREF_Pro_3_19`, sel: true },
+	"4": { txt: `BIBREF_Psa_86_15`, sel: true },
+	"5": { txt: `BIBREF_Num_23_19`, sel: true },
+	"6": { txt: `BIBREF_Deu_32_4`, sel: true },
+	"7": { txt: `BIBREF_Psa_91_1_2`, sel: true },
+	"8": { txt: `BIBREF_Psa_46_1`, sel: true },
+	"9": { txt: `BIBREF_Isa_41_10`, sel: true },
+	"10": { txt: `BIBREF_Jer_29_13`, sel: true },
+	"11": { txt: `BIBREF_Jhn_1_1`, sel: false },
+	"12": { txt: `BIBREF_2Pe_3_18`, sel: false },
+	"13": { txt: `BIBREF_2Th_3_16`, sel: false },
+	"14": { txt: `BIBREF_Heb_4_12`, sel: false },
+	"15": { txt: `BIBREF_Jas_4_7`, sel: false },
+	"16": { txt: `BIBREF_Phl_3_10`, sel: false },
 };
-
-/*
-	: `BIBREF_Jhn_1_1`,
-	: `BIBREF_2Pe_3_18`,
-	: `BIBREF_2Th_3_16`,
-	: `BIBREF_Heb_4_12`,
-	: `BIBREF_Jas_4_7`,
-	: `BIBREF_Phl_3_10`,
-*/
 
 function add_user_info_label(htm_txt){ 
 	const inp_fld = document.createElement("div");
@@ -848,6 +846,76 @@ function fill_general_private_fields(obj){
 	}
 }
 
+function calc_next_card_key(kk){
+	let ii = Number(kk);
+	ii++;
+	const nxt = "" + ii;
+	return nxt;
+}
+
+function add_card_verse(dv_all_vss, vss, kk){
+	const ico_ck = `<i class="has_icons icon-square-check"></i>`;
+	const ico_no_ck = `<i class="has_icons icon-white-square-check"></i>`;
+	const dv_vs_cont = document.createElement("div");		
+	dv_vs_cont.classList.add("grid_verse");
+	dv_vs_cont.is_verse = true;
+	
+	const id_vs = id_all_verses + "_" + kk;
+	const dv_vs = document.createElement("div");
+	dv_vs.classList.add("item_can_select");
+	dv_vs.classList.add("grid_item_auto_auto");
+	dv_vs.id = id_vs;
+	dv_vs.innerHTML = vss[kk].txt;
+	dv_vs.addEventListener('click', async function() {
+		get_bibref_in(dv_vs, (dv_ed_cit, bibref) => {
+			dv_vs.innerHTML = bibref;
+			dv_vs.plain_txt = true;
+			set_bibrefs(dv_vs);
+			dv_ed_cit.remove();
+		});
+	});
+	dv_vs_cont.appendChild(dv_vs);
+
+	const dv_oper = document.createElement("div");
+	dv_oper.classList.add("grid_item_auto_rest");
+	
+	const sp_del = document.createElement("span");
+	sp_del.innerHTML = `<i class="has_icons icon-delete"></i>`;
+	sp_del.addEventListener('click', async function() {
+		let num_vs = Object.keys(vss).length;
+		if(num_vs == NUM_CARDS_IN_PAGE){
+			return;
+		}
+		
+		dv_vs_cont.remove();
+		delete vss[kk];
+	});
+	dv_oper.appendChild(sp_del);
+	
+	let kk_ico = null;
+	if(vss[kk].sel){
+		kk_ico = ico_ck;
+	} else {
+		kk_ico = ico_no_ck;
+	}
+	
+	const sp_sel = document.createElement("span");
+	sp_sel.innerHTML = kk_ico;
+	sp_sel.addEventListener('click', async function() {
+		vss[kk].sel = ! vss[kk].sel;
+		if(vss[kk].sel){
+			kk_ico = ico_ck;
+		} else {
+			kk_ico = ico_no_ck;
+		}
+		sp_sel.innerHTML = kk_ico;
+	});
+	dv_oper.appendChild(sp_sel);
+	dv_vs_cont.appendChild(dv_oper);
+	
+	dv_all_vss.appendChild(dv_vs_cont);
+}
+
 function choose_verses(dv_cho_ver){
 	init_verses_loc_storage();
 	const vss = gvar.card_verses;
@@ -857,72 +925,59 @@ function choose_verses(dv_cho_ver){
 	}
 	const ulang = gvar.glb_curr_lang;
 
-	let dv_all_vss = null;
-	dv_all_vss = get_new_dv_under(dv_cho_ver, id_all_verses);
-	if(dv_all_vss == null){
+	let dv_ed_vss = null;
+	dv_ed_vss = get_new_dv_under(dv_cho_ver, id_all_verses);
+	if(dv_ed_vss == null){
 		if(DEBUG_USER_INFO){ console.log("toggle_all_verses OFF"); }
 		return;
 	}
-	dv_all_vss.classList.add("exam", "has_margin_bot", "has_margin_top");
+	dv_ed_vss.classList.add("exam", "has_margin_bot", "has_margin_top");
+
+	const dv_all_vss = dv_ed_vss.appendChild(document.createElement("div"));
 	
-	const kks = Object.keys(gvar.card_verses);
+	let kks = Object.keys(gvar.card_verses);
 	let ii = 0;
+	let kk = "0";
 	for(ii = 0; ii < kks.length; ii++){
-		const kk = kks[ii];
-		
-		const dv_vs_cont = document.createElement("div");		
-		dv_vs_cont.classList.add("grid_verse");
-		
-		const id_vs = id_all_verses + "_" + kk;
-		const dv_vs = document.createElement("div");
-		dv_vs.classList.add("item_can_select");
-		dv_vs.classList.add("grid_item_auto_auto");
-		dv_vs.id = id_vs;
-		dv_vs.innerHTML = vss[kk];
-		dv_vs.addEventListener('click', async function() {
-			get_bibref_in(dv_vs, (dv_ed_cit, bibref) => {
-				dv_vs.innerHTML = bibref;
-				dv_vs.plain_txt = true;
-				set_bibrefs(dv_vs);
-				dv_ed_cit.remove();
-			});
-		});
-		dv_vs_cont.appendChild(dv_vs);
-
-		const dv_oper = document.createElement("div");
-		dv_oper.classList.add("grid_item_auto_rest");
-		
-		const sp_del = document.createElement("span");
-		sp_del.innerHTML = `<i class="has_icons icon-delete"></i>`;
-		sp_del.addEventListener('click', async function() {
-			dv_vs_cont.remove();
-		});
-		dv_oper.appendChild(sp_del);
-		
-		const sp_sel = document.createElement("span");
-		sp_sel.innerHTML = `<i class="has_icons icon-square-check"></i>`;
-		sp_sel.addEventListener('click', async function() {
-		});
-		dv_oper.appendChild(sp_sel);
-		dv_vs_cont.appendChild(dv_oper);
-		
-		dv_all_vss.appendChild(dv_vs_cont);
+		kk = kks[ii];
+		add_card_verse(dv_all_vss, vss, kk);
 	}
+	
+	const dv_add = dv_ed_vss.appendChild(document.createElement("div"));
+	dv_add.classList.add("item_can_select");
+	dv_add.innerHTML = ulang.msg_add_verse;
+	dv_add.addEventListener('click', async function() {
+		const fst_txt = Object.values(vss)[0].txt;
+		kk = calc_next_card_key(kk);
+		vss[kk] = { txt: fst_txt, sel: false, };
+		add_card_verse(dv_all_vss, vss, kk);
+	});
 
-	const dv_ok = dv_all_vss.appendChild(document.createElement("div"));
+	const dv_ok = dv_ed_vss.appendChild(document.createElement("div"));
 	dv_ok.classList.add("item_can_select");
-	//dv_ok.classList.add("is_button");
 	dv_ok.innerHTML = ulang.msg_save_verses;
 	dv_ok.addEventListener('click', async function() {
+		let nkk = "0";
+		const nvss = {};
+		//for(const dv_vs of dv_all_vss.children) {
+		//}
+		kks = Object.keys(gvar.card_verses);
 		let ii = 0;
 		for(ii = 0; ii < kks.length; ii++){
 			const kk = kks[ii];
+			if(kk == null){ continue; }
 			const id_vs = id_all_verses + "_" + kk;
 			const dv_vs = document.getElementById(id_vs);
-			vss[kk] = dv_vs.innerHTML;
+			vss[kk].txt = dv_vs.innerHTML;
+			
+			nkk = calc_next_card_key(nkk);
+			nvss[nkk] = vss[kk];
 		}
+		
+		gvar.card_verses = nvss;
+		
 		write_verses_loc_storage();
-		dv_all_vss.remove();
+		dv_ed_vss.remove();
 		scroll_to_top(dv_cho_ver, "center");
 	});
 	
@@ -931,6 +986,7 @@ function choose_verses(dv_cho_ver){
 function write_verses_loc_storage(){
 	if(gvar.card_verses == null){ gvar.card_verses = default_card_verses; }
 	const vss = gvar.card_verses;
+	if(DEBUG_USER_INFO){ console.log("WRITE_STORAGE_VERSES="); console.log(vss); }
 	window.localStorage.setItem(STORAGE_CARD_VERSES, JSON.stringify(vss));
 }
 
@@ -953,7 +1009,7 @@ function init_verses_loc_storage(){
 	read_verses_loc_storage();
 	if(gvar.card_verses == null){
 		gvar.card_verses = default_card_verses;
-		set_obj_bibrefs(gvar.card_verses);
+		set_cards_bibrefs(gvar.card_verses);
 	}
 }
 
