@@ -78,11 +78,14 @@ const test_ops = {
 	//try_update_can_del_field:"try_update_can_del_field",
 	//try_delete_can_del_field:"try_delete_can_del_field",
 
-	set_adhoc_field:"set_adhoc_field",
+	//set_adhoc_field:"set_adhoc_field",
 	
-	set_user_in_stats:"set_user_in_stats",
-	write_alias:"write_alias",
-	delete_alias:"delete_alias",
+	//set_user_in_stats:"set_user_in_stats",
+	//write_alias:"write_alias",
+	//delete_alias:"delete_alias",
+	
+	write_referrer:"write_referrer",
+	delete_referrer:"delete_referrer",
 };
 
 const id_admin_ops = "id_admin_ops";
@@ -897,6 +900,12 @@ function do_test_oper(oper, user_nam){
 	if(oper == test_ops.delete_alias){
 		write_alias_test("alias1", null);
 	}
+	if(oper == test_ops.write_referrer){
+		write_referrer_test(test_ids.user9, 1);
+	}
+	if(oper == test_ops.delete_referrer){
+		write_referrer_test(test_ids.user9, null);
+	}
 
 
 	close_pop_menu();
@@ -1112,6 +1121,24 @@ function write_alias_test(the_alias, val1){
 	const db_ref = fb_mod.md_db.ref(fb_database, alias_pth);
 	if(val1 != null){
 		fb_mod.md_db.set(db_ref, 1).catch((error) => { console.error(error); });
+	} else {
+		fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });
+	}
+}
+
+function write_referrer_test(uref_id, val1){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	const curr_ci = fb_mod.tc_fb_current_cicle;
+	let user_id = fb_mod.tc_fb_user.uid;
+
+	const ref_pth = fb_mod.firebase_bib_quest_path + 'score_data/all_referred_by/' + user_id + '/referred_by/' + uref_id + 
+		'/cicle_added/';
+	const db_ref = fb_mod.md_db.ref(fb_database, ref_pth);
+	if(val1 != null){
+		fb_mod.md_db.set(db_ref, curr_ci).catch((error) => { console.error(error); });
 	} else {
 		fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });
 	}

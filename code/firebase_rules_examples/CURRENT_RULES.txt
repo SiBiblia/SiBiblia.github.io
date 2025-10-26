@@ -99,14 +99,42 @@
 			"score_data": {
 				".read": "!(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 				".write": "(! data.exists()) && root.child('bib_quest').child('admins').child(auth.uid).exists()",
+				"$other": { ".validate": false,	},
 				"all_referred_by": {
 					"$referred_uid": {
-						".validate": "root.child('bib_quest').child('users').child('list').child($referred_uid).exists()",
+						".write": "($referred_uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+						".validate": "root.child('bib_quest').child('users').child('list').child($referred_uid).exists() &&
+						! root.child('bib_quest').child('score_data').child('all_referred_by').child($referred_uid).exists()",
+						"$other": { ".validate": false,	},
 						"referred_by": {
+							".validate": "! root.child('bib_quest').child('score_data').child('all_referred_by').child($referred_uid).
+							child('referred_by').exists()",
 							"$referrer_uid": {
-								".validate": "root.child('bib_quest').child('users').child('list').child($referrer_uid).exists()",
+								".validate": "(! data.exists()) && ($referrer_uid != auth.uid) && 
+								root.child('bib_quest').child('users').child('list').child($referrer_uid).exists()",
+								"$other": { ".validate": false,	},
 								"cicle_added": {
 									".validate": "newData.val() === root.child('bib_quest').child('current_cicle').val()",
+								},
+							},
+						},
+					},
+				},
+				"cicle_votes": {
+					".write": "(! data.exists()) && root.child('bib_quest').child('admins').child(auth.uid).exists()",
+					"$cicle": {
+						".validate": "$cicle === root.child('bib_quest').child('current_cicle').val()",
+						"$voter_uid": {
+							".write": "($voter_uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+							".validate": "root.child('bib_quest').child('users').child('list').child($voter_uid).exists() &&
+							! root.child('bib_quest').child('score_data').child('cicle_votes').child($voter_uid).exists()",
+							"$other": { ".validate": false,	},
+							"vote_for": {
+								".validate": "! root.child('bib_quest').child('score_data').child('cicle_votes').child($voter_uid).
+								child('vote_for').exists()",
+								"$voted_uid": {
+									".validate": "(! data.exists()) && ($voted_uid != auth.uid) && 
+									root.child('bib_quest').child('users').child('list').child($voted_uid).exists()",
 								},
 							},
 						},
@@ -255,7 +283,7 @@
 						"$other": { ".validate": false,	},
 						"cand": {
 							"$cand_ref_uid": {
-								".validate": "(! data.exists()) && 
+								".validate": "(! data.exists()) && (newData.val() != auth.uid) && (newData.val() != $uid) && 
 								root.child('bib_quest').child('users').child('list').child($cand_ref_uid).exists()",
 							},
 						},
