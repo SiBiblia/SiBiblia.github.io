@@ -512,6 +512,7 @@ function init_en_basic_msg(){
 	obj.msg_usr_youtube = "Youtube";
 
 	obj.msg_usr_referrer = "My REFERRER";
+	obj.msg_invalid_referrer = "Invalid user";
 	
 	obj.msg_gen_cards = `GEN PDF CARDS`;
 	obj.msg_choose_verses = `Choose verses`;

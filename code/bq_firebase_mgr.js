@@ -151,7 +151,7 @@ export function firebase_get_user_path(the_uid){
 	return path;
 }
 
-async function firebase_set_user_referrer(force_it){
+export async function firebase_set_user_referrer(force_it){
 	init_mod_vars();
 	
 	console.log("Called firebase_set_user_referrer.");
@@ -174,14 +174,18 @@ async function firebase_set_user_referrer(force_it){
 	const fb_database = md_db.getDatabase(tc_fb_app);
 	
 	const curr_ci = tc_fb_current_cicle;
-	let user_id = fb_mod.tc_fb_user.uid;
+	let user_id = tc_fb_user.uid;
 
-	const ref_pth = fb_mod.firebase_bib_quest_path + 'score_data/all_referred_by/' + user_id + '/referred_by/' + cand + '/cicle_added/';
-	const db_ref = fb_mod.md_db.ref(fb_database, ref_pth);
+	const ref_pth = firebase_bib_quest_path + 'score_data/all_referred_by/' + user_id + '/referred_by/' + cand + '/cicle_added/';
+	const db_ref = md_db.ref(fb_database, ref_pth);
 	try{
-		await fb_mod.md_db.set(db_ref, curr_ci).catch((error) => { console.error(error); });
+		await md_db.set(db_ref, curr_ci).catch((error) => { console.error(error); });
 		set_loc_confirmed_referrer(cand);
 	} catch (err){
+		const is_conf = get_loc_confirmed_referrer();
+		if(is_conf == null){
+			set_loc_cand_referrer(null);
+		}
 		console.error(err);
 	}		
 }
