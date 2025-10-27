@@ -10,7 +10,7 @@ import { scroll_to_first_not_answered, get_bibref_in,
 	fb_mod, id_pop_menu_sele, user_logout, 
 } from './bq_quest_mgr.js';
 
-import { get_user_href, 
+import { get_user_href, get_loc_confirmed_referrer, set_loc_confirmed_referrer, 
 } from './bq_referrer_mgr.js';
 
 import { gen_pdf_cards } from './bq_pdf_mgr.js'
@@ -57,6 +57,8 @@ const fb_ids = {
 	id_facebook: "id_ed_user_facebook",
 	id_instagram: "id_ed_user_instagram",
 	id_youtube: "id_ed_user_youtube",
+
+	id_referref: "id_user_referrer",
 };
 
 /*
@@ -140,14 +142,24 @@ function add_user_info_simple_line(dv_ed_usr, label, id, tp, sz, mx_ln, val){
 	let lbl = null;
 	let fld = null;
 	
+	const flds = {};
+	
 	lbl = add_user_info_label(label);
 	dv_ed_usr.appendChild(lbl);
+	
+	flds.lbl = lbl;
 
 	fld = add_user_info_field(id, tp, sz, mx_ln, val, 10);
 	dv_ed_usr.appendChild(fld);
+
+	flds.fld = fld;
 	
 	fld = add_user_info_end_line(id);
 	dv_ed_usr.appendChild(fld);
+
+	flds.end = fld;
+	
+	return flds;
 }
 
 function add_user_info_simple_html_line(dv_ed_usr, label, id, htm_str){
@@ -206,6 +218,7 @@ function add_user_info_select_line(dv_ed_usr, label, id, val, arr_ops){
 export async function toggle_user_info(fb_usr){
 	init_verses_loc_storage();
 	
+	let ln_flds = null;
 	let lbl = null;
 	let fld = null;
 	const ulang = gvar.glb_curr_lang;
@@ -348,6 +361,13 @@ export async function toggle_user_info(fb_usr){
 	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_instagram, fb_ids.id_instagram, "text", 150, 150, "");
 	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_youtube, fb_ids.id_youtube, "text", 150, 150, "");
 	
+	const dv_ref = add_user_info_simple_html_line(dv_ed_usr, ulang.msg_usr_referrer, fb_ids.id_referref, "NO REFERRER");
+	dv_ref.classList.add("is_button");
+	dv_ref.addEventListener('click', function() {
+		
+		return;
+	});
+	
 	//gvar.glb_all_countries[gvar.glb_def_country]
 	//gvar.glb_all_countries[gvar.glb_def_country]
 
@@ -395,6 +415,7 @@ export async function toggle_user_info(fb_usr){
 		read_firebase_user_object();
 		read_firebase_user_private_fields();
 		await read_firebase_general_private_fields();
+		await read_firebase_user_referrer();
 	}	
 
 	scroll_to_top(dv_edit_user);
@@ -591,7 +612,7 @@ function read_firebase_user_object(){
 				console.log("read_firebase_user_object. DEFAULT_OBJ=");
 				console.log(gvar.current_user_info);
 			}
-			console.error("No data available");
+			console.error("No user info available");
 		}
 	});	
 }
@@ -732,7 +753,7 @@ function read_firebase_user_private_fields(){
 			}
 			fill_private_info(gvar.current_user_private_fields);
 		} else {
-			console.error("No data available");
+			console.error("No private fields available");
 		}
 	});	
 }
@@ -811,21 +832,11 @@ async function read_firebase_general_private_fields(){
 			gvar.general_private_fields = JSON.parse(JSON.stringify(rd_obj));
 			fill_general_private_fields(gvar.general_private_fields);
 		} else {
-			console.error("No data available");
+			console.error("No general private fields available");
 		}	
 	} catch (error){
 		console.error(error);
 	}
-	/*
-	fb_mod.md_db.onValue(db_ref, (snapshot) => {
-		if (snapshot.exists()) {
-			const rd_obj = snapshot.val();
-			gvar.general_private_fields = JSON.parse(JSON.stringify(rd_obj));
-			fill_general_private_fields(gvar.general_private_fields);
-		} else {
-			console.error("No data available");
-		}
-	});	*/
 }
 
 function fill_general_private_fields(obj){
@@ -1010,6 +1021,48 @@ function init_verses_loc_storage(){
 	if(gvar.card_verses == null){
 		gvar.card_verses = default_card_verses;
 		set_cards_bibrefs(gvar.card_verses);
+	}
+}
+
+async function read_firebase_user_referrer(){
+	if(DEBUG_USER_INFO){ console.log("Called read_firebase_user_referrer"); }
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	const curr_ci = fb_mod.tc_fb_current_cicle;
+	const user_id = fb_mod.tc_fb_user.uid;
+	if(curr_ci == null){
+		console.error("curr_ci == null");
+		return;
+	}
+	if(user_id == null){
+		console.error("user_id == null");
+		return;
+	}
+
+	const ref_pth = fb_mod.firebase_bib_quest_path + 'score_data/all_referred_by/' + user_id + '/referred_by/';
+	const db_ref = fb_mod.md_db.ref(fb_database, ref_pth);
+	
+	try{ 	
+		const snapshot = await fb_mod.md_db.get(db_ref);
+		if (snapshot.exists()) {
+			const rd_obj = snapshot.val();
+			const obj_ref = JSON.parse(JSON.stringify(rd_obj));
+			const uref = Object.keys(obj_ref)[0];
+			const dv_ref = document.getElementById(fb_ids.id_referref);
+			dv_ref.innerHTML = uref;
+			const confir = get_loc_confirmed_referrer();
+			if(confir != uref){
+				set_loc_confirmed_referrer(uref);
+				if(DEBUG_USER_INFO){ console.log("read_firebase_user_referrer. Setting confirmed referrer=" + uref); }
+			}
+			if(DEBUG_USER_INFO){ console.log("REFERRER_OBJ"); console.log(obj_ref); }
+		} else {
+			console.error("No referrer available");
+		}	
+	} catch (error){
+		console.error(error);
 	}
 }
 

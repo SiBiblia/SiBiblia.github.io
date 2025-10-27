@@ -510,6 +510,8 @@ function init_en_basic_msg(){
 	obj.msg_usr_facebook = "Facebook";
 	obj.msg_usr_instagram = "Instagram";
 	obj.msg_usr_youtube = "Youtube";
+
+	obj.msg_usr_referrer = "My REFERRER";
 	
 	obj.msg_gen_cards = `GEN PDF CARDS`;
 	obj.msg_choose_verses = `Choose verses`;
