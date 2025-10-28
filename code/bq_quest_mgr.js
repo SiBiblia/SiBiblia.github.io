@@ -30,7 +30,7 @@ const ___final_observation_html = "___final_observation_html";
 const ___final_observation_name = "___final_observation_name";
 
 const DEBUG_INITS = false;
-const DEBUG_QNUMS = true;
+const DEBUG_QNUMS = false;
 const DEBUG_PENDING = false;
 const DEBUG_POP_MENU = false;
 const DEBUG_FB_WRITE = false;
@@ -44,6 +44,7 @@ const DEBUG_SHOW_TEST_USERS = true;
 const DEBUG_OBSERV_SCORE = false;
 const DEBUG_SCROLL = false;
 const DEBUG_UPDATE_SCORES = false;
+const DEBUG_SHOW_USER = true;
 
 const MIN_ANSW_SHOW_INVERT = 3;
 
@@ -1444,12 +1445,14 @@ export function init_page_buttons(){
 	dv_button = document.getElementById(id_top_user_name); // this id must be the same to the id in the HTML page.
 	clk_hdlr = user_name_button_handler;
 	if(dv_button != null){ dv_button.click_handler = clk_hdlr; dv_button.addEventListener('click', clk_hdlr); }
-	if(dv_button != null){ dv_button.addEventListener('contextmenu', async (ev1) => {
-			ev1.preventDefault();
-			await toggle_user_info(null);
-			return false;
-		}); 		
-	} 
+	if(DEBUG_SHOW_USER){
+		if(dv_button != null){ dv_button.addEventListener('contextmenu', async (ev1) => {
+				ev1.preventDefault();
+				await toggle_user_info(null);
+				return false;
+			});
+		} 
+	}
 	
 	dv_button = document.getElementById("id_exam_save_button"); // this id must be the same to the id in the HTML page.
 	clk_hdlr = save_button_handler;
@@ -3112,7 +3115,7 @@ export function fill_div_user(){
 			width : 300,
 			height : 300,
 		});		
-		the_qr_maker.makeCode(get_user_href(the_usr));
+		the_qr_maker.makeCode(get_user_href(the_usr.uid));
 	}
 
 	if(dv_user_nam != null){ dv_user_nam.innerHTML = usernam; }

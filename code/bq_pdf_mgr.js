@@ -30,7 +30,7 @@ export function gen_pdf_cards(){
 	const uinfo = gvar.current_user_info;
 	const fb_usr = fb_mod.tc_fb_user;
 
-	const url = get_user_href(fb_usr);
+	const url = get_user_href(fb_usr.uid);
 
 	let user_id = uinfo.id_ed_user_alias;
 	if(user_id == null){

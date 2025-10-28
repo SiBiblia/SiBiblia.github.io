@@ -26,7 +26,13 @@ const firebase_user_info_path = "/user_info";
 const id_user_sele = "id_user_sele";
 const id_all_verses = "id_all_verses";
 
-const fb_ids = {
+export const fb_general_private_ids = {
+	id_comm_info: "id_ed_user_comm_info",
+	id_sibiblia_qr: "id_ed_sibiblia_qr",
+	id_sibiblia_link: "id_ed_sibiblia_link",
+};
+
+export const fb_ids = {
 	//id_ed_user_info: "id_ed_user_info",
 	id_comm_info: "id_ed_user_comm_info",
 
@@ -164,6 +170,17 @@ function add_user_info_simple_line(dv_ed_usr, label, id, tp, sz, mx_ln, val){
 	return flds;
 }
 
+function add_user_div_field(id, htm_str){
+	const fld = document.createElement("div");
+	fld.id = id;
+	fld.classList.add("exam");
+	fld.classList.add("grid_item_user");
+	fld.style.gridColumnEnd = "span 10";
+	fld.innerHTML = htm_str;
+	
+	return fld;	
+}
+
 function add_user_info_simple_html_line(dv_ed_usr, label, id, htm_str){
 	let lbl = null;
 	let fld = null;
@@ -176,12 +193,7 @@ function add_user_info_simple_html_line(dv_ed_usr, label, id, htm_str){
 
 	flds.lbl = lbl;
 	
-	fld = dv_ed_usr.appendChild(document.createElement("div"));
-	fld.id = id;
-	fld.classList.add("exam");
-	fld.classList.add("grid_item_user");
-	fld.style.gridColumnEnd = "span 10";
-	fld.innerHTML = htm_str;
+	fld = add_user_div_field(id, htm_str);
 	dv_ed_usr.appendChild(fld);
 
 	flds.fld = fld;
@@ -225,7 +237,14 @@ function add_user_info_select_line(dv_ed_usr, label, id, val, arr_ops){
 	
 }
 
-export async function toggle_user_info(fb_usr){
+function is_show_fld(obj_usr, fld){
+	if(obj_usr == null){ return true; }
+	if(fld == null){ return true; }
+	if(obj_usr[fld] != null){ return true; }
+	return false;
+}
+
+export async function toggle_user_info(fb_usr, obj_usr){
 	init_verses_loc_storage();
 	
 	let ln_flds = null;
@@ -249,17 +268,19 @@ export async function toggle_user_info(fb_usr){
 	fld.classList.add("exam");
 	dv_edit_user.appendChild(fld);
 	
-	const dv_logout = dv_edit_user.appendChild(document.createElement("div"));
-	dv_logout.classList.add("exam");
-	dv_logout.classList.add("grid_item_auto_span_4");
-	dv_logout.classList.add("is_big_button");
-	dv_logout.innerHTML = ulang.msg_logout;
-	dv_logout.addEventListener('click', function() {		
-		dv_edit_user.remove();
-		user_logout();
-		scroll_to_first_not_answered();
-		return;
-	});
+	if(fb_usr != null){
+		const dv_logout = dv_edit_user.appendChild(document.createElement("div"));
+		dv_logout.classList.add("exam");
+		dv_logout.classList.add("grid_item_auto_span_4");
+		dv_logout.classList.add("is_big_button");
+		dv_logout.innerHTML = ulang.msg_logout;
+		dv_logout.addEventListener('click', function() {		
+			dv_edit_user.remove();
+			user_logout();
+			scroll_to_first_not_answered();
+			return;
+		});
+	}
 	
 	const dv_ed_usr = document.createElement("div");
 	dv_ed_usr.classList.add("exam");
@@ -267,163 +288,219 @@ export async function toggle_user_info(fb_usr){
 	dv_edit_user.appendChild(dv_ed_usr);
 	
 	let htm_str = "";
+	let show_fld = true;
 	
 	// NON EDITABLE INFO
 	
-	if(fb_usr != null){ htm_str = fb_usr.displayName; }	
-	add_user_info_simple_html_line(dv_ed_usr, ulang.msg_google_name, fb_ids.id_goo_name, htm_str);
+	if(fb_usr != null){ htm_str = fb_usr.displayName; }
+	show_fld = is_show_fld(obj_usr, fb_ids.id_goo_name);
+	if((obj_usr != null) && show_fld){ htm_str = obj_usr[fb_ids.id_goo_name]; }
+	if(show_fld){ add_user_info_simple_html_line(dv_ed_usr, ulang.msg_google_name, fb_ids.id_goo_name, htm_str); }
 	htm_str = "";
+
 	if(fb_usr != null){ htm_str = `<img class="img_observ" src="${fb_usr.photoURL}">`; }	
-	add_user_info_simple_html_line(dv_ed_usr, ulang.msg_google_photo, fb_ids.id_goo_photo, htm_str);
+	show_fld = is_show_fld(obj_usr, fb_ids.id_goo_photo);
+	if((obj_usr != null) && show_fld){ htm_str = `<img class="img_observ" src="${obj_usr[fb_ids.id_goo_photo]}">`; }
+	if(show_fld){ add_user_info_simple_html_line(dv_ed_usr, ulang.msg_google_photo, fb_ids.id_goo_photo, htm_str); }
 	htm_str = "";
+	
 	if(fb_usr != null){ htm_str = fb_usr.email; }	
-	add_user_info_simple_html_line(dv_ed_usr, ulang.msg_google_email, fb_ids.id_goo_email, htm_str);
+	show_fld = is_show_fld(obj_usr, fb_ids.id_goo_email);
+	if((obj_usr != null) && show_fld){ htm_str = obj_usr[fb_ids.id_goo_email]; }
+	if(show_fld){ add_user_info_simple_html_line(dv_ed_usr, ulang.msg_google_email, fb_ids.id_goo_email, htm_str); }
 	htm_str = "";
-	ln_flds = add_user_info_simple_html_line(dv_ed_usr, ulang.msg_sibiblia_qr, fb_ids.id_sibiblia_qr, htm_str);
-	const dv_qrcod = ln_flds.fld;
-	dv_qrcod.classList.add("qr_code_img");
+	
+	let user_id = null;
 	let the_link = "";
-	if(fb_usr != null){ 
-		const the_qr_maker = new QRCode(dv_qrcod, {
-			width : 300,
-			height : 300,
-		});
-		the_link = get_user_href(fb_usr);
-		//console.log("LINK for QR code = " + the_link);
-		the_qr_maker.makeCode(the_link);
+	if(fb_usr != null){ user_id = fb_usr.uid; }
+	show_fld = is_show_fld(obj_usr, fb_ids.id_sibiblia_qr);
+	if((obj_usr != null) && show_fld){ user_id = obj_usr[fb_ids.id_sibiblia_id]; }
+	if(show_fld){ 
+		ln_flds = add_user_info_simple_html_line(dv_ed_usr, ulang.msg_sibiblia_qr, fb_ids.id_sibiblia_qr, htm_str);
+		const dv_qrcod = ln_flds.fld;
+		dv_qrcod.classList.add("qr_code_img");
+		if(user_id != null){ 
+			const the_qr_maker = new QRCode(dv_qrcod, {
+				width : 300,
+				height : 300,
+			});
+			the_link = get_user_href(user_id);
+			//console.log("LINK for QR code = " + the_link);
+			the_qr_maker.makeCode(the_link);
+		}
 	}
 
 	if(fb_usr != null){ htm_str = the_link; }	
-	lbl = `<div style="display: flex; justify-content: space-between;"><span>${ulang.msg_sibiblia_link}</span>
-				<span id="id_copy_link"><i class="medium_font has_icons icon-copy"></i></span>
-		</div>`;
-	add_user_info_simple_html_line(dv_ed_usr, lbl, fb_ids.id_sibiblia_link, htm_str);
-	htm_str = "";
-	lbl = `<div style="display: flex; justify-content: space-between;"><span>${ulang.msg_sibiblia_id}</span>
-				<span id="id_copy_id"><i class="medium_font has_icons icon-copy"></i></span>
-		</div>`;
+	show_fld = is_show_fld(obj_usr, fb_ids.id_sibiblia_link);
+	if((obj_usr != null) && show_fld){ htm_str = the_link; }
+	if(show_fld){ 
+		lbl = `<div style="display: flex; justify-content: space-between;"><span>${ulang.msg_sibiblia_link}</span>
+					<span id="id_copy_link"><i class="medium_font has_icons icon-copy"></i></span>
+			</div>`;
+		add_user_info_simple_html_line(dv_ed_usr, lbl, fb_ids.id_sibiblia_link, htm_str);
+		add_copy_data_listener("id_copy_link", fb_ids.id_sibiblia_link);
+	}
+	htm_str = "";	
 	if(fb_usr != null){ htm_str = fb_usr.uid; }	
-	add_user_info_simple_html_line(dv_ed_usr, lbl, fb_ids.id_sibiblia_id, htm_str);
+	show_fld = is_show_fld(obj_usr, fb_ids.id_sibiblia_id);
+	if((obj_usr != null) && show_fld){ htm_str = user_id; }
+	if(show_fld){ 
+		lbl = `<div style="display: flex; justify-content: space-between;"><span>${ulang.msg_sibiblia_id}</span>
+					<span id="id_copy_id"><i class="medium_font has_icons icon-copy"></i></span>
+			</div>`;
+		add_user_info_simple_html_line(dv_ed_usr, lbl, fb_ids.id_sibiblia_id, htm_str);
+		add_copy_data_listener("id_copy_id", fb_ids.id_sibiblia_id);
+	}
 	htm_str = "";
-	
-	add_copy_data_listener("id_copy_link", fb_ids.id_sibiblia_link);
-	add_copy_data_listener("id_copy_id", fb_ids.id_sibiblia_id);
 	
 	//add_user_info_simple_html_line(dv_ed_usr, ulang.msg_sibiblia_photo, fb_ids.id_sibiblia_photo, htm_str);
 	
 	// EDITABLE INFO
 	
-	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_nequi, fb_ids.id_nequi_number, "number", 10, 10, 0);
-	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_paypal, fb_ids.id_paypal_email, "text", 150, 150, "");
-	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_transfiya, fb_ids.id_transfiya_number, "number", 10, 10, 0);
+	show_fld = is_show_fld(obj_usr, fb_ids.id_nequi_number);
+	if(show_fld){ add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_nequi, fb_ids.id_nequi_number, "number", 10, 10, 0); }
+	show_fld = is_show_fld(obj_usr, fb_ids.id_paypal_email);
+	if(show_fld){ add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_paypal, fb_ids.id_paypal_email, "text", 150, 150, ""); }
+	show_fld = is_show_fld(obj_usr, fb_ids.id_transfiya_number);
+	if(show_fld){ add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_transfiya, fb_ids.id_transfiya_number, "number", 10, 10, 0); }
 	//add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_url_photo, fb_ids.id_url_photo, "text", 150, 150, "");
 	
-	lbl = `<div style="display: flex; justify-content: space-between;"><span>${ulang.msg_usr_pub_alias}</span>
-			<div><span id="id_reset_alias"><i class="medium_font has_icons icon-undo-4"></i></span>
-				<span id="id_check_alias"><i class="medium_font has_icons icon-square-check"></i></span>
-			</div>
-		</div>`;
-	add_user_info_simple_line(dv_ed_usr, lbl, fb_ids.id_alias, "text", 150, 150, "");
-	add_alias_checker();
-	add_alias_reset();
+	show_fld = is_show_fld(obj_usr, fb_ids.id_alias);
+	if(show_fld){ 
+		lbl = `<div style="display: flex; justify-content: space-between;"><span>${ulang.msg_usr_pub_alias}</span>
+				<div><span id="id_reset_alias"><i class="medium_font has_icons icon-undo-4"></i></span>
+					<span id="id_check_alias"><i class="medium_font has_icons icon-square-check"></i></span>
+				</div>
+			</div>`;
+		add_user_info_simple_line(dv_ed_usr, lbl, fb_ids.id_alias, "text", 150, 150, "");
+		add_alias_checker();
+		add_alias_reset();
+	}
 	
-	add_user_info_select_line(dv_ed_usr, ulang.msg_usr_country, fb_ids.id_country, gvar.glb_all_countries[gvar.glb_def_country], gvar.glb_all_countries);
+	show_fld = is_show_fld(obj_usr, fb_ids.id_country);
+	if(show_fld){ 
+		add_user_info_select_line(dv_ed_usr, ulang.msg_usr_country, fb_ids.id_country, gvar.glb_all_countries[gvar.glb_def_country], gvar.glb_all_countries);
+	}
 	
-	lbl = document.createElement("div");
-	lbl.id = fb_ids.id_citizen_id_lbl;
-	lbl.innerHTML = gvar.glb_all_id_names[gvar.glb_def_country];
-	lbl.classList.add("exam", "big_font", "bold_font");
-	lbl.classList.add("grid_item_auto_auto");
-	dv_ed_usr.appendChild(lbl);
+	show_fld = is_show_fld(obj_usr, fb_ids.id_citizen_id);
+	if(show_fld){ 
+		lbl = document.createElement("div");
+		lbl.id = fb_ids.id_citizen_id_lbl;
+		lbl.innerHTML = gvar.glb_all_id_names[gvar.glb_def_country];
+		lbl.classList.add("exam", "big_font", "bold_font");
+		lbl.classList.add("grid_item_auto_auto");
+		dv_ed_usr.appendChild(lbl);
 
-	fld = add_user_info_field(fb_ids.id_citizen_id, "number", 15, 15, 0, 10);
-	dv_ed_usr.appendChild(fld);
-	
-	fld = add_user_info_end_line(fb_ids.id_citizen_id);
-	dv_ed_usr.appendChild(fld);	
+		fld = add_user_info_field(fb_ids.id_citizen_id, "number", 15, 15, 0, 10);
+		dv_ed_usr.appendChild(fld);
+		
+		fld = add_user_info_end_line(fb_ids.id_citizen_id);
+		dv_ed_usr.appendChild(fld);	
+	}
 
-	lbl = add_user_info_label(ulang.msg_usr_birth_date);
-	dv_ed_usr.appendChild(lbl);
+	show_fld = is_show_fld(obj_usr, fb_ids.id_birth_day);
+	if(show_fld){ 
+		lbl = add_user_info_label(ulang.msg_usr_birth_date);
+		dv_ed_usr.appendChild(lbl);
 
-	fld = add_user_info_field(fb_ids.id_birth_year, "number", 4, 4, 2024, 4);
-	dv_ed_usr.appendChild(fld);
+		fld = add_user_info_field(fb_ids.id_birth_year, "number", 4, 4, 2024, 4);
+		dv_ed_usr.appendChild(fld);
+		
+		fld = add_user_info_field(fb_ids.id_birth_month, "number", 2, 2, 12, 3);
+		dv_ed_usr.appendChild(fld);
+		
+		fld = add_user_info_field(fb_ids.id_birth_day, "number", 2, 2, 31, 3);
+		dv_ed_usr.appendChild(fld);
+		
+		fld = add_user_info_end_line(fb_ids.id_birth_day);
+		dv_ed_usr.appendChild(fld);	
+	}
 	
-	fld = add_user_info_field(fb_ids.id_birth_month, "number", 2, 2, 12, 3);
-	dv_ed_usr.appendChild(fld);
+	show_fld = is_show_fld(obj_usr, fb_ids.id_sex);
+	if(show_fld){ add_user_info_select_line(dv_ed_usr, ulang.msg_usr_sex, fb_ids.id_sex, gvar.glb_all_sex["1"], gvar.glb_all_sex); }
 	
-	fld = add_user_info_field(fb_ids.id_birth_day, "number", 2, 2, 31, 3);
-	dv_ed_usr.appendChild(fld);
-	
-	fld = add_user_info_end_line(fb_ids.id_birth_day);
-	dv_ed_usr.appendChild(fld);	
-	
-	add_user_info_select_line(dv_ed_usr, ulang.msg_usr_sex, fb_ids.id_sex, gvar.glb_all_sex["1"], gvar.glb_all_sex);
-	
-	add_user_info_select_line(dv_ed_usr, ulang.msg_usr_marital_status, fb_ids.id_marital_status, 
+	show_fld = is_show_fld(obj_usr, fb_ids.id_marital_status);
+	if(show_fld){ 
+		add_user_info_select_line(dv_ed_usr, ulang.msg_usr_marital_status, fb_ids.id_marital_status, 
 							  gvar.glb_all_marital[gvar.glb_def_marital], gvar.glb_all_marital);
+	}
 	
 	if(fb_usr != null){ htm_str = fb_usr.displayName; }	
-	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_name, fb_ids.id_name, "text", 150, 150, htm_str);
+	show_fld = is_show_fld(obj_usr, fb_ids.id_name);
+	if(show_fld){ add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_name, fb_ids.id_name, "text", 150, 150, htm_str); }
 	htm_str = "";
-	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_divorce_num, fb_ids.id_divorce_number, "number", 1, 1, 123);
-	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_children_num, fb_ids.id_children_number, "number", 2, 2, 123);
-	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_website, fb_ids.id_website, "text", 150, 150, "");
-	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_facebook, fb_ids.id_facebook, "text", 150, 150, "");
-	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_instagram, fb_ids.id_instagram, "text", 150, 150, "");
-	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_youtube, fb_ids.id_youtube, "text", 150, 150, "");
+	show_fld = is_show_fld(obj_usr, fb_ids.id_divorce_number);
+	if(show_fld){ add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_divorce_num, fb_ids.id_divorce_number, "number", 1, 1, 123); }
+	show_fld = is_show_fld(obj_usr, fb_ids.id_children_number);
+	if(show_fld){ add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_children_num, fb_ids.id_children_number, "number", 2, 2, 123); }
+	show_fld = is_show_fld(obj_usr, fb_ids.id_website);
+	if(show_fld){ add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_website, fb_ids.id_website, "text", 150, 150, ""); }
+	show_fld = is_show_fld(obj_usr, fb_ids.id_facebook);
+	if(show_fld){ add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_facebook, fb_ids.id_facebook, "text", 150, 150, ""); }
+	show_fld = is_show_fld(obj_usr, fb_ids.id_instagram);
+	if(show_fld){ add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_instagram, fb_ids.id_instagram, "text", 150, 150, ""); }
+	show_fld = is_show_fld(obj_usr, fb_ids.id_youtube);
+	if(show_fld){ add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_youtube, fb_ids.id_youtube, "text", 150, 150, ""); }
 	
-	add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_referrer, fb_ids.id_referrer, "text", 25, 25, ulang.msg_invalid_referrer);
+	show_fld = is_show_fld(obj_usr, fb_ids.id_referrer);
+	if(show_fld){ add_user_info_simple_line(dv_ed_usr, ulang.msg_usr_referrer, fb_ids.id_referrer, "text", 25, 25, ulang.msg_invalid_referrer); }
 	//add_user_info_simple_html_line(dv_ed_usr, ulang.msg_usr_referrer, fb_ids.id_referrer, ulang.msg_invalid_referrer);
 	
 	//gvar.glb_all_countries[gvar.glb_def_country]
 	//gvar.glb_all_countries[gvar.glb_def_country]
-
-	const dv_ok = dv_edit_user.appendChild(document.createElement("div"));
-	dv_ok.classList.add("exam");
-	dv_ok.classList.add("grid_item_auto_span_4");
-	dv_ok.classList.add("is_big_button");
-	dv_ok.innerHTML = ulang.msg_save;
-	dv_ok.addEventListener('click', async function() {
-		gvar.current_user_info = get_user_info_object();
-		gvar.current_user_private_fields = get_user_private_fields();
-		
-		await write_firebase_user_object();
-		await write_firebase_user_alias();
-		await write_firebase_user_private_fields();
-		
-		dv_edit_user.remove();
-		scroll_to_first_not_answered();		
-		return;
-	});
-	
-	const dv_cards = dv_edit_user.appendChild(document.createElement("div"));
-	dv_cards.classList.add("exam");
-	dv_cards.classList.add("grid_item_auto_span_4");
-	dv_cards.classList.add("is_big_button");
-	dv_cards.innerHTML = ulang.msg_gen_cards;
-	dv_cards.addEventListener('click', function() {
-		gen_pdf_cards();
-		return;
-	});
-	
-	const dv_cho_ver = dv_edit_user.appendChild(document.createElement("div"));
-	dv_cho_ver.classList.add("exam");
-	dv_cho_ver.classList.add("grid_item_auto_span_4");
-	dv_cho_ver.classList.add("is_button");
-	dv_cho_ver.classList.add("has_margin_bot");
-	dv_cho_ver.classList.add("has_margin_top");
-	dv_cho_ver.innerHTML = ulang.msg_choose_verses;
-	dv_cho_ver.addEventListener('click', function() {
-		choose_verses(dv_cho_ver);
-		return;
-	});
-	
 	if(fb_usr != null){
+
+		const dv_save = dv_edit_user.appendChild(document.createElement("div"));
+		dv_save.classList.add("exam");
+		dv_save.classList.add("grid_item_auto_span_4");
+		dv_save.classList.add("is_big_button");
+		dv_save.innerHTML = ulang.msg_save;
+		dv_save.addEventListener('click', async function() {
+			if(gvar.users_private_fields == null){ gvar.users_private_fields = {}; }
+			
+			gvar.current_user_info = get_user_info_object(fb_usr);
+			gvar.users_private_fields[fb_usr.uid] = get_user_private_fields();
+			
+			await write_firebase_user_object();
+			await write_firebase_user_alias();
+			await write_firebase_user_private_fields();
+			
+			dv_edit_user.remove();
+			scroll_to_first_not_answered();		
+			return;
+		});
+		
+		const dv_cards = dv_edit_user.appendChild(document.createElement("div"));
+		dv_cards.classList.add("exam");
+		dv_cards.classList.add("grid_item_auto_span_4");
+		dv_cards.classList.add("is_big_button");
+		dv_cards.innerHTML = ulang.msg_gen_cards;
+		dv_cards.addEventListener('click', function() {
+			gen_pdf_cards();
+			return;
+		});
+		
+		const dv_cho_ver = dv_edit_user.appendChild(document.createElement("div"));
+		dv_cho_ver.classList.add("exam");
+		dv_cho_ver.classList.add("grid_item_auto_span_4");
+		dv_cho_ver.classList.add("is_button");
+		dv_cho_ver.classList.add("has_margin_bot");
+		dv_cho_ver.classList.add("has_margin_top");
+		dv_cho_ver.innerHTML = ulang.msg_choose_verses;
+		dv_cho_ver.addEventListener('click', function() {
+			choose_verses(dv_cho_ver);
+			return;
+		});
+	
 		read_firebase_user_object();
-		read_firebase_user_private_fields();
-		await read_firebase_general_private_fields();
 		await read_firebase_user_referrer();
-	}	
+		await read_firebase_user_private_fields(fb_usr.uid);
+		await read_firebase_general_private_fields();
+	}
+	if(obj_usr != null){
+		obj_usr.ck_flds = true;
+		fill_user_info(obj_usr);
+	}
 
 	scroll_to_top(dv_edit_user);
 }
@@ -444,15 +521,31 @@ function get_user_field(obj, id_fld, get_htm){
 	}
 }
 
-function get_user_info_object(){
+function get_user_info_object(fb_usr){
 	const obj = {};
 	//get_user_field(obj, fb_ids.id_sibiblia_link, true);
-	//get_user_field(obj, fb_ids.id_sibiblia_id, true);
+	if(fb_usr != null){
+		let fld = fb_ids.id_goo_name;
+		obj[fld] = fb_usr.displayName;
+		if(obj[fld] == null){ obj[fld] = ""; }
+		
+		fld = fb_ids.id_goo_email;
+		obj[fld] = fb_usr.email;
+		if(obj[fld] == null){ obj[fld] = ""; }
+		
+		fld = fb_ids.id_goo_photo;
+		obj[fld] = fb_usr.photoURL;
+		if(obj[fld] == null){ obj[fld] = ""; }
+		
+		fld = fb_ids.id_sibiblia_id;
+		obj[fld] = fb_usr.uid;
+		if(obj[fld] == null){ obj[fld] = ""; }
+	}
+	//get_user_field(obj, fb_ids.id_url_photo);
 	get_user_field(obj, fb_ids.id_nequi_number);
 	get_user_field(obj, fb_ids.id_paypal_email);
 	get_user_field(obj, fb_ids.id_transfiya_number);
 	// fb_ids.id_alias is SEPARETLY
-	//get_user_field(obj, fb_ids.id_url_photo);
 	get_user_field(obj, fb_ids.id_country, true);
 	get_user_field(obj, fb_ids.id_citizen_id);
 	get_user_field(obj, fb_ids.id_birth_year);
@@ -472,12 +565,15 @@ function get_user_info_object(){
 }
 
 function set_user_field(obj, id_fld, set_htm){
+	let vv = obj[id_fld];
+	if(obj.ck_flds && (vv == null)){
+		return;
+	}
 	const dv_fld = document.getElementById(id_fld);
 	if(dv_fld == null){
 		console.error(`dv_fld == null for ${id_fld}`);
 		return;
 	}
-	let vv = obj[id_fld];
 	if(vv == null){ vv = ""; }
 	if(set_htm){
 		dv_fld.innerHTML = vv;
@@ -614,7 +710,7 @@ function read_firebase_user_object(){
 			}
 			fill_user_info(gvar.current_user_info);
 		} else {
-			gvar.current_user_info = get_user_info_object();
+			gvar.current_user_info = get_user_info_object(fb_mod.tc_fb_user);
 			if(DEBUG_USER_INFO){ 
 				console.log("read_firebase_user_object. DEFAULT_OBJ=");
 				console.log(gvar.current_user_info);
@@ -740,29 +836,39 @@ function add_copy_data_listener(id_but, id_data){
 	});
 }
 
-function read_firebase_user_private_fields(){
+async function read_firebase_user_private_fields(user_id){
+	if(user_id == null){ console.error("user_id == null.");  return; }
+	if(gvar.users_private_fields == null){ gvar.users_private_fields = {}; }
+	
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
-	let user_id = fb_mod.tc_fb_user.uid;
-	if(user_id == null){ console.error("user_id == null.");  return; }
 	const usr_path = fb_mod.firebase_get_user_path(user_id);
 	const usr_private_pth = usr_path + '/private_fields/';
 
 	const db_ref = fb_mod.md_db.ref(fb_database, usr_private_pth);
-	fb_mod.md_db.onValue(db_ref, (snapshot) => {
+	let u_prv_flds = null;
+	try {
+		const snapshot = await fb_mod.md_db.get(db_ref);
 		if (snapshot.exists()) {
 			const rd_obj = snapshot.val();
-			gvar.current_user_private_fields = JSON.parse(JSON.stringify(rd_obj));
+			gvar.users_private_fields[user_id] = JSON.parse(JSON.stringify(rd_obj));
+			u_prv_flds = gvar.users_private_fields[user_id];
 			if(DEBUG_USER_INFO){ 
-				console.log("read_firebase_user_private_fields. FULL_OBJ=");
-				console.log(gvar.current_user_private_fields);
+				console.log(`read_firebase_user_private_fields(${user_id}). FULL_OBJ=`);
+				console.log(u_prv_flds);
 			}
-			fill_private_info(gvar.current_user_private_fields);
+			if(user_id == fb_mod.tc_fb_user.uid){
+				fill_private_info(u_prv_flds);
+			}
 		} else {
-			console.error("No private fields available");
+			gvar.users_private_fields[user_id] = {};
+			console.error(`No private fields available for user=${user_id}`);
 		}
-	});	
+	} catch(err){
+		console.error(err);
+	}
+	return u_prv_flds;
 }
 
 function fill_private_info(obj){
@@ -791,6 +897,10 @@ function get_user_private_fields(){
 		if(dv_visi == null){ continue; }
 		if(dv_visi.fb_visi === false){
 			obj[fld_id] = 1;
+			if(fld_id == ids.id_birth_day){
+				obj[ids.id_birth_year] = 1;
+				obj[ids.id_birth_month] = 1;
+			}
 		}
 	}
 	if(DEBUG_USER_INFO){
@@ -801,18 +911,24 @@ function get_user_private_fields(){
 }
 
 async function write_firebase_user_private_fields(){
-	if(gvar.current_user_private_fields == null){
-		return;
-	}
+	if(gvar.users_private_fields == null){ gvar.users_private_fields = {}; }
+	
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	const user_id = fb_mod.tc_fb_user.uid;
+	
+	if(gvar.users_private_fields[user_id] == null){
+		console.error(`gvar.users_private_fields[${user_id}] == null`);
+		return;
+	}
+	const u_prv_flds = gvar.users_private_fields[user_id];
+	
 	if(user_id == null){ console.error("user_id == null.");  return; }
 	const usr_path = fb_mod.firebase_get_user_path(user_id);
 	const usr_info_pth = usr_path + '/private_fields/';
 
-	const wr_data = JSON.parse(JSON.stringify(gvar.current_user_private_fields));
+	const wr_data = JSON.parse(JSON.stringify(u_prv_flds));
 	const db_ref = fb_mod.md_db.ref(fb_database, usr_info_pth);
 	
 	await fb_mod.md_db.update(db_ref, wr_data).catch((error) => { console.error(error); });	
@@ -839,6 +955,7 @@ async function read_firebase_general_private_fields(){
 			gvar.general_private_fields = JSON.parse(JSON.stringify(rd_obj));
 			fill_general_private_fields(gvar.general_private_fields);
 		} else {
+			gvar.general_private_fields = {};
 			console.error("No general private fields available");
 		}	
 	} catch (error){
@@ -860,7 +977,9 @@ function fill_general_private_fields(obj){
 		const fld_id = ids[ii];
 		const visi_id = fld_id + SUF_FLD_VISI;
 		const dv_visi = document.getElementById(visi_id);
-		dv_visi.classList.add("is_color_grey");
+		if(dv_visi != null){
+			dv_visi.classList.add("is_color_grey");
+		}
 	}
 }
 
@@ -971,10 +1090,10 @@ function choose_verses(dv_cho_ver){
 		add_card_verse(dv_all_vss, vss, kk);
 	});
 
-	const dv_ok = dv_ed_vss.appendChild(document.createElement("div"));
-	dv_ok.classList.add("item_can_select");
-	dv_ok.innerHTML = ulang.msg_save_verses;
-	dv_ok.addEventListener('click', async function() {
+	const dv_save = dv_ed_vss.appendChild(document.createElement("div"));
+	dv_save.classList.add("item_can_select");
+	dv_save.innerHTML = ulang.msg_save_verses;
+	dv_save.addEventListener('click', async function() {
 		let nkk = "0";
 		const nvss = {};
 		//for(const dv_vs of dv_all_vss.children) {
@@ -1054,11 +1173,16 @@ async function read_firebase_user_referrer(){
 			const rd_obj = snapshot.val();
 			const obj_ref = JSON.parse(JSON.stringify(rd_obj));
 			const uref = Object.keys(obj_ref)[0];
-			dv_ref.value = uref;
-			dv_ref.classList.add("is_button");
-			dv_ref.addEventListener('click', function() {
-				show_referrer();
+			
+			const nw_but = add_user_div_field(fb_ids.id_referrer, ulang.msg_show_referrer);
+			nw_but.classList.add("is_button");
+			nw_but.id_referrer = uref;
+			nw_but.addEventListener('click', async function() {
+				await show_referrer(uref);
 			});
+			const pnt = dv_ref.parentNode;
+			pnt.replaceChild(nw_but, dv_ref);
+			
 			const confir = get_loc_confirmed_referrer();
 			if(confir != uref){
 				set_loc_confirmed_referrer(uref);
@@ -1113,25 +1237,32 @@ async function set_referrer(){
 	
 	try{
 		fb_mod.md_db.onValue(db_ref, (snapshot) => {
+			let uref = ulang.msg_invalid_referrer;
 			if (snapshot.exists()) {
 				const obj = snapshot.val();
-				const cand = Object.keys(obj)[0];
-				if(DEBUG_USER_INFO){ console.log("set_referrer. CAND="); console.log(cand); }
-				set_loc_cand_referrer(cand);
+				uref = Object.keys(obj)[0];
+				if(DEBUG_USER_INFO){ console.log("set_referrer. CAND="); console.log(uref); }
+				set_loc_cand_referrer(uref);
 				fb_mod.firebase_set_user_referrer();
 			} else {
-				if(DEBUG_USER_INFO){ console.log("set_referrer. THE_ALIAS="); console.log(the_alias); }
-				set_loc_cand_referrer(the_alias);
+				uref = the_alias;
+				if(DEBUG_USER_INFO){ console.log("set_referrer. THE_ALIAS="); console.log(uref); }
+				set_loc_cand_referrer(uref);
 				fb_mod.firebase_set_user_referrer();
 			}			
 			
 			const dv_set_rf = document.getElementById("id_set_referrer");
 			dv_set_rf.remove();
-			
-			dv_ref.classList.add("is_button");
-			dv_ref.addEventListener('click', function() {
-				show_referrer();
+
+			const nw_but = add_user_div_field(fb_ids.id_referrer, ulang.msg_show_referrer);
+			nw_but.classList.add("is_button");
+			nw_but.id_referrer = uref;
+			nw_but.addEventListener('click', async function() {
+				await show_referrer(uref);
 			});
+			const pnt = dv_ref.parentNode;
+			pnt.replaceChild(nw_but, dv_ref);
+			
 		});		
 	} catch(err){
 		dv_ref.value = ulang.msg_invalid_referrer;
@@ -1140,10 +1271,77 @@ async function set_referrer(){
 	
 }
 
-function show_referrer(){
+async function show_referrer(uref){
 	if(DEBUG_USER_INFO){ console.log("Called show_referrer"); }	
+	await read_firebase_user_private_fields(uref);
+	await read_firebase_general_private_fields();
+	const obj = await read_firebase_user_fields(uref);
+	const dv_usr = document.getElementById(id_pop_menu_sele);
+	if(dv_usr != null){ dv_usr.remove(); }
+	await toggle_user_info(null, obj);
 }
 
+function arr_union(aa, bb){
+	return [...new Set([...aa, ...bb])];
+}
+
+function arr_diff(aa, bb){
+	return aa.filter(ee => ! bb.includes(ee));
+}
+
+async function read_firebase_user_fields(user_id){
+	if(DEBUG_USER_INFO){ console.log("Called read_firebase_user_fields"); }
+	
+	if(gvar.users_private_fields == null){ gvar.users_private_fields = {}; }
+	let u_prv_flds = gvar.users_private_fields[user_id];
+	if(u_prv_flds == null){
+		console.error(`u_prv_flds == null for ${user_id}`);
+		return;
+	}
+	u_prv_flds = Object.keys(u_prv_flds);
+	
+	let g_prv_flds = gvar.general_private_fields;
+	if(g_prv_flds == null){
+		console.error(`g_prv_flds == null`);
+		return;
+	}
+	g_prv_flds = Object.keys(g_prv_flds);
+	const all_pvt = arr_union( u_prv_flds, g_prv_flds);
+	
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	if(user_id == null){ console.error("user_id == null.");  return; }
+	const usr_path = fb_mod.firebase_get_user_path(user_id);
+	const usr_info_pth = usr_path + '/user_info/';
+	
+	let all_fld = JSON.parse(JSON.stringify(fb_ids));
+	all_fld = Object.values(all_fld);
+	
+	const all_to_read = arr_diff(all_fld, all_pvt);
+	if(DEBUG_USER_INFO){ console.log(`read_firebase_user_fields. user_id=${user_id} all_to_read=`); console.log(all_to_read); }
+	
+	let obj = {};
+	let ii = 0;
+	try{
+		for(ii = 0; ii < all_to_read.length; ii++){
+			const fld = all_to_read[ii];
+			const fld_pth = usr_info_pth + fld;
+			const db_ref = fb_mod.md_db.ref(fb_database, fld_pth);
+			//if(DEBUG_USER_INFO){ console.log(`read_firebase_user_fields. user_id=${user_id} fld_pth=${fld_pth}`); }
+			
+			const snapshot = await fb_mod.md_db.get(db_ref);
+			if (snapshot.exists()) {
+				const vfld = snapshot.val();
+				obj[fld] = vfld;
+				//if(DEBUG_USER_INFO){ console.log(`read_firebase_user_fields. ${fld}=${vfld}`); }
+			}
+		}	
+	} catch(err){
+		console.error(err);
+	}
+	return obj;
+}
 
 /* 
 {

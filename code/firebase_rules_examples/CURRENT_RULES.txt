@@ -267,24 +267,15 @@
 					},
 					"user_info": {
 						"$user_field": {
-							".validate": "newData.exists() && root.child('bib_quest').child('user_fields').child($user_field).exists()",
-							"$val": {
-								".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists()) && 
+							".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists()) && 
 								! root.child('bib_quest').child('users').child($uid).child('private_fields').child($user_field).exists() &&
 								! root.child('bib_quest').child('private_fields').child($user_field).exists()",
+							".validate": "newData.exists() && root.child('bib_quest').child('user_fields').child($user_field).exists()",
+							"$val": {
 								".validate": "
 									(newData.isNumber() && (newData.val() >= 0) && (newData.val() < 9999999999)) ||
 									(newData.isString() && newData.val().length < 200)
 								",
-							},
-						},
-					},
-					"referred_by": {
-						"$other": { ".validate": false,	},
-						"cand": {
-							"$cand_ref_uid": {
-								".validate": "(! data.exists()) && (newData.val() != auth.uid) && (newData.val() != $uid) && 
-								root.child('bib_quest').child('users').child('list').child($cand_ref_uid).exists()",
 							},
 						},
 					},

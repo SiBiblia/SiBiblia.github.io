@@ -31,11 +31,9 @@ export function is_null_storage(the_val){
 	return ((the_val == null) || (the_val == "null")); // CAREFUL TRICKY FIRST CONDITION. CAN BE A STRING !!!
 }
 
-export function get_user_href(the_usr){
-	//const qr_href = window.location.href + "?" + GET_var_referrer + "=" + the_usr.uid;
-	//const loc = window.location;
+export function get_user_href(user_id){
 	const loc = document.location;
-	const qr_href = loc.origin + loc.pathname + "?" + GET_var_referrer + "=" + the_usr.uid;
+	const qr_href = loc.origin + loc.pathname + "?" + GET_var_referrer + "=" + user_id;  // old   the_usr.uid
 	return qr_href;
 }
 

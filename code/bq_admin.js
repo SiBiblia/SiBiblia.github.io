@@ -10,11 +10,17 @@ import { start_qmodu,
 	get_qmodule_score_weights, 
 } from './bq_quest_mgr.js';
 
-import { load_qmodu, load_next_qmodu, } from './bq_module_mgr.js';
+import { load_qmodu, load_next_qmodu, 	
+} from './bq_module_mgr.js';
 
-import { get_bib_verse, } from './bq_bible_mgr.js';
+import { get_bib_verse, 
+} from './bq_bible_mgr.js';
 
-import { gen_pdf_cards } from './bq_pdf_mgr.js'
+import { gen_pdf_cards,
+} from './bq_pdf_mgr.js'
+
+import { fb_general_private_ids, fb_ids, 
+} from './bq_user_info.js'
 
 const DEBUG_ADMIN_OPS = true;
 const DEBUG_UPDATE_STATS = true;
@@ -45,6 +51,8 @@ const admin_ops = {
 	download_db:"Download Database",
 	up_qmodu_observ:"Update current module observations",
 	up_mods:"Update ALL module observations",
+	up_user_fields:"Update user fields",
+	up_general_private_fields:"Update general private fields",
 	//upload_index_W:`upload_index("W")`,
 	//upload_index_S:`upload_index("S")`,
 	//upload_index_A:`upload_index("A")`,
@@ -96,6 +104,12 @@ async function do_selec(val_sel_w){
 	}
 	if(val_sel_w == admin_ops.up_mods){
 		update_ALL_qmodule_observations();
+	}
+	if(val_sel_w == admin_ops.up_user_fields){ 
+		update_user_fields();
+	}
+	if(val_sel_w == admin_ops.up_general_private_fields){ 
+		update_general_private_fields();
 	}
 	if(val_sel_w == admin_ops.up_stats){
 		await update_ALL_stats_and_results();
@@ -1143,4 +1157,44 @@ function write_referrer_test(uref_id, val1){
 		fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });
 	}
 }
+
+function get_fb_obj_ids(obj_ids){
+	const flds = Object.values(obj_ids);
+	const obj = {};
+	let ii = 0;
+	for(ii = 0; ii < flds.length; ii++){
+		const fld = flds[ii];
+		obj[fld] = 1;
+	}
+	return obj;
+}
+
+function update_user_fields(){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	const ids = get_fb_obj_ids(fb_ids);
+
+	const ref_pth = fb_mod.firebase_bib_quest_path + 'user_fields/';
+	const db_ref = fb_mod.md_db.ref(fb_database, ref_pth);
+	fb_mod.md_db.set(db_ref, ids).catch((error) => { 
+		console.error(error); 
+	});	
+}
+
+function update_general_private_fields(){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+
+	const ids = get_fb_obj_ids(fb_general_private_ids);
+	
+	const ref_pth = fb_mod.firebase_bib_quest_path + 'private_fields/';
+	const db_ref = fb_mod.md_db.ref(fb_database, ref_pth);
+	fb_mod.md_db.set(db_ref, ids).catch((error) => { 
+		console.error(error); 
+	});	
+}
+
 
