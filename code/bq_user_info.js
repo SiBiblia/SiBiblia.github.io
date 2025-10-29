@@ -380,9 +380,13 @@ export async function toggle_user_info(fb_usr, obj_usr){
 					<span id="id_check_alias"><i class="medium_font has_icons icon-square-check"></i></span>
 				</div>
 			</div>`;
-		add_user_info_simple_line(dv_ed_usr, lbl, fb_ids.id_alias, "text", 150, 150, "");
-		add_alias_checker("id_check_alias", fb_ids.id_alias, true);
-		add_alias_reset();
+		const skip_checker = (obj_usr != null);
+		if(skip_checker){ lbl = ulang.msg_usr_pub_alias; }
+		add_user_info_simple_line(dv_ed_usr, lbl, fb_ids.id_alias, "text", 150, 150, ulang.msg_usr_type_alias);
+		if(! skip_checker){
+			add_alias_checker("id_check_alias", fb_ids.id_alias, true);
+			add_alias_reset();
+		}
 	}
 	
 	show_fld = is_show_fld(obj_usr, fb_ids.id_country);
@@ -520,11 +524,12 @@ export async function toggle_user_info(fb_usr, obj_usr){
 		});
 	
 		read_firebase_user_object();
-		await read_firebase_user_referrer();
-		await read_firebase_user_private_fields(fb_usr.uid);
-		await read_firebase_general_private_fields();
 	}
 
+	await read_firebase_user_referrer(user_id);
+	await read_firebase_user_private_fields(user_id);
+	await read_firebase_general_private_fields();
+	
 	scroll_to_top(dv_edit_user);
 }
 
@@ -864,6 +869,7 @@ function add_alias_checker(id_ck, id_fld, null_ok){
 }
 
 function add_alias_reset(){
+	const ulang = gvar.glb_curr_lang;
 	const dv_ck = document.getElementById("id_reset_alias");
 	const dv_als = document.getElementById(fb_ids.id_alias);
 	dv_ck.addEventListener('click', async function() {
@@ -877,6 +883,13 @@ function add_alias_reset(){
 		dv_als.classList.remove("background_red");
 		dv_als.classList.remove("background_green");
 		
+	});
+	dv_als.addEventListener('click', async function() {
+		if(dv_als.value == ulang.msg_usr_type_alias){
+			dv_als.value = "";
+		}
+		dv_als.classList.remove("background_red");
+		dv_als.classList.remove("background_green");
 	});
 }
 
@@ -1229,18 +1242,17 @@ function init_verses_loc_storage(){
 	}
 }
 
-async function read_firebase_user_referrer(){
+async function read_firebase_user_referrer(user_id){
+	if(user_id == null){
+		console.error("user_id == null");
+		return;
+	}
 	if(DEBUG_USER_INFO){ console.log("Called read_firebase_user_referrer"); }
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	
 	const ulang = gvar.glb_curr_lang;
-	const user_id = fb_mod.tc_fb_user.uid;
-	if(user_id == null){
-		console.error("user_id == null");
-		return;
-	}
 
 	const ref_pth = fb_mod.firebase_bib_quest_path + 'score_data/all_referred_by/' + user_id + '/referred_by/';
 	const db_ref = fb_mod.md_db.ref(fb_database, ref_pth);
@@ -1275,6 +1287,8 @@ async function read_firebase_user_referrer(){
 			const lbl = `<div style="display: flex; justify-content: space-between;"><span>${ulang.msg_usr_referrer}</span>
 						<span id="id_ck_referrer"><i class="medium_font has_icons icon-square-check"></i></span>
 				</div>`;
+			const skip_checker = (user_id != fb_mod.tc_fb_user.uid);
+			if(skip_checker){ lbl = ulang.msg_usr_referrer; }
 			const lbl_id = fb_ids.id_referrer + SUF_LBL_FLD;
 			const dv_lbl = document.getElementById(lbl_id);
 			if(dv_lbl != null){
@@ -1282,7 +1296,7 @@ async function read_firebase_user_referrer(){
 			} else {
 				console.error("dv_lbl == null");
 			}
-			add_alias_checker("id_ck_referrer", fb_ids.id_referrer, false);
+			if(! skip_checker){ add_alias_checker("id_ck_referrer", fb_ids.id_referrer, false); }
 			
 			/*
 			const dv_ck_rf = document.getElementById("id_ck_referrer");
@@ -1372,7 +1386,7 @@ async function write_firebase_referrer(){
 }
 
 async function show_referrer(uref){
-	if(DEBUG_USER_INFO){ console.log("Called show_referrer"); }	
+	if(DEBUG_USER_INFO){ console.log(`Called show_referrer for ${uref}`); }	
 	await read_firebase_user_private_fields(uref);
 	await read_firebase_general_private_fields();
 	const dv_usr = document.getElementById(id_pop_menu_sele);
