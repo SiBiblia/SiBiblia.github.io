@@ -164,7 +164,7 @@ export async function firebase_set_user_referrer(force_it){
 		return; 
 	}
 	if(norm && (confir != null)){ 
-		console.error("confir != null");
+		console.error(`confir != null. ${confir}`);
 		return; 
 	}
 	
@@ -179,7 +179,7 @@ export async function firebase_set_user_referrer(force_it){
 	const ref_pth = firebase_bib_quest_path + 'score_data/all_referred_by/' + user_id + '/referred_by/' + cand + '/cicle_added/';
 	const db_ref = md_db.ref(fb_database, ref_pth);
 	try{
-		await md_db.set(db_ref, curr_ci).catch((error) => { console.error(error); });
+		await md_db.set(db_ref, curr_ci);
 		set_loc_confirmed_referrer(cand);
 	} catch (err){
 		const is_conf = get_loc_confirmed_referrer();

@@ -732,6 +732,11 @@ a.exam_ref:hover {
 	grid-auto-rows: auto;
 }
 
+.brown_background {
+	background-color: #aa5500;
+}
+
+
 /*
 	align-content: center center;
 	align-items: stretch;

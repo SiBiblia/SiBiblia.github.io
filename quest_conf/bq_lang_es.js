@@ -512,8 +512,9 @@ function init_es_basic_msg(){
 	obj.msg_usr_youtube = "Youtube";
 
 	obj.msg_usr_referrer = "REFERIDO POR";
-	obj.msg_invalid_referrer = "Usuario invalido";
-	obj.msg_show_referrer = "Mostrar usuario";
+	obj.msg_no_referrer = "Sin referido por. ";
+	obj.msg_type_referrer = "Escriba un id de usuario valido o un alias de usuario.";
+	obj.msg_show_referrer = "Mostrar datos de quien refiere";
 	
 	obj.msg_gen_cards = `GEN PDF TARJETAS`;
 	obj.msg_choose_verses = `Escoja versículos`;

@@ -75,7 +75,7 @@
 				},
 			},
 			"stats": { 
-				".read": "!(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 				"last_check": { 
 					".validate": "newData.isString() && (newData.val().length < 25)",
@@ -97,7 +97,7 @@
 				},
 			},
 			"score_data": {
-				".read": "!(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 				".write": "(! data.exists()) && root.child('bib_quest').child('admins').child(auth.uid).exists()",
 				"$other": { ".validate": false,	},
 				"all_referred_by": {
@@ -177,8 +177,8 @@
 				".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 				".write": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 				"list": {
+					".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 					"$uid": {
-						".read": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 						".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
 						".validate": "newData.exists() && newData.isNumber() && (newData.val() === 1)",
 					},
