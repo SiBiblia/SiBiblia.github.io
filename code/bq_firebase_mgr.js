@@ -65,6 +65,17 @@ export let tc_fb_is_test_user = false;
 export let tc_fb_current_cicle = null;
 export let bq_fb_user_finished_qmodules = null;
 
+const test_user_ids = {
+	"2s9VD9GYUYTAABs10uTc4ffPjIl1": 1,
+	"aEGcnW9mryNAZXjdlo4dKLajiZj1": 1,
+	"zRaEatJMbJbYMefNXjS8zTVtD5k1": 1,
+	"2uRMCFlCeZQ4f4OwJc2Puas8zY73": 1,
+	"sPh7cf5NvqTVkPZzPpWBcSH7tGc2": 1,
+	"REAFsHwfknZupnUjCMjbaHoHDV13": 1,
+	"AYIKhJkFuOXB01qAwzswq0mNdP73": 1,
+	"0pm1Ys62dMc1Taz1gqDRMjA23Ex2": 1,
+	"026iih43UqXvDQFsdFNhiTedtvB2": 1,
+};
 
 function init_mod_vars(){
 	if(md_app != null){ return; }
@@ -216,25 +227,6 @@ async function firebase_get_user_finished_qmodules(){
 	}
 }
 
-export function firebase_has_current_user(){
-	init_mod_vars();
-	try {
-		if(tc_fb_app == null){ tc_fb_app = md_app.initializeApp(firebase_config); }
-		if(tc_fb_auth == null){ tc_fb_auth = md_auth.getAuth(); }
-		console.log("firebase_has_current_user. tc_fb_auth=");
-		console.log(tc_fb_auth);
-		if(tc_fb_auth.currentUser){
-			console.log("firebase_has_current_user. tc_fb_auth.currentUser=");
-			console.log(tc_fb_auth.currentUser);
-		} else {
-			console.log("firebase_has_current_user. NO TIENEN USUARIO EN SESION");
-		}
-	} catch(error){
-		console.error("ERROR in firebase_has_current_user.");
-		console.error(error);
-	}
-}
-
 export async function firebase_check_user(callbk){
 	init_mod_vars();
 	try {
@@ -258,6 +250,10 @@ export async function firebase_check_user(callbk){
 		md_auth.onAuthStateChanged(tc_fb_auth, (user) => {
 			if (user) {
 				tc_fb_user = user;
+				
+				if(test_user_ids[tc_fb_user.uid] != null){
+					tc_fb_is_test_user = true;
+				}
 				
 				if(DEBUG_FB_CHECK2){
 					console.log("GOT USER");

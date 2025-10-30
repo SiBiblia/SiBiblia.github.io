@@ -406,3 +406,168 @@ function show_photo(url_photo){
 	div.appendChild(sp);
 }
 
+// -------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
+
+
+
+function user_has_google_id(){
+  const cookies = document.cookie.split(';');
+  let ii = 0;
+  for(ii = 0; ii < cookies.length; ii++){
+    const cookie = cookies[ii].trim();
+	console.log('user_has_google_id. cookie=' + cookie);
+    if(cookie.startsWith('__Secure-3PAPISID=') || cookie.startsWith('__Secure-3PSID=') || cookie.startsWith('APISID=')) {
+		console.log('user_has_google_id. TIENE sesion.');
+		return true;
+    }
+  }
+  console.log('user_has_google_id. SIN sesion.');
+  return false;	
+}
+function check_google(){
+	console.log('CALLING check_google.');
+	try{
+		gapi.load('auth2', (pm) => {
+			console.log('check_google. FINNISHED load.');
+			gapi.auth2.init({ client_id: "313540425147-sgtmrf9uav4q7qs8ghmg4pce3n8sl28k.apps.googleusercontent.com" }).then((pm2) => {
+				console.log('check_google. FINNISHED init.');
+				const inst_auth = gapi.auth2.getAuthInstance();
+				const is_sgin = inst_auth.isSignedIn.get();
+				if(is_sgin){
+					console.log('ESTA_LOGEADO_EN_GOOGLE');
+				} else {
+					console.log('no_esta_logeado_en_google');
+				}
+			});
+		});
+	} catch(error) {
+		console.error(error);
+	}
+}
+
+function check_google(){
+	console.log('CALLING check_google.');
+	try{
+		google.accounts.id.initialize({
+			//client_id: "313540425147-sgtmrf9uav4q7qs8ghmg4pce3n8sl28k.apps.googleusercontent.com",
+			client_id: "313540425147-g2070bfjvbgvtjjefjd7r43s3vj8vlmu.apps.googleusercontent.com",
+			callback: handle_ini_ok,
+			error_callback: handle_ini_bad,
+		});
+		google.accounts.id.getStatus({
+			callback: (status) => {
+				if (status.signedIn) {
+					console.log('User is already signed in.');
+					// You can optionally retrieve more user details here
+					google.accounts.id.getProfile()
+					.then(profile => {
+						console.log('User profile:', profile);
+					})
+					.catch(error => {
+						console.error('Error getting user profile:', error);
+					});
+				} else {
+					console.log('User is not signed in.');
+				}
+			}
+		});
+		//google.accounts.id.prompt();
+		//handle_ini_ok();
+		console.log('AFTER initialize.');
+	} catch(error) {
+		console.error(error);
+	}
+}
+
+function handle_ini_ok(resp){
+	console.log('CALLING handle_ini_ok.');
+	console.log(resp);
+	google.accounts.id.getStatus().then((status) => {
+		if(status === google.accounts.id.SignInStatus.SESSION_ALIVE){
+			console.log('TIENE SESION.');
+		} else {
+			console.log('no tiene sesion.');
+		}
+	});
+}
+
+function handle_ini_bad(resp){
+	console.log('CALLING handle_ini_bad.');
+	console.log(resp);
+}
+
+function check_google(){
+	console.log('CALLING check_google.');
+	if(fb_mod == null){
+		console.log('check_google. (fb_mod == null)');
+		return;
+	}
+	fb_mod.firebase_has_current_user();
+}
+
+//const APP_CLIENT_ID = "313540425147-sgtmrf9uav4q7qs8ghmg4pce3n8sl28k.apps.googleusercontent.com";
+const APP_CLIENT_ID = "313540425147-g2070bfjvbgvtjjefjd7r43s3vj8vlmu.apps.googleusercontent.com";
+
+function check_google(){
+	console.log('CALLING check_google.');
+	try{
+		google.accounts.id.initialize({
+			client_id: APP_CLIENT_ID,
+			//cookiepolicy: 'single_host_origin',
+			callback: handle_ini_ok,
+			error_callback: handle_ini_bad,
+		});
+		//google.accounts.id.prompt();
+		//handle_ini_ok();
+		console.log('AFTER initialize.');
+	} catch(error) {
+		console.error(error);
+	}
+}
+
+function handle_ini_ok(resp){
+	console.log('CALLING handle_ini_ok.');
+	console.log(resp);
+	google.accounts.getTokens({
+		client_id: APP_CLIENT_ID,
+		callback: (response) => {
+			if (response.accessToken) {
+				console.log('handle_ini_ok. Sesión de Google INICIADA');
+			} else {
+				console.log('handle_ini_ok. Sesión de Google NO iniciada');
+			}
+		}
+	});
+}
+
+function handle_ini_bad(resp){
+	console.log('CALLING handle_ini_bad.');
+	console.log(resp);
+}
+
+export function firebase_has_current_user(){
+	init_mod_vars();
+	try {
+		if(tc_fb_app == null){ tc_fb_app = md_app.initializeApp(firebase_config); }
+		if(tc_fb_auth == null){ tc_fb_auth = md_auth.getAuth(); }
+		console.log("firebase_has_current_user. tc_fb_auth=");
+		console.log(tc_fb_auth);
+		if(tc_fb_auth.currentUser){
+			console.log("firebase_has_current_user. tc_fb_auth.currentUser=");
+			console.log(tc_fb_auth.currentUser);
+		} else {
+			console.log("firebase_has_current_user. NO TIENEN USUARIO EN SESION");
+		}
+	} catch(error){
+		console.error("ERROR in firebase_has_current_user.");
+		console.error(error);
+	}
+}
+
+
+
+
