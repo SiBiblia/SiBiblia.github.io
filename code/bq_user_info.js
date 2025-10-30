@@ -491,10 +491,10 @@ export async function toggle_user_info(fb_usr, obj_usr){
 			gvar.current_user_info = get_user_info_object(fb_usr);
 			gvar.users_private_fields[fb_usr.uid] = get_user_private_fields();
 			
-			await write_firebase_user_object();
 			await write_firebase_user_alias();
-			await write_firebase_user_private_fields();
 			await write_firebase_referrer();
+			await write_firebase_user_private_fields();
+			await write_firebase_user_object();
 			
 			dv_edit_user.remove();
 			scroll_to_first_not_answered();		
@@ -523,7 +523,7 @@ export async function toggle_user_info(fb_usr, obj_usr){
 			return;
 		});
 	
-		read_firebase_user_object();
+		await read_firebase_user_object();
 	}
 
 	await read_firebase_user_referrer(user_id);
@@ -539,13 +539,14 @@ function get_user_field(obj, id_fld, get_htm){
 		console.log("GET_user_field. No field with id = " + id_fld);
 		return;
 	}
+	obj[id_fld] = null;
 	if(get_htm){
 		obj[id_fld] = dv_fld.innerHTML;
 	} else {
 		obj[id_fld] = dv_fld.value;
 	}
 	if(DEBUG_USER_INFO){ 
-		console.log("GET_user_field. id = " + id_fld + " = " + obj[id_fld]);
+		console.log(`GET_user_field. elem(${id_fld}) = '${obj[id_fld]}'`);
 	}
 }
 
@@ -691,9 +692,13 @@ async function write_firebase_user_alias(){
 	const obj = {};
 	get_user_field(obj, fb_ids.id_alias);
 	let nw_alias = obj[fb_ids.id_alias];
+	if(nw_alias == null){
+		console.error(`nw_alias == null. FLD_ID='${fb_ids.id_alias}'`);
+		return;
+	}
 	let nw_fixed_alias = fix_alias(nw_alias);
 	if(nw_fixed_alias == null){
-		console.error("nw_fixed_alias == null");
+		console.error(`nw_fixed_alias == null. FROM_ALIAS='${nw_alias}'`);
 		return;
 	}
 	
@@ -702,13 +707,16 @@ async function write_firebase_user_alias(){
 		console.error("old_alias == nw_alias");
 		return;
 	}
-	let old_fixed_alias = fix_alias(old_alias);
 
 	let db_ref = null;
 	try{
-		const old_alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + old_fixed_alias + '/' + user_id;
-		db_ref = fb_mod.md_db.ref(fb_database, old_alias_pth);
-		await fb_mod.md_db.remove(db_ref);
+		let old_fixed_alias = fix_alias(old_alias);
+		if(old_fixed_alias != null){
+			const old_alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + old_fixed_alias + '/' + user_id;
+			db_ref = fb_mod.md_db.ref(fb_database, old_alias_pth);
+			await fb_mod.md_db.remove(db_ref);
+			if(DEBUG_USER_INFO){ console.log(`write_firebase_user_alias. removing path=${old_alias_pth}`); }
+		}
 		
 		const nw_alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + nw_fixed_alias + '/' + user_id;
 		
@@ -718,6 +726,7 @@ async function write_firebase_user_alias(){
 		
 		db_ref = fb_mod.md_db.ref(fb_database);
 		await fb_mod.md_db.update(db_ref, wr_data);
+		if(DEBUG_USER_INFO){ console.log(`write_firebase_user_alias. updating nw_alias_pth=${nw_alias_pth} and usr_alias_pth=${usr_alias_pth}`); }
 	} catch (error){
 		console.error(error);
 		const dv_als = document.getElementById(fb_ids.id_alias);
@@ -725,7 +734,7 @@ async function write_firebase_user_alias(){
 	}
 }
 
-function read_firebase_user_object(){
+async function read_firebase_user_object(){
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
@@ -735,24 +744,23 @@ function read_firebase_user_object(){
 	const usr_info_pth = usr_path + '/user_info/';
 
 	const db_ref = fb_mod.md_db.ref(fb_database, usr_info_pth);
-	fb_mod.md_db.onValue(db_ref, (snapshot) => {
-		if (snapshot.exists()) {
-			const rd_obj = snapshot.val();
-			gvar.current_user_info = JSON.parse(JSON.stringify(rd_obj));
-			if(DEBUG_USER_INFO){ 
-				console.log("read_firebase_user_object. FULL_OBJ=");
-				console.log(gvar.current_user_info);
-			}
-			fill_user_info(gvar.current_user_info);
-		} else {
-			gvar.current_user_info = get_user_info_object(fb_mod.tc_fb_user);
-			if(DEBUG_USER_INFO){ 
-				console.log("read_firebase_user_object. DEFAULT_OBJ=");
-				console.log(gvar.current_user_info);
-			}
-			console.error("No user info available");
+	const snapshot = await fb_mod.md_db.get(db_ref);
+	if(snapshot.exists()) {
+		const rd_obj = snapshot.val();
+		gvar.current_user_info = JSON.parse(JSON.stringify(rd_obj));
+		if(DEBUG_USER_INFO){ 
+			console.log("read_firebase_user_object. FULL_OBJ=");
+			console.log(gvar.current_user_info);
 		}
-	});	
+		fill_user_info(gvar.current_user_info);
+	} else {
+		gvar.current_user_info = get_user_info_object(fb_mod.tc_fb_user);
+		if(DEBUG_USER_INFO){ 
+			console.log("read_firebase_user_object. DEFAULT_OBJ=");
+			console.log(gvar.current_user_info);
+		}
+		console.error("No user info available");
+	}
 }
 
 async function is_valid_user(u_fld_id){ // returns null if INvalid otherwise returns obj with id and alias of the valid user
@@ -1285,32 +1293,31 @@ async function write_firebase_referrer(){
 		return;
 	}
 	const dv_ref = document.getElementById(fb_ids.id_referrer);
-	const the_alias = dv_ref.value;
+	const the_referrer = dv_ref.value;
 	const nw_rf_msg = ulang.msg_no_referrer + ulang.msg_type_referrer;
-	if((the_alias == nw_rf_msg) || (the_alias == ulang.msg_no_referrer)){
-		console.error(`the_alias == ${the_alias}`);
+	if((the_referrer == nw_rf_msg) || (the_referrer == ulang.msg_no_referrer)){
+		console.error(`the_referrer == ${the_referrer}`);
 		return;
 	}
 
-	const alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + the_alias;
+	const alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + the_referrer;
 		
 	try{
+		let uref = null;
 		let db_ref = fb_mod.md_db.ref(fb_database, alias_pth);
-		fb_mod.md_db.onValue(db_ref, async (snapshot) => {
-			let uref = nw_rf_msg;
-			if (snapshot.exists()) {
-				const obj = snapshot.val();
-				uref = Object.keys(obj)[0];
-				if(DEBUG_USER_INFO){ console.log("write_firebase_referrer. CAND="); console.log(uref); }
-				set_loc_cand_referrer(uref);
-				await fb_mod.firebase_set_user_referrer();
-			} else {
-				uref = the_alias;
-				if(DEBUG_USER_INFO){ console.log("write_firebase_referrer. THE_ALIAS="); console.log(uref); }
-				set_loc_cand_referrer(uref);
-				await fb_mod.firebase_set_user_referrer();
-			}
-		});		
+		const snapshot = await fb_mod.md_db.get(db_ref);
+		if (snapshot.exists()) {
+			const obj = snapshot.val();
+			uref = Object.keys(obj)[0];
+			if(DEBUG_USER_INFO){ console.log(`write_firebase_referrer. FROM_ALIAS=${the_referrer} ID=${uref}`); }
+			set_loc_cand_referrer(uref);
+			await fb_mod.firebase_set_user_referrer();
+		} else {
+			uref = the_referrer;
+			if(DEBUG_USER_INFO){ console.log(`write_firebase_referrer. FROM_ID=${uref}`); }
+			set_loc_cand_referrer(uref);
+			await fb_mod.firebase_set_user_referrer();
+		}
 	} catch(err){
 		dv_ref.value = nw_rf_msg;
 		console.error(err);
