@@ -755,57 +755,6 @@ function read_firebase_user_object(){
 	});	
 }
 
-/*
-async function check_alias(){
-	if(gvar.current_user_info == null){
-		console.error(gvar.current_user_info == null);
-		return;
-	}
-	const uinfo = gvar.current_user_info;
-
-	let old_alias = uinfo[fb_ids.id_alias];
-	let old_fixed_alias = fix_alias(old_alias);
-	
-	if(fb_mod == null){ console.error("fb_mod == null."); return; }
-	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
-	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
-	
-	const user_id = fb_mod.tc_fb_user.uid;
-	if(user_id == null){ console.error("user_id == null.");  return; }
-	
-	const obj = {};
-	get_user_field(obj, fb_ids.id_alias);
-	let nw_alias = obj[fb_ids.id_alias];
-	let nw_fixed_alias = fix_alias(nw_alias);
-	if(nw_fixed_alias == null){
-		console.error("nw_fixed_alias == null");
-		return;
-	}
-	if(old_alias == nw_alias){
-		console.error("old_alias == nw_alias");
-		return;
-	}
-	
-	const nw_alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + nw_fixed_alias;
-	
-	let db_ref = null;
-	db_ref = fb_mod.md_db.ref(fb_database, nw_alias_pth);
-	const snapshot = await fb_mod.md_db.get(db_ref);
-
-	let ck_alias = null;
-	if (snapshot.exists()) {
-		ck_alias = snapshot.val();
-		console.error(`alias ${ck_alias} ALREADY in use`);
-		const kk = Object.keys(ck_alias)[0];
-		const same = (kk == user_id);
-		if(same){
-			ck_alias = null;
-		}
-	}
-	return ck_alias;
-}
-*/
-
 async function is_valid_user(u_fld_id){ // returns null if INvalid otherwise returns obj with id and alias of the valid user
 	const obj = {};
 	get_user_field(obj, u_fld_id);
@@ -1337,13 +1286,16 @@ async function write_firebase_referrer(){
 	}
 	const dv_ref = document.getElementById(fb_ids.id_referrer);
 	const the_alias = dv_ref.value;
+	const nw_rf_msg = ulang.msg_no_referrer + ulang.msg_type_referrer;
+	if((the_alias == nw_rf_msg) || (the_alias == ulang.msg_no_referrer)){
+		console.error(`the_alias == ${the_alias}`);
+		return;
+	}
 
 	const alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + the_alias;
-	let db_ref = fb_mod.md_db.ref(fb_database, alias_pth);
-	
-	const nw_rf_msg = ulang.msg_no_referrer + ulang.msg_type_referrer;
-	
+		
 	try{
+		let db_ref = fb_mod.md_db.ref(fb_database, alias_pth);
 		fb_mod.md_db.onValue(db_ref, async (snapshot) => {
 			let uref = nw_rf_msg;
 			if (snapshot.exists()) {
@@ -1357,26 +1309,7 @@ async function write_firebase_referrer(){
 				if(DEBUG_USER_INFO){ console.log("write_firebase_referrer. THE_ALIAS="); console.log(uref); }
 				set_loc_cand_referrer(uref);
 				await fb_mod.firebase_set_user_referrer();
-			}			
-			
-			/*
-			const confir = get_loc_confirmed_referrer();
-			if(confir != null){
-				const dv_ck_rf = document.getElementById("id_ck_referrer");
-				dv_ck_rf.remove();
-
-				const nw_but = add_user_div_field(fb_ids.id_referrer, ulang.msg_show_referrer);
-				nw_but.classList.add("is_button");
-				nw_but.id_referrer = uref;
-				nw_but.addEventListener('click', async function() {
-					await show_referrer(uref);
-				});
-				const pnt = dv_ref.parentNode;
-				pnt.replaceChild(nw_but, dv_ref);
-			} else {
-				dv_ref.value = nw_rf_msg;
-			}*/
-			
+			}
 		});		
 	} catch(err){
 		dv_ref.value = nw_rf_msg;

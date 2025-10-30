@@ -568,6 +568,55 @@ export function firebase_has_current_user(){
 	}
 }
 
+async function check_alias(){
+	if(gvar.current_user_info == null){
+		console.error(gvar.current_user_info == null);
+		return;
+	}
+	const uinfo = gvar.current_user_info;
+
+	let old_alias = uinfo[fb_ids.id_alias];
+	let old_fixed_alias = fix_alias(old_alias);
+	
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	const user_id = fb_mod.tc_fb_user.uid;
+	if(user_id == null){ console.error("user_id == null.");  return; }
+	
+	const obj = {};
+	get_user_field(obj, fb_ids.id_alias);
+	let nw_alias = obj[fb_ids.id_alias];
+	let nw_fixed_alias = fix_alias(nw_alias);
+	if(nw_fixed_alias == null){
+		console.error("nw_fixed_alias == null");
+		return;
+	}
+	if(old_alias == nw_alias){
+		console.error("old_alias == nw_alias");
+		return;
+	}
+	
+	const nw_alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + nw_fixed_alias;
+	
+	let db_ref = null;
+	db_ref = fb_mod.md_db.ref(fb_database, nw_alias_pth);
+	const snapshot = await fb_mod.md_db.get(db_ref);
+
+	let ck_alias = null;
+	if (snapshot.exists()) {
+		ck_alias = snapshot.val();
+		console.error(`alias ${ck_alias} ALREADY in use`);
+		const kk = Object.keys(ck_alias)[0];
+		const same = (kk == user_id);
+		if(same){
+			ck_alias = null;
+		}
+	}
+	return ck_alias;
+}
+
 
 
 
