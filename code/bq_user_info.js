@@ -674,11 +674,6 @@ async function write_firebase_user_object(){
 }
 
 async function write_firebase_user_alias(){
-	if(gvar.current_user_info == null){
-		console.error(gvar.current_user_info == null);
-		return;
-	}
-	const uinfo = gvar.current_user_info;
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
@@ -702,27 +697,25 @@ async function write_firebase_user_alias(){
 		return;
 	}
 	
-	let old_alias = uinfo[fb_ids.id_alias];
+	let old_alias = gvar.current_user_alias;
 	if(old_alias == nw_alias){
 		console.error("old_alias == nw_alias");
 		return;
 	}
+	let old_fixed_alias = fix_alias(old_alias);
 
 	let db_ref = null;
-	try{
-		let old_fixed_alias = fix_alias(old_alias);
+	try{		
+		const nw_alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + nw_fixed_alias + '/' + user_id;		
+		const wr_data = {};
+		wr_data[usr_alias_pth] = nw_alias;
+		wr_data[nw_alias_pth] = 1;
+		
 		if(old_fixed_alias != null){
 			const old_alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + old_fixed_alias + '/' + user_id;
-			db_ref = fb_mod.md_db.ref(fb_database, old_alias_pth);
-			await fb_mod.md_db.remove(db_ref);
+			wr_data[old_alias_pth] = null;
 			if(DEBUG_USER_INFO){ console.log(`write_firebase_user_alias. removing path=${old_alias_pth}`); }
 		}
-		
-		const nw_alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + nw_fixed_alias + '/' + user_id;
-		
-		const wr_data = {};
-		wr_data[nw_alias_pth] = 1;
-		wr_data[usr_alias_pth] = nw_alias;
 		
 		db_ref = fb_mod.md_db.ref(fb_database);
 		await fb_mod.md_db.update(db_ref, wr_data);
@@ -748,6 +741,9 @@ async function read_firebase_user_object(){
 	if(snapshot.exists()) {
 		const rd_obj = snapshot.val();
 		gvar.current_user_info = JSON.parse(JSON.stringify(rd_obj));
+		if(gvar.current_user_info[fb_ids.id_alias] != null){
+			gvar.current_user_alias = gvar.current_user_info[fb_ids.id_alias];
+		}
 		if(DEBUG_USER_INFO){ 
 			console.log("read_firebase_user_object. FULL_OBJ=");
 			console.log(gvar.current_user_info);
@@ -830,11 +826,12 @@ function add_alias_reset(){
 	const dv_ck = document.getElementById("id_reset_alias");
 	const dv_als = document.getElementById(fb_ids.id_alias);
 	dv_ck.addEventListener('click', async function() {
-		if(gvar.current_user_info == null){
-			console.error(gvar.current_user_info == null);
-			return;
+		const obj = {};
+		if(gvar.current_user_alias != null){
+			obj[fb_ids.id_alias] = gvar.current_user_alias;
+		} else {
+			obj[fb_ids.id_alias] = ulang.msg_usr_type_alias;
 		}
-		const obj = gvar.current_user_info;
 		set_user_field(obj, fb_ids.id_alias);
 		
 		dv_als.classList.remove("background_red");

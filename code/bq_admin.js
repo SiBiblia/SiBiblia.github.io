@@ -89,8 +89,8 @@ const test_ops = {
 	//set_adhoc_field:"set_adhoc_field",
 	
 	//set_user_in_stats:"set_user_in_stats",
-	//write_alias:"write_alias",
-	//delete_alias:"delete_alias",
+	write_alias:"write_alias",
+	delete_alias:"delete_alias",
 	
 	write_referrer:"write_referrer",
 	delete_referrer:"delete_referrer",
@@ -1133,11 +1133,13 @@ function write_alias_test(the_alias, val1){
 
 	const alias_pth = fb_mod.firebase_bib_quest_path + 'all_alias/' + the_alias + '/' + user_id;
 	const db_ref = fb_mod.md_db.ref(fb_database, alias_pth);
+	fb_mod.md_db.set(db_ref, val1).catch((error) => { console.error(error); });
+	/*
 	if(val1 != null){
 		fb_mod.md_db.set(db_ref, 1).catch((error) => { console.error(error); });
 	} else {
 		fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });
-	}
+	}*/
 }
 
 function write_referrer_test(uref_id, val1){
