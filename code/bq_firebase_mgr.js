@@ -31,6 +31,7 @@ const DEBUG_FB_CHECK1 = false;
 const DEBUG_FB_CHECK2 = false;
 const DEBUG_FB_ADMIN = true;
 const DEBUG_FB_finished_qmodu = false;
+const DEBUG_FB_REFERRER = true;
 
 export let md_app = null;
 export let md_auth = null;
@@ -199,6 +200,7 @@ export async function firebase_set_user_referrer(force_it){
 	
 	try{
 		const db_ref = md_db.ref(fb_database, ref_pth);
+		if(DEBUG_FB_REFERRER){ console.log(`firebase_set_user_referrer. PTH=${ref_pth} REF_UID=${cand}`); }
 		await md_db.set(db_ref, wr_data);
 		set_loc_confirmed_referrer(cand);
 	} catch (err){

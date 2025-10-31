@@ -295,11 +295,11 @@ a.exam_ref:hover {
 }
 
 .has_margin_top {
-	margin-top: 1em;
+	margin-top: 2vh;
 }
 
 .has_margin_bot {
-	margin-bottom: 1em;
+	margin-bottom: 2vh;
 }
 
 .space_top {
@@ -324,6 +324,38 @@ a.exam_ref:hover {
 	text-align: center;
 }
 
+.is_button:hover,.is_button:hover>* {
+	background-color: #ddd;
+	color: black;
+}
+
+.is_button.active {
+	background-color: #04AA6D;
+	color: white;
+}
+
+.has_big_margin_top {
+	margin-top: 5vh;
+	padding-top: 5vh;
+}
+
+.has_big_margin_bot {
+	margin-bottom: 5vh;
+	padding-bottom: 5vh;
+}
+
+.has_big_margin_left {
+	margin-left: 5vh;
+}
+
+.has_big_margin_right {
+	margin-right: 5vh;
+}
+
+.has_big_margins {
+	margin: 5vh 5vh 5vh 5vh;
+}
+
 .is_big_button {
 	border: 0.2vw solid white;
 	height: 15vh;
@@ -334,15 +366,16 @@ a.exam_ref:hover {
 	align-content: center;
 }
 
-.is_button:hover,.is_button:hover>* {
+.is_big_button:hover,.is_big_button:hover>* {
 	background-color: #ddd;
 	color: black;
 }
 
-.is_button.active {
+.is_big_button.active {
 	background-color: #04AA6D;
 	color: white;
 }
+
 
 .stm {
 	display: flex;

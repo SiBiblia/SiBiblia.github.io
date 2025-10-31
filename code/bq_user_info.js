@@ -26,6 +26,7 @@ const SUF_LBL_FLD = "SUF_LBL_FLD";
 const firebase_user_info_path = "/user_info";
 const id_user_sele = "id_user_sele";
 const id_all_verses = "id_all_verses";
+const id_all_referred = "id_all_referred";
 
 export const fb_general_private_ids = {
 	id_comm_info: "id_ed_user_comm_info",
@@ -264,15 +265,19 @@ export async function toggle_user_info(fb_usr, obj_usr){
 		return;
 	}
 	dv_edit_user.classList.add("exam");
+	dv_edit_user.classList.add("has_big_margin_top");
+	dv_edit_user.classList.add("has_big_margin_bot");
 	if(obj_usr != null){ dv_edit_user.classList.add("brown_background"); }
 
+	/*
 	fld = document.createElement("div");
 	fld.id = fb_ids.id_comm_info;
 	fld.classList.add("exam");
 	dv_edit_user.appendChild(fld);
+	*/
 	
 	if(fb_usr != null){
-		const dv_logout = dv_edit_user.appendChild(document.createElement("div"));
+		const dv_logout = document.createElement("div");
 		dv_logout.classList.add("exam");
 		dv_logout.classList.add("grid_item_auto_span_4");
 		dv_logout.classList.add("is_big_button");
@@ -283,6 +288,7 @@ export async function toggle_user_info(fb_usr, obj_usr){
 			scroll_to_first_not_answered();
 			return;
 		});
+		dv_edit_user.appendChild(dv_logout);
 	}
 	
 	if(obj_usr != null){
@@ -480,7 +486,7 @@ export async function toggle_user_info(fb_usr, obj_usr){
 	
 	if(fb_usr != null){
 
-		const dv_save = dv_edit_user.appendChild(document.createElement("div"));
+		const dv_save = document.createElement("div");
 		dv_save.classList.add("exam");
 		dv_save.classList.add("grid_item_auto_span_4");
 		dv_save.classList.add("is_big_button");
@@ -500,8 +506,9 @@ export async function toggle_user_info(fb_usr, obj_usr){
 			scroll_to_first_not_answered();		
 			return;
 		});
+		dv_edit_user.appendChild(dv_save);
 		
-		const dv_cards = dv_edit_user.appendChild(document.createElement("div"));
+		const dv_cards = document.createElement("div");
 		dv_cards.classList.add("exam");
 		dv_cards.classList.add("grid_item_auto_span_4");
 		dv_cards.classList.add("is_big_button");
@@ -510,18 +517,30 @@ export async function toggle_user_info(fb_usr, obj_usr){
 			gen_pdf_cards();
 			return;
 		});
+		dv_edit_user.appendChild(dv_cards);
 		
-		const dv_cho_ver = dv_edit_user.appendChild(document.createElement("div"));
+		const dv_cho_ver = document.createElement("div");
 		dv_cho_ver.classList.add("exam");
 		dv_cho_ver.classList.add("grid_item_auto_span_4");
 		dv_cho_ver.classList.add("is_button");
-		dv_cho_ver.classList.add("has_margin_bot");
-		dv_cho_ver.classList.add("has_margin_top");
+		dv_cho_ver.classList.add("has_big_margins");
 		dv_cho_ver.innerHTML = ulang.msg_choose_verses;
 		dv_cho_ver.addEventListener('click', function() {
 			choose_verses(dv_cho_ver);
 			return;
 		});
+		dv_edit_user.appendChild(dv_cho_ver);
+	
+		const dv_show_refs = document.createElement("div");
+		dv_show_refs.classList.add("exam");
+		dv_show_refs.classList.add("grid_item_auto_span_4");
+		dv_show_refs.classList.add("is_button");
+		dv_show_refs.classList.add("has_big_margins");
+		dv_show_refs.innerHTML = ulang.msg_show_list_referred;
+		dv_show_refs.addEventListener('click', async function() {
+			await show_all_referred(dv_show_refs);
+		});
+		dv_edit_user.appendChild(dv_show_refs);
 	
 		await read_firebase_user_object();
 	}
@@ -1166,6 +1185,56 @@ function choose_verses(dv_cho_ver){
 	
 }
 
+async function show_all_referred(dv_show_refs){
+	const ulang = gvar.glb_curr_lang;
+
+	let dv_all_ref = null;
+	dv_all_ref = get_new_dv_under(dv_show_refs, id_all_referred);
+	if(dv_all_ref == null){
+		if(DEBUG_USER_INFO){ console.log("toggle_all_referred OFF"); }
+		return;
+	}
+	dv_all_ref.classList.add("exam", "has_margin_bot", "has_margin_top");
+
+	const user_id = fb_mod.tc_fb_user.uid;
+	
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	try{ 
+		const ref_path = fb_mod.firebase_bib_quest_path + "score_data/all_referred";
+		const db_ref = fb_mod.md_db.ref(fb_database, ref_path);
+
+		let cond1 = fb_mod.md_db.orderByChild('referrer');
+		let cond2 = fb_mod.md_db.equalTo(user_id);
+		let db_qry = fb_mod.md_db.query(db_ref, cond1, cond2);
+		let snapshot = await fb_mod.md_db.get(db_qry);
+
+		if(snapshot.exists()){
+			const all_usr = snapshot.val();
+			if(DEBUG_USER_INFO){
+				console.log("show_all_referred, ALL_REFERRED=");
+				console.log(all_usr); 
+			}
+			
+			const all_rf_ids = Object.keys(all_usr);
+			let ii = 0;
+			for(ii = 0; ii < all_rf_ids.length; ii++){
+				const ref_id = all_rf_ids[ii];
+				const rf_butt = get_ref_button(ref_id);
+				dv_all_ref.appendChild(rf_butt);				
+			}
+		} else {
+			dv_all_ref.innerHTML = ulang.msg_no_referred_yet;
+			console.error(`show_all_referred. ref_path=${ref_path} query not exists`);
+		}
+	} catch(err){
+		console.error(err);
+	}
+	
+}
+
 function write_verses_loc_storage(){
 	if(gvar.card_verses == null){ gvar.card_verses = default_card_verses; }
 	const vss = gvar.card_verses;
@@ -1218,11 +1287,10 @@ async function read_firebase_user_referrer(user_id){
 		const dv_ref = document.getElementById(fb_ids.id_referrer);
 		const snapshot = await fb_mod.md_db.get(db_ref);
 		if (snapshot.exists()) {
-			const rd_obj = snapshot.val();
-			const obj_ref = JSON.parse(JSON.stringify(rd_obj));
+			const obj_ref = snapshot.val();
 			const uref = obj_ref.referrer;
 			
-			const nw_but = add_user_div_field(fb_ids.id_referrer, ulang.msg_show_referrer);
+			const nw_but = add_user_div_field(fb_ids.id_referrer, uref); //ulang.msg_show_referrer
 			nw_but.classList.add("is_button");
 			nw_but.id_referrer = uref;
 			nw_but.addEventListener('click', async function() {
@@ -1301,7 +1369,7 @@ async function write_firebase_referrer(){
 		if (snapshot.exists()) {
 			const obj = snapshot.val();
 			uref = Object.keys(obj)[0];
-			if(DEBUG_USER_INFO){ console.log(`write_firebase_referrer. FROM_ALIAS=${the_referrer} ID=${uref}`); }
+			if(DEBUG_USER_INFO){ console.log(`write_firebase_referrer. USER_ID=${user_id} FROM_ALIAS=${the_referrer} REF_UID=${uref}`); }
 			set_loc_cand_referrer(uref);
 			await fb_mod.firebase_set_user_referrer();
 		} else {
@@ -1413,6 +1481,18 @@ async function read_firebase_user_fields(obj){
 	return obj;
 }
 
+function get_ref_button(ref_id){
+	const nw_but = document.createElement("div");
+	nw_but.classList.add("is_button");
+	nw_but.classList.add("has_big_margin_left");
+	nw_but.classList.add("has_big_margin_right");
+	nw_but.innerHTML = ref_id;
+	nw_but.addEventListener('click', async function() {
+		await show_referrer(ref_id);
+	});
+	return nw_but;
+}
+
 /* 
 {
 "id_ed_user_nequi_number":1,
@@ -1436,6 +1516,8 @@ async function read_firebase_user_fields(obj){
 }
 
 ali3_usu3
+
+msg_show_list_referred
 ​
 */
 

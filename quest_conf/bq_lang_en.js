@@ -512,10 +512,14 @@ function init_en_basic_msg(){
 	obj.msg_usr_instagram = "Instagram";
 	obj.msg_usr_youtube = "Youtube";
 
-	obj.msg_usr_referrer = "My REFERRER";
+	obj.msg_usr_referrer = "REFERRER";
 	obj.msg_no_referrer = "Without referrer. ";
 	obj.msg_type_referrer = "Type a valid user id or a valid user alias.";
 	obj.msg_show_referrer = "Show data of referrer";
+	
+	obj.msg_usr_all_referred = "ALL REFERRED";
+	obj.msg_show_list_referred = "Show referred list";
+	obj.msg_no_referred_yet = "No referred yet.";
 	
 	obj.msg_gen_cards = `GEN PDF CARDS`;
 	obj.msg_choose_verses = `Choose verses`;
