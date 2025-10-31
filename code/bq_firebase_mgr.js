@@ -186,11 +186,20 @@ export async function firebase_set_user_referrer(force_it){
 	
 	const curr_ci = tc_fb_current_cicle;
 	let user_id = tc_fb_user.uid;
+	
+	const ref_pth = firebase_bib_quest_path + 'score_data/all_referred/' + user_id;
 
-	const ref_pth = firebase_bib_quest_path + 'score_data/all_referred_by/' + user_id + '/referred_by/' + cand + '/cicle_added/';
-	const db_ref = md_db.ref(fb_database, ref_pth);
+	let wr_data = {};
+	if(cand != null){
+		wr_data['referrer'] = cand;
+		wr_data['cicle_added'] = curr_ci;
+	} else {
+		wr_data = null;
+	}
+	
 	try{
-		await md_db.set(db_ref, curr_ci);
+		const db_ref = md_db.ref(fb_database, ref_pth);
+		await md_db.set(db_ref, wr_data);
 		set_loc_confirmed_referrer(cand);
 	} catch (err){
 		const is_conf = get_loc_confirmed_referrer();
@@ -198,7 +207,7 @@ export async function firebase_set_user_referrer(force_it){
 			set_loc_cand_referrer(null);
 		}
 		console.error(err);
-	}		
+	}
 }
 
 async function firebase_get_user_finished_qmodules(){

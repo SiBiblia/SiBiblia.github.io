@@ -42,7 +42,6 @@ const test_ids = {
 
 const admin_ops = {
 	//up_all:"Update ALL to Update",
-	up_referrers:"Update ALL referrers",
 	up_stats:"Update ALL stats and results",
 	up_qmodu_ustats:"Update pending stats and results for current module",
 	show_user_list:"Show user list",
@@ -89,19 +88,18 @@ const test_ops = {
 	//set_adhoc_field:"set_adhoc_field",
 	
 	//set_user_in_stats:"set_user_in_stats",
-	write_alias:"write_alias",
-	delete_alias:"delete_alias",
+	//write_alias:"write_alias",
+	//delete_alias:"delete_alias",
 	
 	write_referrer:"write_referrer",
 	delete_referrer:"delete_referrer",
+
+	read_all_referrer:"read_all_referrer",
 };
 
 const id_admin_ops = "id_admin_ops";
 
 async function do_selec(val_sel_w){
-	if(val_sel_w == admin_ops.up_referrers){
-		update_ALL_referrers();
-	}
 	if(val_sel_w == admin_ops.up_mods){
 		update_ALL_qmodule_observations();
 	}
@@ -613,103 +611,6 @@ function test_get_verse(){
 	});
 }
 
-async function update_ALL_referrers(){	
-	console.log("Called update_ALL_referrers.");
-	
-	if(fb_mod == null){ console.error("fb_mod == null."); return; }
-	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
-	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
-	
-	//const ref_path = "users/list";
-	const ref_path = fb_mod.firebase_bib_quest_path + "to_update/referred_by";
-	const db_ref = fb_mod.md_db.ref(fb_database, ref_path);
-
-	const snapshot = await fb_mod.md_db.get(db_ref).catch((error) => { console.error("update_ALL_referrers. get failed." + error); });
-	if(! snapshot.exists()) {
-		console.log("update_ALL_referrers. Nothing to update.");
-		return;
-	}
-	
-	const all_usr = snapshot.val();
-	const all_uid = Object.keys(all_usr);
-	for(const the_uid of all_uid){
-		update_user_referrer(fb_database, the_uid);
-	}
-	
-}
-
-async function update_user_referrer(fb_database, the_uid){
-	const db = fb_database;
-	
-	if(fb_mod.tc_fb_current_cicle == null){
-		console.error("fb_mod.tc_fb_current_cicle == null");
-		return;
-	}
-	
-	const curr_ci = fb_mod.tc_fb_current_cicle;
-	const upd_path = fb_mod.firebase_bib_quest_path + "to_update/referred_by/" + the_uid;	
-	const usr_path = fb_mod.firebase_get_user_path(the_uid);
-	const usr_rfr_pth = usr_path + "/referred_by";
-	const score_all_rfred = fb_mod.firebase_bib_quest_path + 'score_data/all_referred_by/';
-	const score_all_rfrrer = fb_mod.firebase_bib_quest_path + 'score_data/all_referrer_of/';
-	const old_rfr_pth = score_all_rfred + the_uid;
-
-	if(DEBUG_UPDATE_REFERRERS){
-		//console.log("upd_path=" + upd_path);
-		console.log("usr_path=" + usr_path);
-		console.log("usr_rfr_pth=" + usr_rfr_pth);
-		console.log("old_rfr_pth=" + old_rfr_pth);
-	}
-
-	let nw_cand = null;
-	let adm_rf_by = null; 
-	let adm_nw_rf_of = null; 
-	let adm_old_rf_of = null; 
-	let db_ref = null;
-	
-	db_ref = fb_mod.md_db.ref(db, usr_rfr_pth);
-	const snapshot = await fb_mod.md_db.get(db_ref);
-	if(snapshot.exists()) {
-		nw_cand = snapshot.val();
-		if((nw_cand != null) && (nw_cand.cand != null)){
-			adm_rf_by = score_all_rfred + the_uid + '/referred_by/' + nw_cand.cand + '/cicle_added';
-			adm_nw_rf_of = score_all_rfrrer + nw_cand.cand + '/referrer_of/' + the_uid + '/cicle_added';
-		} else {
-			console.error(nw_cand);
-		}
-	} else {
-		console.error("INEXISTANT PATH=" + usr_rfr_pth);
-	}
-	
-	/*
-	db_ref = fb_mod.md_db.ref(db, old_rfr_pth);
-	const snapshot2 = await fb_mod.md_db.get(db_ref);
-	if(snapshot2.exists()) {
-		const old_rfr = snapshot2.val();
-		if((old_rfr != null) && (old_rfr.referred_by != null)){
-			adm_old_rf_of = fb_mod.firebase_bib_quest_path + 'score_data/all_referrer_of/' + old_rfr.referred_by + '/referrer_of/' + the_uid;
-		} else {
-			console.error(old_rfr);
-		}
-	} else {
-		console.error("INEXISTANT PATH=" + old_rfr_pth);
-	}*/
-	
-	const wr_data = {};
-	wr_data[upd_path] = {};
-	if((adm_rf_by != null) && (adm_nw_rf_of != null)){
-		//wr_data[usr_rfr_pth] = {};
-		wr_data[adm_rf_by] = curr_ci;
-		wr_data[adm_nw_rf_of] = curr_ci;
-		/*if(adm_old_rf_of != null){
-			wr_data[adm_old_rf_of] = {};
-		}*/
-	}
-	
-	const db_base_ref = fb_mod.md_db.ref(db);	
-	fb_mod.md_db.update(db_base_ref, wr_data).catch((error) => { console.error(error); });	
-}
-
 function get_server_timestamp(){
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
@@ -853,14 +754,14 @@ async function remove_big_test_data(){
 export function toggle_test_opers(){
 	const dv_upper = document.getElementById("id_admin_ops_sec");
 	const all_vals = Object.values(test_ops);
-	toggle_select_option(dv_upper, id_pop_menu_sele, all_vals, function(dv_ret_w, dv_ops_w, val_sel_w, idx_sel_w){
-		do_test_oper(val_sel_w, null);
+	toggle_select_option(dv_upper, id_pop_menu_sele, all_vals, async function(dv_ret_w, dv_ops_w, val_sel_w, idx_sel_w){
+		await do_test_oper(val_sel_w, null);
 	});
 	
 	scroll_to_top(dv_upper);
 }
 
-function do_test_oper(oper, user_nam){
+async function do_test_oper(oper, user_nam){
 	if(oper == test_ops.set_write_once_field){
 		set_field(user_nam, "write_once", "VAL_INI");
 	}
@@ -915,11 +816,15 @@ function do_test_oper(oper, user_nam){
 		write_alias_test("alias1", null);
 	}
 	if(oper == test_ops.write_referrer){
-		write_referrer_test(test_ids.user9, 1);
+		write_referrer_test(test_ids.user1);
 	}
 	if(oper == test_ops.delete_referrer){
-		write_referrer_test(test_ids.user9, null);
+		write_referrer_test(null);
 	}
+	if(oper == test_ops.read_all_referrer){
+		await read_all_referrer(test_ids.user9);
+	}
+	
 
 
 	close_pop_menu();
@@ -1142,7 +1047,7 @@ function write_alias_test(the_alias, val1){
 	}*/
 }
 
-function write_referrer_test(uref_id, val1){
+function write_referrer_test(uref_id){
 	if(fb_mod == null){ console.error("fb_mod == null."); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
@@ -1150,14 +1055,18 @@ function write_referrer_test(uref_id, val1){
 	const curr_ci = fb_mod.tc_fb_current_cicle;
 	let user_id = fb_mod.tc_fb_user.uid;
 
-	const ref_pth = fb_mod.firebase_bib_quest_path + 'score_data/all_referred_by/' + user_id + '/referred_by/' + uref_id + 
-		'/cicle_added/';
-	const db_ref = fb_mod.md_db.ref(fb_database, ref_pth);
-	if(val1 != null){
-		fb_mod.md_db.set(db_ref, curr_ci).catch((error) => { console.error(error); });
+	const ref_pth = fb_mod.firebase_bib_quest_path + 'score_data/all_referred/' + user_id;
+
+	let wr_data = {};
+	if(uref_id != null){
+		wr_data['referrer'] = uref_id;
+		wr_data['cicle_added'] = curr_ci;
 	} else {
-		fb_mod.md_db.remove(db_ref).catch((error) => { console.error(error); });
+		wr_data = null;
 	}
+	
+	const db_ref = fb_mod.md_db.ref(fb_database, ref_pth);
+	fb_mod.md_db.set(db_ref, wr_data).catch((error) => { console.error(error); });
 }
 
 function get_fb_obj_ids(obj_ids){
@@ -1197,6 +1106,32 @@ function update_general_private_fields(){
 	fb_mod.md_db.set(db_ref, ids).catch((error) => { 
 		console.error(error); 
 	});	
+}
+
+async function read_all_referrer(user_id){
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	try{ 
+		const ref_path = fb_mod.firebase_bib_quest_path + "score_data/all_referred";
+		const db_ref = fb_mod.md_db.ref(fb_database, ref_path);
+
+		let cond1 = fb_mod.md_db.orderByChild('referrer');
+		let cond2 = fb_mod.md_db.equalTo(user_id);
+		let db_qry = fb_mod.md_db.query(db_ref, cond1, cond2);
+		let snapshot = await fb_mod.md_db.get(db_qry);
+
+		if(snapshot.exists()){
+			const all_usr = snapshot.val();
+			console.log("read_all_referrer, ALL_FOUND=");
+			console.log(all_usr);
+		} else {
+			console.error(`ref_path=${ref_path} query not exists`);
+		}
+	} catch(err){
+		console.error(err);
+	}
 }
 
 

@@ -1208,18 +1208,19 @@ async function read_firebase_user_referrer(user_id){
 	
 	const ulang = gvar.glb_curr_lang;
 
-	const ref_pth = fb_mod.firebase_bib_quest_path + 'score_data/all_referred_by/' + user_id + '/referred_by/';
-	const db_ref = fb_mod.md_db.ref(fb_database, ref_pth);
-	
+	const ref_pth = fb_mod.firebase_bib_quest_path + 'score_data/all_referred/' + user_id;
+	if(DEBUG_USER_INFO){ console.log(`read_firebase_user_referrer. ref_pth=${ref_pth}`); }
+		
 	const nw_rf_msg = ulang.msg_no_referrer + ulang.msg_type_referrer;
 	
 	try{ 	
+		const db_ref = fb_mod.md_db.ref(fb_database, ref_pth);
 		const dv_ref = document.getElementById(fb_ids.id_referrer);
 		const snapshot = await fb_mod.md_db.get(db_ref);
 		if (snapshot.exists()) {
 			const rd_obj = snapshot.val();
 			const obj_ref = JSON.parse(JSON.stringify(rd_obj));
-			const uref = Object.keys(obj_ref)[0];
+			const uref = obj_ref.referrer;
 			
 			const nw_but = add_user_div_field(fb_ids.id_referrer, ulang.msg_show_referrer);
 			nw_but.classList.add("is_button");
@@ -1251,12 +1252,6 @@ async function read_firebase_user_referrer(user_id){
 				console.error("dv_lbl == null");
 			}
 			if(! skip_checker){ add_alias_checker("id_ck_referrer", fb_ids.id_referrer, false); }
-			
-			/*
-			const dv_ck_rf = document.getElementById("id_ck_referrer");
-			dv_ck_rf.addEventListener('click', async function() {
-				await write_firebase_referrer();
-			});*/
 			
 			dv_ref.addEventListener('click', async function() {
 				if(dv_ref.value == nw_rf_msg){
