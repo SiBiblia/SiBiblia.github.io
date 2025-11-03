@@ -84,6 +84,13 @@ export const bib_defaults = {
 	BIB_VER: "BIB",
 };
 
+export function arr_union(aa, bb){
+	return [...new Set([...aa, ...bb])];
+}
+
+export function arr_diff(aa, bb){
+	return aa.filter(ee => ! bb.includes(ee));
+}
 
 export const num2abbr = {
 	"-1":INVALID_BOOK_ABBR,

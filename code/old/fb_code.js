@@ -702,5 +702,37 @@ async function update_user_referrer(fb_database, the_uid){
 	fb_mod.md_db.update(db_base_ref, wr_data).catch((error) => { console.error(error); });	
 }
 
+/// --------------------------------------------------------------------------
+/// --------------------------------------------------------------------------
+/// --------------------------------------------------------------------------
+
+ 
+{
+"id_ed_user_nequi_number":1,
+"id_ed_user_paypal_email":1,
+"id_ed_user_transfiya_number":1,
+"id_ed_user_url_photo":1,
+"id_ed_user_country":1,
+"id_ed_user_citizen_id":1,
+"id_ed_user_birth_year":1,
+"id_ed_user_birth_month":1,
+"id_ed_user_birth_day":1,
+"id_ed_user_sex":1,
+"id_ed_user_marital_status":1,
+"id_ed_user_name":1,
+"id_ed_user_divorce_number":1,
+"id_ed_user_children_number":1,
+"id_ed_user_website":1,
+"id_ed_user_facebook":1,
+"id_ed_user_instagram":1,
+"id_ed_user_youtube":1
+}
+
+ali3_usu3
+
+msg_show_list_referred
+​
+
+
 
 

@@ -517,6 +517,11 @@ function init_es_basic_msg(){
 	obj.msg_type_referrer = "Escriba un id de usuario valido o un alias de usuario.";
 	obj.msg_show_referrer = "Mostrar datos de quien refiere";
 
+	obj.msg_usr_nominee = "NOMINADO";
+	obj.msg_no_nominee = "Sin nominado. ";
+	obj.msg_type_nominee = "Escriba un id de usuario valido o un alias de usuario.";
+	obj.msg_show_nominee = "Mostrar datos del nominado ";
+
 	obj.msg_usr_all_referred = "REFERIDOS";
 	obj.msg_show_list_referred = "Mostrar lista referidos";
 	obj.msg_no_referred_yet = "No tiene referidos todavia.";
