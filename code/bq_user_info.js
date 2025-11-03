@@ -1483,7 +1483,8 @@ async function read_firebase_user_fields(obj){
 
 function get_ref_button(ref_id){
 	const nw_but = document.createElement("div");
-	nw_but.classList.add("is_button");
+	//nw_but.classList.add("is_button");
+	nw_but.classList.add("item_can_select");
 	nw_but.classList.add("has_big_margin_left");
 	nw_but.classList.add("has_big_margin_right");
 	nw_but.innerHTML = ref_id;
