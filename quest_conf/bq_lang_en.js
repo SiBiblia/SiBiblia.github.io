@@ -526,6 +526,10 @@ function init_en_basic_msg(){
 	obj.msg_show_list_referred = "Show referred list";
 	obj.msg_no_referred_yet = "No referred yet.";
 	
+	obj.msg_usr_all_voters = "ALL VOTERS";
+	obj.msg_show_list_voters = "Show voters list";
+	obj.msg_no_voters_yet = "No voters yet.";
+	
 	obj.msg_gen_cards = `GEN PDF CARDS`;
 	obj.msg_choose_verses = `Choose verses`;
 

@@ -27,7 +27,7 @@ const SUF_LBL_FLD = "SUF_LBL_FLD";
 const firebase_user_info_path = "/user_info";
 const id_user_sele = "id_user_sele";
 const id_all_verses = "id_all_verses";
-const id_all_referred = "id_all_referred";
+const id_all_sibib_usrs = "id_all_sibib_usrs";
 
 const CAND_NOMINEE = "CAND_NOMINEE";
 const SAVED_NOMINEE = "SAVED_NOMINEE";
@@ -535,7 +535,9 @@ export async function toggle_user_info(fb_usr, obj_usr){
 		dv_cho_ver.classList.add("exam");
 		dv_cho_ver.classList.add("grid_item_auto_span_4");
 		dv_cho_ver.classList.add("is_button");
-		dv_cho_ver.classList.add("has_big_margins");
+		dv_cho_ver.classList.add("has_big_margin_left");
+		dv_cho_ver.classList.add("has_big_margin_right");
+		//dv_cho_ver.classList.add("has_big_margins");
 		dv_cho_ver.innerHTML = ulang.msg_choose_verses;
 		dv_cho_ver.addEventListener('click', function() {
 			choose_verses(dv_cho_ver);
@@ -547,12 +549,27 @@ export async function toggle_user_info(fb_usr, obj_usr){
 		dv_show_refs.classList.add("exam");
 		dv_show_refs.classList.add("grid_item_auto_span_4");
 		dv_show_refs.classList.add("is_button");
-		dv_show_refs.classList.add("has_big_margins");
+		dv_show_refs.classList.add("has_big_margin_left");
+		dv_show_refs.classList.add("has_big_margin_right");
+		//dv_show_refs.classList.add("has_big_margins");
 		dv_show_refs.innerHTML = ulang.msg_show_list_referred;
 		dv_show_refs.addEventListener('click', async function() {
 			await show_all_referred(dv_show_refs);
 		});
 		dv_edit_user.appendChild(dv_show_refs);
+	
+		const dv_show_votrs = document.createElement("div");
+		dv_show_votrs.classList.add("exam");
+		dv_show_votrs.classList.add("grid_item_auto_span_4");
+		dv_show_votrs.classList.add("is_button");
+		dv_show_votrs.classList.add("has_big_margin_left");
+		dv_show_votrs.classList.add("has_big_margin_right");
+		//dv_show_votrs.classList.add("has_big_margins");
+		dv_show_votrs.innerHTML = ulang.msg_show_list_voters;
+		dv_show_votrs.addEventListener('click', async function() {
+			await show_all_voters(dv_show_votrs);
+		});
+		dv_edit_user.appendChild(dv_show_votrs);
 	
 		await read_firebase_user_object();
 	}
@@ -1202,7 +1219,7 @@ async function show_all_referred(dv_show_refs){
 	const ulang = gvar.glb_curr_lang;
 
 	let dv_all_ref = null;
-	dv_all_ref = get_new_dv_under(dv_show_refs, id_all_referred);
+	dv_all_ref = get_new_dv_under(dv_show_refs, id_all_sibib_usrs);
 	if(dv_all_ref == null){
 		if(DEBUG_USER_INFO){ console.log("toggle_all_referred OFF"); }
 		return;
@@ -1695,5 +1712,56 @@ async function firebase_set_user_nominee(force_it){
 		}
 		console.error(err);
 	}
+}
+
+async function show_all_voters(dv_show_refs){
+	const ulang = gvar.glb_curr_lang;
+
+	let dv_all_vtrs = null;
+	dv_all_vtrs = get_new_dv_under(dv_show_refs, id_all_sibib_usrs);
+	if(dv_all_vtrs == null){
+		if(DEBUG_USER_INFO){ console.log("toggle_all_voters OFF"); }
+		return;
+	}
+	dv_all_vtrs.classList.add("exam", "has_margin_bot", "has_margin_top");
+
+	const user_id = fb_mod.tc_fb_user.uid;
+	const curr_ci = fb_mod.tc_fb_current_cicle;
+	
+	if(fb_mod == null){ console.error("fb_mod == null."); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null.");  return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+	
+	try{ 
+		const ref_path = fb_mod.firebase_bib_quest_path + 'score_data/cicle_votes/c' + curr_ci;
+		const db_ref = fb_mod.md_db.ref(fb_database, ref_path);
+
+		let cond1 = fb_mod.md_db.orderByChild('nominee');
+		let cond2 = fb_mod.md_db.equalTo(user_id);
+		let db_qry = fb_mod.md_db.query(db_ref, cond1, cond2);
+		let snapshot = await fb_mod.md_db.get(db_qry);
+
+		if(snapshot.exists()){
+			const all_usr = snapshot.val();
+			if(DEBUG_USER_INFO){
+				console.log("show_all_voters, ALL_VOTERS=");
+				console.log(all_usr); 
+			}
+			
+			const all_rf_ids = Object.keys(all_usr);
+			let ii = 0;
+			for(ii = 0; ii < all_rf_ids.length; ii++){
+				const ref_id = all_rf_ids[ii];
+				const rf_butt = get_ref_button(ref_id);
+				dv_all_vtrs.appendChild(rf_butt);				
+			}
+		} else {
+			dv_all_vtrs.innerHTML = ulang.msg_no_voters_yet;
+			console.error(`show_all_voters. ref_path=${ref_path} query not exists`);
+		}
+	} catch(err){
+		console.error(err);
+	}
+	
 }
 

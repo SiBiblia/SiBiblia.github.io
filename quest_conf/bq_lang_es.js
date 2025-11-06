@@ -523,8 +523,12 @@ function init_es_basic_msg(){
 	obj.msg_show_nominee = "Mostrar datos del nominado ";
 
 	obj.msg_usr_all_referred = "REFERIDOS";
-	obj.msg_show_list_referred = "Mostrar lista referidos";
+	obj.msg_show_list_referred = "Mostrar lista de referidos";
 	obj.msg_no_referred_yet = "No tiene referidos todavia.";
+	
+	obj.msg_usr_all_voters = "VOTANTES";
+	obj.msg_show_list_voters = "Mostrar lista de votantes";
+	obj.msg_no_voters_yet = "No tiene votantes todavia.";
 	
 	obj.msg_gen_cards = `GEN PDF TARJETAS`;
 	obj.msg_choose_verses = `Escoja versículos`;
