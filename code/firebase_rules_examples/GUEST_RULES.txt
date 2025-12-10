@@ -1,8 +1,17 @@
 			"guest": { 
 				".read": true,
-				".write": "true",
+				".write": "! data.exists()",
+				"all_ids": {
+					".write": "! data.exists()",
+					"$uid": {
+						"guest_id": { 
+							".validate": "newData.isString() && (newData.val().length < 40) && (newData.val() == $uid)",
+						},
+					},
+				},
 				"$guest_id": { 
-					".validate": "newData.isString() && (newData.val().length < 40)",
+					".validate": "root.child('bib_quest').child('guest').child('all_ids').child($guest_id).exists()",
+					"$other": { ".validate": false,	},
 					"results": { 
 						"$module_name": {
 							".validate": "(! data.exists()) && root.child('bib_quest').child('modules').child($module_name).exists()",
@@ -28,12 +37,3 @@
 					},
 				},
 			},
-
-
-					"login": { 
-						".write": "! data.exists()",
-						"$uid": {
-							".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
-							".validate": "newData.exists() && newData.isNumber() && (newData.val() === 1)",
-						},
-					},

@@ -76,15 +76,18 @@
 			},
 			"guest": { 
 				".read": true,
-				".write": "! data.exists()",
-				"$guest_id": { 
-					"login": { 
-						".write": "! data.exists()",
-						"$uid": {
-							".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
-							".validate": "newData.exists() && newData.isNumber() && (newData.val() === 1)",
+				".write": "true",
+				"all_ids": {
+					".write": "! data.exists()",
+					"$uid": {
+						"guest_id": { 
+							".validate": "newData.isString() && (newData.val().length < 40) && (newData.val() == $uid)",
 						},
 					},
+				},
+				"$guest_id": { 
+					".validate": "root.child('bib_quest').child('guest').child('all_ids').child($guest_id).exists()",
+					"$other": { ".validate": false,	},
 					"results": { 
 						"$module_name": {
 							".validate": "(! data.exists()) && root.child('bib_quest').child('modules').child($module_name).exists()",
@@ -216,11 +219,6 @@
 						},
 						"num_visits": { 
 							".validate": "newData.exists() && newData.isNumber() && (newData.val() >= 0) && (newData.val() < 9999999999)",
-						},
-					},
-					"guest_id": { 
-						"$guest_id": {
-							".validate": "root.child('bib_quest').child('guest').child($guest_id).exists()",
 						},
 					},
 					"stats": { 

@@ -35,6 +35,8 @@ const DEBUG_FB_REFERRER = true;
 const DEBUG_FB_GUEST = true;
 
 const LOCAL_STORAGE_GUEST_ID = "LOCAL_STORAGE_GUEST_ID";
+const GUEST_ID_IN_FB = "GUEST_ID_IN_FB";
+const GUEST_ID_OWNED = "GUEST_ID_OWNED";
 
 export let md_app = null;
 export let md_auth = null;
@@ -254,6 +256,9 @@ export async function firebase_check_user(callbk){
 		
 		if(tc_fb_current_cicle == null){
 			await firebase_read_current_cicle();
+		}
+		if(! is_guest_id_in_firebase()){
+			await firebase_write_guest_id();
 		}
 		
 		if(DEBUG_FB_CHECK1){
@@ -490,5 +495,35 @@ export function firebase_get_guest_path(){
 	const path = firebase_guest_path + gid;
 	if(DEBUG_FB_GUEST){ console.log("GUEST_PATH=" + path); }
 	return path;
+}
+
+function is_guest_id_in_firebase(){
+	const sv = localStorage.getItem(GUEST_ID_IN_FB);
+	return sv;
+}
+
+function set_guest_id_in_firebase(){
+	console.log("Called set_guest_id_in_firebase");
+	const gid = get_guest_id();
+	localStorage.setItem(GUEST_ID_IN_FB, gid);
+}
+
+async function firebase_write_guest_id(){ 
+	console.log("Called firebase_write_guest_id");
+	
+	init_mod_vars();
+	if(tc_fb_app == null){ console.error("tc_fb_app is NULL!!"); return; }
+	const fb_database = md_db.getDatabase(tc_fb_app);
+
+	const gid = get_guest_id();
+	
+	try {
+		const db_ref = md_db.ref(fb_database, firebase_guest_path + '/all_ids/' + gid + '/guest_id');
+		console.log("firebase_write_guest_id. db_ref = " + db_ref);
+		await md_db.set(db_ref, gid);
+		set_guest_id_in_firebase()
+	} catch (error) { 
+		console.error(error); 
+	}
 }
 
