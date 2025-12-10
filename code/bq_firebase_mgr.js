@@ -32,6 +32,9 @@ const DEBUG_FB_CHECK2 = false;
 const DEBUG_FB_ADMIN = true;
 const DEBUG_FB_finished_qmodu = false;
 const DEBUG_FB_REFERRER = true;
+const DEBUG_FB_GUEST = true;
+
+const LOCAL_STORAGE_GUEST_ID = "LOCAL_STORAGE_GUEST_ID";
 
 export let md_app = null;
 export let md_auth = null;
@@ -51,6 +54,7 @@ export const firebase_config = {
 };
 
 export const firebase_bib_quest_path = 'bib_quest/';
+export const firebase_guest_path = firebase_bib_quest_path + 'guest/';
 export const firebase_users_path = firebase_bib_quest_path + 'users/';
 export const firebase_users_list_path = firebase_users_path + 'list/';
 export const firebase_ck_admin_path = firebase_bib_quest_path + 'ck_admin/';
@@ -136,7 +140,7 @@ export function firebase_check_login(err_fn){
 			console.log('finished_login');
 		}
 		
-		firebase_write_user_id();
+		//firebase_write_user_id();
 		
 	}).catch((error) => {
 		// Handle Errors here.
@@ -186,6 +190,8 @@ export async function firebase_set_user_referrer(force_it){
 	const fb_database = md_db.getDatabase(tc_fb_app);
 	
 	const curr_ci = tc_fb_current_cicle;
+	if(curr_ci == null){ console.err(`(curr_ci == null)`); return; }
+	
 	let user_id = tc_fb_user.uid;
 	
 	const ref_pth = firebase_bib_quest_path + 'score_data/all_referred/' + user_id;
@@ -246,6 +252,10 @@ export async function firebase_check_user(callbk){
 		const db = md_db.getDatabase(tc_fb_app);
 		if(db == null){ return; }
 		
+		if(tc_fb_current_cicle == null){
+			await firebase_read_current_cicle();
+		}
+		
 		if(DEBUG_FB_CHECK1){
 			const cn_ref = md_db.ref(db, ".info/connected");
 			if(cn_ref == null){ return; }
@@ -282,6 +292,7 @@ export async function firebase_check_user(callbk){
 				}
 				
 				firebase_write_user_id();
+				firebase_set_user_referrer();
 				
 				firebase_get_user_finished_qmodules();
 				if(callbk != null){ callbk(tc_fb_user); }
@@ -329,22 +340,25 @@ function firebase_user_ck_is_admin(){
 	});
 }
 
-function firebase_read_current_cicle(){ 
+async function firebase_read_current_cicle(){ 
+	console.log("Called firebase_read_current_cicle");
+	
 	init_mod_vars();
 	if(tc_fb_app == null){ console.error("tc_fb_app is NULL!!"); return; }
-	if(tc_fb_user == null){ console.error("tc_fb_user is NULL!!"); return; }
 	const fb_database = md_db.getDatabase(tc_fb_app);
 	const db_ref = md_db.ref(fb_database, firebase_current_cicle_path);
 	
-	tc_fb_current_cicle = null;
-	md_db.onValue(db_ref, (snapshot) => {
-		if (snapshot.exists()) {
+	try{
+		tc_fb_current_cicle = null;
+		const snapshot = await md_db.get(db_ref);
+		if(snapshot.exists()) {
 			const num = snapshot.val();
 			tc_fb_current_cicle = num;
 			console.log("CURRENT_CICLE=" + tc_fb_current_cicle);
-			firebase_set_user_referrer();			
 		}
-	});
+	} catch(err) {
+		console.error(err);		
+	}
 }
 
 function firebase_write_user_id_in_list(){ 
@@ -354,18 +368,17 @@ function firebase_write_user_id_in_list(){
 	const fb_database = md_db.getDatabase(tc_fb_app);
 
 	const db_ref = md_db.ref(fb_database, firebase_users_list_path + tc_fb_user.uid);
-	console.log("firebase_write_user_id. db_ref = " + db_ref);
+	console.log("firebase_write_user_id_in_list. db_ref = " + db_ref);
 	md_db.set(db_ref, 1).catch((error) => { 
 		console.error(error); 
 	});
 }
 
 function firebase_write_user_id(){ 
-	console.log("Called firebase_update_user_visits.");
+	console.log("Called firebase_write_user_id.");
 	init_mod_vars();
 	firebase_user_ck_is_admin();
 	firebase_write_user_id_in_list();
-	firebase_read_current_cicle();
 	
 	if(tc_fb_app == null){ console.error("tc_fb_app is NULL!!"); return; }
 	if(tc_fb_user == null){ console.error("tc_fb_user is NULL!!"); return; }
@@ -447,7 +460,7 @@ export function firebase_email_login(num_test_user){
 			console.log('finished_EMAIL_login');
 		}
 		
-		firebase_write_user_id();
+		//firebase_write_user_id();
 		
 	}).catch((error) => {
 		const errorCode = error.code;
@@ -458,5 +471,24 @@ export function firebase_email_login(num_test_user){
 		console.log('errorMessage=' + errorMessage);
 	});      
 	
+}
+
+function get_guest_id(){
+	let gid = localStorage.getItem(LOCAL_STORAGE_GUEST_ID);
+	if(! gid) {
+		gid = 'Gxxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+			const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+			return v.toString(16);
+		});
+		localStorage.setItem(LOCAL_STORAGE_GUEST_ID, gid);
+	}
+	return gid;
+}
+
+export function firebase_get_guest_path(){
+	const gid = get_guest_id();
+	const path = firebase_guest_path + gid;
+	if(DEBUG_FB_GUEST){ console.log("GUEST_PATH=" + path); }
+	return path;
 }
 

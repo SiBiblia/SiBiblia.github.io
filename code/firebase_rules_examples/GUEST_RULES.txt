@@ -1,0 +1,39 @@
+			"guest": { 
+				".read": true,
+				".write": "true",
+				"$guest_id": { 
+					".validate": "newData.isString() && (newData.val().length < 40)",
+					"results": { 
+						"$module_name": {
+							".validate": "(! data.exists()) && root.child('bib_quest').child('modules').child($module_name).exists()",
+							"$other": { ".validate": false,	},
+							"ts_reported": { 
+								".validate": "newData.isNumber() && (newData.val() <= now)",
+							},
+							"observ": { 
+								"$observation_qid": {
+									".validate": "root.child('bib_quest').child('modules').child($module_name).child($observation_qid).exists()",
+									"$val": {
+										".validate": "newData.isNumber() && (newData.val() === 1)",
+									},
+								},
+							},
+							"score": { 
+								".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() <= 1)",
+							},
+							"cicle_added": {
+								".validate": "newData.val() === root.child('bib_quest').child('current_cicle').val()",
+							},
+						},
+					},
+				},
+			},
+
+
+					"login": { 
+						".write": "! data.exists()",
+						"$uid": {
+							".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+							".validate": "newData.exists() && newData.isNumber() && (newData.val() === 1)",
+						},
+					},

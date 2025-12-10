@@ -90,6 +90,8 @@ const test_ops = {
 	//set_user_in_stats:"set_user_in_stats",
 	//write_alias:"write_alias",
 	//delete_alias:"delete_alias",
+
+	reset_storage:"reset_storage",
 	
 	write_referrer:"write_referrer",
 	delete_referrer:"delete_referrer",
@@ -825,7 +827,10 @@ async function do_test_oper(oper, user_nam){
 		await read_all_referrer(test_ids.user9);
 	}
 	
-
+	if(oper == test_ops.reset_storage){
+		console.log("CALLED CLEAR_LOCAL_STORAGE");
+		clear_local_storage();
+	}
 
 	close_pop_menu();
 }

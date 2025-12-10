@@ -39,12 +39,13 @@ const DEBUG_INIT_ANSW = false;
 const DEBUG_SHOW_OBSERV = false;
 const DEBUG_UPDATE_OBSERV = false;
 const DEBUG_FB_WRITE_RESULTS = true;
-const DEBUG_SHOW_RESULTS = true;
+const DEBUG_SHOW_RESULTS = false;
 const DEBUG_SHOW_TEST_USERS = true;
 const DEBUG_OBSERV_SCORE = false;
 const DEBUG_SCROLL = false;
 const DEBUG_UPDATE_SCORES = false;
 const DEBUG_SHOW_USER = true;
+const DEBUG_FB_WRITE_GUEST_RESULTS = true;
 
 const MIN_ANSW_SHOW_INVERT = 3;
 
@@ -58,7 +59,9 @@ const LEFT_POS = "grid_item_left";
 const RIGHT_POS = "grid_item_right";
 
 const ALL_SAVED_OBJ_NAMES = "ALL_SAVED_OBJ_NAMES";
+const LOCAL_STORAGE_GUEST_ID = "LOCAL_STORAGE_GUEST_ID";
 
+const SUF_SCORE_IN_ST = "_score_in_st";
 const SUF_RESULTS_IN_ST = "_results_in_st";
 const SUF_RESULTS_IN_FB_PSTAT = "_results_in_fb_Pstat";
 const SUF_RESULTS_IN_FB_USTAT = "_results_in_fb_Ustat";
@@ -2227,6 +2230,8 @@ function write_fb_user_qmodu_results(usr_rslts){
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 
 	const curr_ci = fb_mod.tc_fb_current_cicle;
+	if(curr_ci == null){ console.err(`(curr_ci == null)`); return; }
+	
 	const qmonam = gvar.current_qmonam;
 	const usr_path = fb_mod.firebase_get_user_path();  // has NO slash at the end
 	const results_pth = usr_path + '/results/' + qmonam;
@@ -2295,7 +2300,7 @@ function write_fb_user_qmodu_stats(usr_rslts, dt){
 	});	
 }
 
-function write_fb_qmod_stats_and_results(force_wr){
+async function write_fb_qmod_stats_and_results(force_wr){
 	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_fb_qmod_stats_and_results. CALLED. "); }
 	
 	const resp = {};
@@ -2319,15 +2324,14 @@ function write_fb_qmod_stats_and_results(force_wr){
 		resp.wr_o = resp.pr_o;
 	}
 	
-	if(fb_mod == null){ 
-		console.error("fb_mod == null.");
-		return resp;
-	}	
+	if(fb_mod == null){ console.error("fb_mod == null"); return resp; }
 	
 	resp.has_usr = (fb_mod.tc_fb_user != null);
 	if(resp.has_usr){
 		write_fb_user_qmodu_results(resp.wr_o);
 		write_fb_user_qmodu_stats(resp.wr_o, dt);
+	} else {
+		write_fb_guest_qmodu_results(resp.wr_o);
 	}
 	write_fb_qmodu_pub_stats(resp.wr_o, dt);
 	
@@ -3307,7 +3311,6 @@ function reset_fb_Ustat(){
 	window.localStorage.setItem(in_fb_Uname(), null);
 }
 
-
 function write_st_qmodu_results(obj){
 	if(gvar.current_qmonam == null){ return; }
 	if(DEBUG_FB_WRITE_RESULTS){ console.log("write_st_qmodu_results. CALLED. "); }
@@ -3329,6 +3332,21 @@ function read_st_qmodu_results(){
 	return obj;
 }
 
+function write_st_qmodu_score(score){
+	if(gvar.current_qmonam == null){ return; }
+	if(score < 0){ return; }
+	if(score > 1){ return; }
+	window.localStorage.setItem(gvar.current_qmonam + SUF_SCORE_IN_ST, JSON.stringify(obj));
+}
+
+function read_st_qmodu_score(){
+	if(gvar.current_qmonam == null){ return -1; }
+	let obj_str = window.localStorage.getItem(gvar.current_qmonam + SUF_SCORE_IN_ST);
+	let obj = -1;
+	if(obj_str != null){ obj = Number(obj_str);	}
+	return obj;
+}
+
 /*
 	obj.msg_write_results_not_signed_in
 	obj.msg_write_results_signed_in
@@ -3343,13 +3361,13 @@ function read_st_qmodu_results(){
 	resp.has_usr
 	*/
 
-function finish_qmodu(){
+async function finish_qmodu(){
 	const gst = gvar.glb_poll_db.qmodu_state;
 	const qid = gst.writer_qid;
 	if(qid == null){ console.error("qid == null");  return; }
 	
-	show_score_in_observation(qid);
-	const resp = write_fb_qmod_stats_and_results(false);
+	await show_score_in_observation(qid);
+	const resp = await write_fb_qmod_stats_and_results(false);
 	
 	const is_write = (resp.pr_o == null);
 	const is_signed = resp.has_usr;
@@ -3374,7 +3392,6 @@ function finish_qmodu(){
 	dv_stm.innerHTML = msg;
 	
 	scroll_to_qid(get_first_not_answered());
-	//load_next_qmodu();
 }
 
 function get_grid_results(fb_stats, fb_results){
@@ -3498,7 +3515,7 @@ function get_grid_results(fb_stats, fb_results){
 		//num_row++;
 		//const gr_rows = window.getComputedStyle(dv_gr).gridTemplateRows;;
 		//const num_rows = gr_rows.split(',').length;
-		console.log("NUM_ROWS = " + num_row);
+		if(DEBUG_SHOW_RESULTS){ console.log("NUM_ROWS = " + num_row); }
 		
 		/*  "ALL" title
 		const dv_title = document.createElement("div");
@@ -3688,7 +3705,7 @@ function show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts
 	dv_results.appendChild(grd_res);
 }
 
-function show_score_in_observation(qid){
+async function show_score_in_observation(qid){
 	const dv_results_obs = document.getElementById(qid + SUF_ID_RESULTS_OBSERVATION);
 	const lang = gvar.glb_curr_lang;
 	
@@ -3714,6 +3731,8 @@ function show_score_in_observation(qid){
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
 	
 	const qmonam = gvar.current_qmonam;
+	
+	if(fb_mod.tc_fb_user == null){ return; }
 	const the_uid = fb_mod.tc_fb_user.uid;
 	
 	read_user_qmod_results(fb_database, the_uid, qmonam).then((usr_resul) => {
@@ -3750,7 +3769,7 @@ export function calc_stats_qmodule_score(qmod_scow, fb_stats){
 		}
 		let cntr = fb_stats[qid];
 		if((cntr != null) && ((cntr <= 0) || (cntr > tot))){
-			console.error(`${cntr} <= 0 || ${cntr} > ${tot}`);
+			console.error(`(${cntr} <= 0 || ${cntr} > ${tot}) for ${qid}`);
 			continue;
 		}
 		if(cntr == null){
@@ -3769,5 +3788,39 @@ export function calc_stats_qmodule_score(qmod_scow, fb_stats){
 	if(score > 1){ score = 1; }
 	
 	return score;
+}
+
+function write_fb_guest_qmodu_results(usr_rslts){
+	if(fb_mod == null){ console.error("fb_mod == null"); return; }
+	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null. "); return; }
+	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+
+	const curr_ci = fb_mod.tc_fb_current_cicle;	
+	if(curr_ci == null){ console.err(`(curr_ci == null)`); return; }
+	
+	const qmonam = gvar.current_qmonam;
+	const guest_path = fb_mod.firebase_get_guest_path();  // has NO slash at the end
+	//const guest_path = fb_mod.firebase_guest_path + "invitado0001";
+	const results_pth = guest_path + '/results/' + qmonam;
+
+	const qmod_scow = gvar.all_observations;
+	const usr_score = calc_user_qmodule_score(qmod_scow, usr_rslts);
+	
+	const wr_data = {};
+	
+	wr_data[results_pth + '/observ/'] = usr_rslts;
+	wr_data[results_pth + '/ts_reported/'] = fb_mod.md_db.serverTimestamp();
+	wr_data[results_pth + '/score/'] = usr_score;
+	wr_data[results_pth + '/cicle_added/'] = curr_ci;
+	
+	if(DEBUG_FB_WRITE_GUEST_RESULTS){
+		console.log("FULL_GUEST_OBJ=");
+		console.log(wr_data);
+	}
+	
+	const db_ref = fb_mod.md_db.ref(fb_database);
+	fb_mod.md_db.update(db_ref, wr_data).catch((error) => { 
+		console.error(error); 
+	});	
 }
 

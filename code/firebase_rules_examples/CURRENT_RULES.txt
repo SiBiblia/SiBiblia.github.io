@@ -9,7 +9,7 @@
 				".read": "root.child('bib_quest').child('admins').child(auth.uid).exists()",
 			},
 			"previous_cicles": {
-				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+				".read": "true",
 				".write": "(! data.exists()) && root.child('bib_quest').child('admins').child(auth.uid).exists()",
 				"$val": {
 					".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() < 99999999999999999999)",
@@ -19,7 +19,7 @@
 				},
 			},
 			"current_cicle": {
-				".read": "(auth != null) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+				".read": "true",
 				"$val": {
 					".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() < 99999999999999999999)",
 				},
@@ -70,6 +70,42 @@
 						"$tot_obs_ok": {
 							".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() < 99999999999999999999) && 
 									((newData.val() === 1) || (newData.val() === (data.val() + 1)))",
+						},
+					},
+				},
+			},
+			"guest": { 
+				".read": true,
+				".write": "! data.exists()",
+				"$guest_id": { 
+					"login": { 
+						".write": "! data.exists()",
+						"$uid": {
+							".write": "($uid === auth.uid) && !(root.child('bib_quest').child('blocked').child(auth.uid).exists())",
+							".validate": "newData.exists() && newData.isNumber() && (newData.val() === 1)",
+						},
+					},
+					"results": { 
+						"$module_name": {
+							".validate": "(! data.exists()) && root.child('bib_quest').child('modules').child($module_name).exists()",
+							"$other": { ".validate": false,	},
+							"ts_reported": { 
+								".validate": "newData.isNumber() && (newData.val() <= now)",
+							},
+							"observ": { 
+								"$observation_qid": {
+									".validate": "root.child('bib_quest').child('modules').child($module_name).child($observation_qid).exists()",
+									"$val": {
+										".validate": "newData.isNumber() && (newData.val() === 1)",
+									},
+								},
+							},
+							"score": { 
+								".validate": "newData.isNumber() && (newData.val() >= 0) && (newData.val() <= 1)",
+							},
+							"cicle_added": {
+								".validate": "newData.val() === root.child('bib_quest').child('current_cicle').val()",
+							},
 						},
 					},
 				},
@@ -180,6 +216,11 @@
 						},
 						"num_visits": { 
 							".validate": "newData.exists() && newData.isNumber() && (newData.val() >= 0) && (newData.val() < 9999999999)",
+						},
+					},
+					"guest_id": { 
+						"$guest_id": {
+							".validate": "root.child('bib_quest').child('guest').child($guest_id).exists()",
 						},
 					},
 					"stats": { 
