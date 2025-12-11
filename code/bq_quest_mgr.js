@@ -141,11 +141,15 @@ export let fb_mod = null;
 
 export async function init_firebase_mgr(call_bk){ // NEW CODE
 	if(fb_mod != null){ return; }
-	fb_mod = await import("./bq_firebase_mgr.js");
-	await fb_mod.firebase_check_user((user) => {
-		if(call_bk != null){ call_bk(); }
-		else { fill_div_user(); }
-	}); 
+	try {
+		fb_mod = await import("./bq_firebase_mgr.js");
+		await fb_mod.firebase_check_user((user) => {
+			if(call_bk != null){ call_bk(); }
+			else { fill_div_user(); }
+		}); 
+	} catch (error){
+		console.error(error);
+	}
 }
 
 function is_content_horizontal() {
@@ -1618,7 +1622,8 @@ function pop_menu_handler(){
 		dv_pop_men.appendChild(op);
 	}
 
-	const show_test_usr = DEBUG_SHOW_TEST_USERS && (fb_mod != null) && (fb_mod.tc_fb_is_admin || fb_mod.tc_fb_is_test_user || is_localhost());
+	const is_tst_usr = ((fb_mod != null) && (fb_mod.tc_fb_is_admin || fb_mod.tc_fb_is_test_user));
+	const show_test_usr = DEBUG_SHOW_TEST_USERS && (is_localhost() || is_tst_usr);
 	if(show_test_usr){
 		let op = document.createElement("div");
 		op.classList.add("exam");

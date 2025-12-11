@@ -17,6 +17,9 @@ import { default_card_verses,
 const DEBUG_GEN_PDF = true;
 
 const NUM_CARDS_IN_PAGE = 10;
+const CARD_WIDTH = 97;
+const CARD_HEIGHT = 45;
+const MARK_LENGTH = 3;
 
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js"></script>
 //import * as MOD_PDF from "https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js";
@@ -62,10 +65,12 @@ export function gen_pdf_cards(){
 	
 	const img_cod = get_code_img(url);
 	
-	const xx1 = 8;
-	const xx2 = 110;
-	const yy = 10;
-	const hh = 50;
+	//const xx1 = 8;
+	//const xx2 = 110;
+	const xx1 = 10;
+	const xx2 = 107;
+	const yy = 25;
+	const hh = 45;
 	const lines = 5;
 
 	const doc = new window.jspdf.jsPDF({
@@ -80,9 +85,24 @@ export function gen_pdf_cards(){
 	let ii = 0;
 	for(ii = 0; ii < lines; ii++){
 		const yy1 = yy + (hh * ii);
+		if(ii == 0){
+			add_vline(doc, xx1, yy1);
+			add_vline(doc, xx1 + CARD_WIDTH, yy1);
+		}
+		add_hline(doc, xx1, yy1);
 		add_side_1(doc, xx1, yy1, user_id, img_cod);
 		add_side_1(doc, xx2, yy1, user_id, img_cod);
+		add_hline(doc, xx2 + CARD_WIDTH, yy1);
+		if(ii == 0){
+			add_vline(doc, xx2 + CARD_WIDTH, yy1);
+		}
 	}
+	const yy2 = yy + (hh * ii);
+	add_hline(doc, xx1, yy2);
+	add_hline(doc, xx2 + CARD_WIDTH, yy2);
+	add_vline(doc, xx1, yy2);
+	add_vline(doc, xx1 + CARD_WIDTH, yy2);
+	add_vline(doc, xx2 + CARD_WIDTH, yy2);
 
 	doc.addPage();
 
@@ -91,7 +111,12 @@ export function gen_pdf_cards(){
 		let vv = 1;
 		for(ii = 0; ii < lines; ii++){
 			const yy1 = yy + (hh * ii);
+			if(ii == 0){
+				add_vline(doc, xx1, yy1);
+				add_vline(doc, xx1 + CARD_WIDTH, yy1);
+			}
 			
+			add_hline(doc, xx1, yy1);
 			add_side_2(doc, xx1, yy1, txt);
 			if(vv >= arr_txt.length){
 				txt = arr_txt[0]; vv = 1;
@@ -105,10 +130,29 @@ export function gen_pdf_cards(){
 			} else {
 				txt = arr_txt[vv]; vv++;
 			}
+			add_hline(doc, xx2 + CARD_WIDTH, yy1);
+			if(ii == 0){
+				add_vline(doc, xx2 + CARD_WIDTH, yy1);
+			}
 		}
 	}
+
+	const yy3 = yy + (hh * ii);
+	add_hline(doc, xx1, yy3);
+	add_hline(doc, xx2 + CARD_WIDTH, yy3);
+	add_vline(doc, xx1, yy3);
+	add_vline(doc, xx1 + CARD_WIDTH, yy3);
+	add_vline(doc, xx2 + CARD_WIDTH, yy3);
 	
 	doc.save("image_jspdf.pdf");	
+}
+
+function add_hline(doc, xx, yy){
+	doc.line(xx - MARK_LENGTH, yy, xx + MARK_LENGTH, yy, 'S');
+}
+
+function add_vline(doc, xx, yy){
+	doc.line(xx, yy - MARK_LENGTH, xx, yy + MARK_LENGTH, 'S');
 }
 
 function add_side_1(doc, xx, yy, user_id, img_cod){
@@ -122,7 +166,7 @@ function add_side_1(doc, xx, yy, user_id, img_cod){
 	if(img_cod != null){
 		doc.addImage(img_cod, "PNG", xx + mx + 55, yy + my, 35, 35);	
 	}
-	doc.rect(xx, yy, 97, 45);
+	//doc.rect(xx, yy, CARD_WIDTH, CARD_HEIGHT);
 }
 
 function add_side_2(doc, xx, yy, txt){
@@ -132,7 +176,7 @@ function add_side_2(doc, xx, yy, txt){
 	doc.setFontSize(12);
 	//doc.setFont("Times", "bold");
 	doc.text(arr, xx + mx, yy + my + 5);
-	doc.rect(xx, yy, 97, 45);
+	//doc.rect(xx, yy, CARD_WIDTH, CARD_HEIGHT);
 }
 
 function get_code_img(url){

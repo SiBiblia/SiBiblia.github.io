@@ -45,7 +45,7 @@ function check_param_clear_loc_storage(){
 function read_storage_fini_qmodus(){
 	let all_fini_str = window.localStorage.getItem(STORAGE_FINI_QMODUS_ID);
 	let all_fini = {};
-	if(all_fini_str != null){
+	if(all_fini_str){
 		all_fini = JSON.parse(all_fini_str);
 	}
 	return all_fini;
@@ -102,6 +102,16 @@ function init_conf_qmodus(){
 }
 
 function get_nxt_qmonam(){
+	const qmonam = get_next_qmonam();
+	if(qmonam != null){
+		window.localStorage.setItem(STORAGE_CURRENT_QMONAM, qmonam);
+	} else {
+		window.localStorage.setItem(STORAGE_CURRENT_QMONAM, FINISHED_QMONAM);
+	}
+	return qmonam;
+}
+
+function get_next_qmonam(){
 	if(gvar.conf_qmodus == null){ console.error("get_nxt_qmonam. gvar.conf_qmodus == null."); return null; }
 	if(gvar.conf_qmodus.all_qmodus == null){ console.error("get_nxt_qmonam. gvar.conf_qmodus.all_qmodus == null."); return null; }
 	const all_qmonams = Object.keys(gvar.conf_qmodus.all_qmodus);
@@ -231,15 +241,13 @@ export async function load_next_qmodu(st_qmodu = 2){
 	await load_qmodu(qmonam, st_qmodu);
 }
 
-function get_storage_current_qmonam(){
+function get_st_current_qmonam(){
 	let qmonam = null;
 	if(PERSISTANT_STATE){ qmonam = window.localStorage.getItem(STORAGE_CURRENT_QMONAM); }
-	if((qmonam == null) || (qmonam == "null")){  // CAREFUL TRICKY CONDITION. IT IS A STRING !!!
-		window.localStorage.setItem(STORAGE_CURRENT_QMONAM, "null");
+	if(! qmonam){ 
 		qmonam = get_nxt_qmonam();
 	}
-	if(qmonam == FINISHED_QMONAM){
-		window.localStorage.setItem(STORAGE_CURRENT_QMONAM, "null");
+	if(qmonam == FINISHED_QMONAM){ 
 		qmonam = null;
 	}
 	return qmonam;
@@ -255,7 +263,7 @@ function get_save_name(){
 }
 
 async function init_current_qmodu(){
-	const qmonam = get_storage_current_qmonam();
+	const qmonam = get_st_current_qmonam();
 	console.log("Called init_current_qmodu. qmonam = " + qmonam);
 	if(DEBUG_INITS){ console.trace(); }
 	await load_qmodu(qmonam, 2);
@@ -293,11 +301,8 @@ export async function start_module_mgr(lang_md, curr_lang){
 
 function save_current_qmodu_hdlr(){
 	if(gvar.current_qmonam != null){
-		window.localStorage.setItem(STORAGE_CURRENT_QMONAM, gvar.current_qmonam);
 		if(PERSISTANT_STATE){ write_exam_object(get_save_name()); }
-	} else {
-		window.localStorage.setItem(STORAGE_CURRENT_QMONAM, FINISHED_QMONAM);
-	}
+	} 
 }
 
 function is_qmodu_dnf_sat(monam, all_fini){

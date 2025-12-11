@@ -248,6 +248,7 @@ async function firebase_get_user_finished_qmodules(){
 
 export async function firebase_check_user(callbk){
 	init_mod_vars();
+	if(! navigator.onLine){ return; }
 	try {
 		if(tc_fb_app == null){ tc_fb_app = md_app.initializeApp(firebase_config); }
 		if(tc_fb_auth == null){ tc_fb_auth = md_auth.getAuth(); }
