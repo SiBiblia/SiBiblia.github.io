@@ -87,10 +87,13 @@ export function gen_pdf_cards(){
 		const yy1 = yy + (hh * ii);
 		if(ii == 0){
 			add_vline(doc, xx1, yy1);
-			add_vline(doc, xx1 + CARD_WIDTH, yy1);
 		}
 		add_hline(doc, xx1, yy1);
 		add_side_1(doc, xx1, yy1, user_id, img_cod);
+		
+		add_hline(doc, xx1 + CARD_WIDTH, yy1);
+		add_vline(doc, xx1 + CARD_WIDTH, yy1);
+		
 		add_side_1(doc, xx2, yy1, user_id, img_cod);
 		add_hline(doc, xx2 + CARD_WIDTH, yy1);
 		if(ii == 0){
@@ -113,7 +116,6 @@ export function gen_pdf_cards(){
 			const yy1 = yy + (hh * ii);
 			if(ii == 0){
 				add_vline(doc, xx1, yy1);
-				add_vline(doc, xx1 + CARD_WIDTH, yy1);
 			}
 			
 			add_hline(doc, xx1, yy1);
@@ -123,6 +125,9 @@ export function gen_pdf_cards(){
 			} else {
 				txt = arr_txt[vv]; vv++;
 			}
+			
+			add_hline(doc, xx1 + CARD_WIDTH, yy1);
+			add_vline(doc, xx1 + CARD_WIDTH, yy1);
 			
 			add_side_2(doc, xx2, yy1, txt);
 			if(vv >= arr_txt.length){
