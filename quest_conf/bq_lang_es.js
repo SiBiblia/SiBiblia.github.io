@@ -438,7 +438,7 @@ function init_es_basic_msg(){
 	obj.msg_fb_not_finished = "Por favor complete el cuestionario para guardar los resultados";
 	
 	const loggin_str = `por favor asegurate de hacer login en google.com y luego haz click en el icono superior <br>
-	<img id="id_top_user_picture" class="img_user" src="../img/user.jpg">`;
+	<img id="id_msg_user_picture" class="img_ico_user" src="../img/user.jpg">`;
 
 	obj.msg_write_results_not_signed_in = `Felicitaciones ! Terminaste este modulo. 
 		Para obtener un link personal, un codigo QR y participar en el concurso ${loggin_str}`;
@@ -446,10 +446,10 @@ function init_es_basic_msg(){
 	obj.msg_write_results_signed_in = `Felicitaciones ! Terminaste este modulo.`;
 
 	obj.msg_rewrite_results_not_signed_in = `Has terminado este modulo mas de una vez. 
-		Si quieres escribir de nuevo tus resultados en las estadísticas, ${loggin_str}`;
+		Para el concurso solo cuenta tu primer resultado. Si quieres escribir de nuevo tus resultados en las estadísticas, ${loggin_str}`;
 
 	obj.msg_rewrite_results_signed_in = `Has terminado este modulo mas de una vez. 
-		Quieres escribir de nuevo tus resultados en las estadísticas?`;
+		Para el concurso solo cuenta tu primer resultado. SI quieres escribir de nuevo tus resultados en las estadísticas dale ${obj.msg_understood}`;
 
 	obj.msg_your_first_score = `Su primer puntaje`;
 	obj.msg_registered = `Registrado en`;

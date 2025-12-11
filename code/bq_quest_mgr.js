@@ -5,7 +5,7 @@ import { get_new_dv_under, scroll_to_top, toggle_select_option,
 import { get_msg, make_bible_ref, make_strong_ref, bib_defaults, refs_ids, bib_obj_to_txt, get_verse_cit_txt, bib_obj_to_cit_obj, 
 	gvar, 
 	get_qid_base, get_verse_match, get_answer_key, set_anchors_target, get_date_and_time, is_bad_bibcit, 
-	is_observation, qid_to_qhref, set_bibrefs, make_bibref, bibref_to_bibcit, get_bibcit_obs_stm_id, clear_local_storage, 
+	is_observation, qid_to_qhref, set_bibrefs, make_bibref, bibref_to_bibcit, get_bibcit_obs_stm_id, clear_local_storage, is_localhost, 
 } from './bq_tools.js';
 
 import { get_user_href, 
@@ -106,6 +106,8 @@ const base_answ_classes = ["exam", "grid_item_all_col", "item_can_select"];
 
 const id_top_user_name = "id_top_user_name";
 const id_top_user_picture = "id_top_user_picture";
+
+const id_msg_user_picture = "id_msg_user_picture";
 
 const id_dv_user = "id_dv_user";
 const id_dv_user_qrcod = "id_dv_user_qrcod";
@@ -1645,12 +1647,6 @@ function pop_menu_handler(){
 	scroll_to_top(dv_pop_men);
 }
 
-function is_localhost(){
-	const nm = location.hostname;
-	const is_lh = ((nm === 'localhost') || (nm === '127.0.0.1'));
-	return is_lh;
-}
-
 function remove_all_classes(dv_elem) {
 	const all_cl = dv_elem.classList.values();
 
@@ -2146,7 +2142,8 @@ function write_fb_qmodu_pub_stats(usr_rslts, dt){
 	const qmod_pstats_path = pstats_path + module_pth;
 	
 	const suf_id_results = gvar.current_qmonam + SUF_ID_PSTATS_RESULTS;
-	on_stats_change_show_results(suf_id_results, STATS_PUB, qmod_pstats_path, usr_rslts);
+	const db_qmod_pstats_ref = fb_mod.md_db.ref(fb_database, qmod_pstats_path);
+	on_stats_change_show_results(suf_id_results, STATS_PUB, db_qmod_pstats_ref, usr_rslts);
 	
 	if(in_fb_Pstat()){ 
 		console.error("ALREADY in Pstat."); 
@@ -2173,7 +2170,7 @@ function write_fb_qmodu_pub_stats(usr_rslts, dt){
 	set_fb_Pstat();
 	
 	const db_pref = fb_mod.md_db.ref(fb_database, pstats_path);
-	fb_mod.md_db.update(db_pref, wr_data).catch((error) => { 
+	fb_mod.md_db.update(db_pref, wr_data).catch((error) => { // update001
 		console.error(error); 
 		reset_fb_Pstat();
 	});	
@@ -2274,7 +2271,8 @@ function write_fb_user_qmodu_stats(usr_rslts, dt){
 	const usr_qmod_up_path = fb_mod.firebase_bib_quest_path + "to_update/stats/" + gvar.current_qmonam + "/" + fb_mod.tc_fb_user.uid;
 	
 	const suf_id_results = gvar.current_qmonam + SUF_ID_USTATS_RESULTS;
-	on_stats_change_show_results(suf_id_results, STATS_USR, qmod_usr_pth, usr_rslts);
+	const db_qmod_usr_ref = fb_mod.md_db.ref(fb_database, qmod_usr_pth);
+	on_stats_change_show_results(suf_id_results, STATS_USR, db_qmod_usr_ref, usr_rslts);
 
 	if(in_fb_Ustat()){ 
 		console.error("ALREADY in Ustat. "); 
@@ -3366,6 +3364,16 @@ function read_st_qmodu_score(){
 	resp.has_usr
 	*/
 
+function add_user_msg_login_handler(){
+	console.log("Called add_user_msg_login_handler");
+	const dv_button = document.getElementById(id_msg_user_picture);
+	const clk_hdlr = user_name_button_handler;
+	if(dv_button != null){ 
+		dv_button.click_handler = clk_hdlr; dv_button.addEventListener('click', clk_hdlr); 
+		console.log("add_user_msg_login_handler. ADDED login_handler");
+	}
+}
+
 async function finish_qmodu(){
 	const gst = gvar.glb_poll_db.qmodu_state;
 	const qid = gst.writer_qid;
@@ -3395,6 +3403,8 @@ async function finish_qmodu(){
 	if(dv_stm == null){ console.error("dv_stm == null");  return; }
 	
 	dv_stm.innerHTML = msg;
+
+	add_user_msg_login_handler();
 	
 	scroll_to_qid(get_first_not_answered());
 }
@@ -3612,7 +3622,7 @@ function get_grid_results(fb_stats, fb_results){
 	return dv_gr;
 }
 
-function on_stats_change_show_results(suf_id_results, stats_kind, stts_path, usr_rslts){
+function on_stats_change_show_results(suf_id_results, stats_kind, db_ref, usr_rslts){
 	const gst = gvar.glb_poll_db.qmodu_state;
 	const qid = gst.writer_qid;
 	const id_results = qid + suf_id_results;
@@ -3642,17 +3652,25 @@ function on_stats_change_show_results(suf_id_results, stats_kind, stts_path, usr
 	if(fb_mod == null){ console.error("fb_mod == null"); return; }
 	if(fb_mod.tc_fb_app == null){ console.error("fb_mod.tc_fb_app == null"); return; }
 	const fb_database = fb_mod.md_db.getDatabase(fb_mod.tc_fb_app);
+
+	if(DEBUG_FB_WRITE_RESULTS){ 
+		console.log(`on_stats_change_show_results. ADDING onValue with db_ref = ${db_ref}`);
+	}
 	
-	const db_ref = fb_mod.md_db.ref(fb_database, stts_path);
+	//const db_ref = fb_mod.md_db.ref(fb_database, stts_path);
 	fb_mod.md_db.onValue(db_ref, (snapshot) => {
 		if (snapshot.exists()) {
 			const rd_obj = snapshot.val();
 			const fb_stats = JSON.parse(JSON.stringify(rd_obj));
 			if(DEBUG_FB_WRITE_RESULTS){ 
-				console.log("on_stats_change_show_results. FULL_OBJ=");
+				console.log(`on_stats_change_show_results. FROM ONVALUE. db_ref = ${db_ref}. GOT_OBJ=`);
+				//console.log(rd_obj);
 				console.log(fb_stats);
 			}
-			show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts);
+			if(fb_stats.num_checks != 1){	
+				// CHEATING !!!!  onValue called TWICE during update001 !!!! In one call fb_stats.num_checks has 1, the increment value !!!
+				show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts);
+			}
 		} else {
 			console.error("on_stats_change_show_results. No data available");
 		}
@@ -3761,7 +3779,7 @@ async function show_score_in_observation(qid){
 	
 }
 
-export function calc_stats_qmodule_score(qmod_scow, fb_stats){
+function calc_stats_qmodule_score(qmod_scow, fb_stats){
 	let bad_score = 0;
 	const tot = fb_stats.num_checks;
 	const num_deci = MAX_SCORE_WEIGHT_DECI;

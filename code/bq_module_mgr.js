@@ -300,6 +300,9 @@ export async function start_module_mgr(lang_md, curr_lang){
 }
 
 function save_current_qmodu_hdlr(){
+	if(gvar.did_local_storage_clear){
+		return;
+	}
 	if(gvar.current_qmonam != null){
 		if(PERSISTANT_STATE){ write_exam_object(get_save_name()); }
 	} 

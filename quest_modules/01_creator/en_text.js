@@ -175,16 +175,18 @@ export function init_en_poll_txt(){
 
 	lg.o_get_qrcode = `<span class='has_left_padding very_big_font bold_font'>You need to login to get your QR code and start spreading the Good News and winning some while doing so. Please login.</span>`;
 	
+	/*
 	lg.o_congrats_you_have_a_qrcode = `
 		Congrats ! You can now spread the Good News using your QR code. Anyone using your QR code to access this page will be registered as a refered person by you. The more people use your QR code the more you will win.
 	`;
 	
 	lg.o_sorry_no_loging_no_qrcode = `
 		<img class="img_observ" src="${site_img_dir}/woman_shrugging.webp"><br>
-		<span class='big_font bold_font'>Sorry. No Google login, no QR code. If you don have a <a href='http://accounts.google.com'>Google account</a>, please get one by clicking the <a href='http://accounts.google.com'>link</a>. You can login at any time by clicking in "Guest" or by clicking in the icon <img id="id_top_user_picture" class="img_user" src="${site_img_dir}/user.jpg"></span>
+		<span class='big_font bold_font'>Sorry. No Google login, no QR code. If you don have a <a href='http://accounts.google.com'>Google account</a>, please get one by clicking the <a href='http://accounts.google.com'>link</a>. You can login at any time by clicking in "Guest" or by clicking in the icon <img class="img_user" src="${site_img_dir}/user.jpg"></span>
 	`;
 
 	lg.o_finished_module = `YOU HAVE FINISHED THIS MODULE !!!`;
+	*/
 
 	lg.o_evolution_nam = `Evolution`;
 	lg.o_logic_nam = `Logic`;

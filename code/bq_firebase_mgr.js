@@ -1,5 +1,5 @@
 
-import { get_date_and_time, } from './bq_tools.js';
+import { get_date_and_time, is_localhost, } from './bq_tools.js';
 
 import { write_storage_fini_qmodus, load_next_qmodu, } from './bq_module_mgr.js';
 
@@ -482,7 +482,11 @@ export function firebase_email_login(num_test_user){
 function get_guest_id(){
 	let gid = localStorage.getItem(LOCAL_STORAGE_GUEST_ID);
 	if(! gid) {
-		gid = 'Gxxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		let PREF = "G";
+		if(is_localhost() || tc_fb_is_test_user){
+			PREF = "L";
+		}
+		gid = PREF + 'xxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
 			const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
 			return v.toString(16);
 		});

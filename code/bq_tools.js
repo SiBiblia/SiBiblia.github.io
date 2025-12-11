@@ -50,6 +50,7 @@ export function clear_local_storage(){
 	console.log("CLEARING_LOCAL_STORAGE !!!!");
 	console.log("CLEARING_LOCAL_STORAGE !!!!");
 	window.localStorage.clear();
+	gvar.did_local_storage_clear = true;
 }
 
 export function fill_reversed_object(orig, reverse){
@@ -846,5 +847,11 @@ export function is_bad_bibcit(bcit){
 		return bad_verse;
 	}
 	return null;
+}
+
+export function is_localhost(){
+	const nm = location.hostname;
+	const is_lh = ((nm === 'localhost') || (nm === '127.0.0.1'));
+	return is_lh;
 }
 

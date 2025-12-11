@@ -177,16 +177,18 @@ export function init_es_poll_txt(){
 
 	lg.o_get_qrcode = `<span class='has_left_padding very_big_font bold_font'>Usted necesita hacer "login" (entrar) para obtener un código QR y comenzar a compartir las Buenas Nuevas y ganarse algo mientras lo hace. Por favor haga "login" (entre).</span>`;
 	
+	/*
 	lg.o_congrats_you_have_a_qrcode = `
 		Felicidades ! Ya puede compartir las Buenas Nuevas usando su código QR. Cualquiera que use su código QR para acceder esta página sera registrado como una persona referida por usted. Entre mas personas usen su código QR, mas ganará usted.
 	`;
 	
 	lg.o_sorry_no_loging_no_qrcode = `
 		<img class="img_observ" src="${site_img_dir}/woman_shrugging.webp"><br>
-		<span class='big_font bold_font'>Lo sentimos. Sin Google login, no hay código QR. Si usted no tiene una <a href='http://accounts.google.com'>cuenta Google</a>, por favor obtenga una haciendo click en <a href='http://accounts.google.com'>este link</a>. Usted puede hacer login en cualquier momento haciendo click "Invitado" o haciendo click en el icono <img id="id_top_user_picture" class="img_user" src="${site_img_dir}/user.jpg"></span>
+		<span class='big_font bold_font'>Lo sentimos. Sin Google login, no hay código QR. Si usted no tiene una <a href='http://accounts.google.com'>cuenta Google</a>, por favor obtenga una haciendo click en <a href='http://accounts.google.com'>este link</a>. Usted puede hacer login en cualquier momento haciendo click "Invitado" o haciendo click en el icono <img class="img_user" src="${site_img_dir}/user.jpg"></span>
 	`;
 	
 	lg.o_finished_module = `TERMINASTE ESTE MODULO !!!`;
+	*/
 
 	lg.o_evolution_nam = `Evolución`;
 	lg.o_logic_nam = `Lógica`;

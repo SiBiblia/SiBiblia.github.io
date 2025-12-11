@@ -438,7 +438,7 @@ function init_en_basic_msg(){
 	obj.msg_fb_not_finished = "Please complete the questionary to save results";
 
 	const loggin_str = `please be sure to login in google.com and then click on the top icon <br>
-		<img id="id_top_user_picture" class="img_user" src="../img/user.jpg">`;
+		<img id="id_msg_user_picture" class="img_ico_user" src="../img/user.jpg">`;
 
 	obj.msg_write_results_not_signed_in = `Congrats ! You finished this module. 
 		To get a personal link and a QR code and participate in the contest ${loggin_str}`;
@@ -446,10 +446,10 @@ function init_en_basic_msg(){
 	obj.msg_write_results_signed_in = `Congrats ! You finished this module.`;
 
 	obj.msg_rewrite_results_not_signed_in = `You have finished this module more than once. 
-		If you want to write your results again in the stats, ${loggin_str}`;
+		For the contest only the first results count. If you want to write your results again in the stats, ${loggin_str}`;
 
 	obj.msg_rewrite_results_signed_in = `You have finished this module more than once. 
-		Do you want to write your results again in the stats?`;
+		For the contest only the first results count. If you want to write your results again in the stats click ${obj.msg_understood}`;
 
 	obj.msg_your_first_score = `Your first score`;
 	obj.msg_registered = `Registered on`;
