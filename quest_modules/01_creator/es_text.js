@@ -59,7 +59,8 @@ export function init_es_poll_txt(){
 	lg.q_millions_of_years = `<span class='big_font bold_font'><a href='${hb.href_factories}'>Millones de años</a> de evolución?</span>`;
 
 	lg.q_intelligent_design = `<span class='big_font bold_font'>Diseño Inteligente?</span>`;
-	lg.q_about_7_thousand_years = `<span class='big_font bold_font'>Una pareja hace aprox. 7 mil años?</span>`;
+	lg.q_from_adam_and_eve = `<span class='big_font bold_font'>Todos somos hijos de Adan y Eva?</span>`;
+	lg.q_about_7_thousand_years = `<span class='big_font bold_font'>Vivieron hace menos de 8 mil años?</span>`;
 	
 	lg.q_logic_stm = `<span class='big_font bold_font'>Lógica?</span>`;
 	lg.a_YES_logic = "SI es necesaria la lógica";
@@ -101,6 +102,8 @@ export function init_es_poll_txt(){
 	
 	lg.q_noah = `<span class='big_font bold_font'>Noé y el diluvio son historia?</span>`;
 	lg.q_genesis = `<span class='big_font bold_font'>El libro de Génesis es historia?</span>`;
+	
+	lg.o_creator_argument_comm = `<span class='big_font bold_font'>Las siguientes respuestas requieren usar logica y evidencia.</span>`;
 	
 	lg.q_requires_creativity = `<span class='big_font bold_font'>Requiere diseño y <a href='${hb.href_tch_crea}'>creatividad</a>?</span>`;
 	
@@ -202,6 +205,7 @@ export function init_es_poll_txt(){
 	lg.o_contracts_nam = `Contratos`;
 	lg.o_technology2_nam = `Tecnología & evidencia`;
 	lg.o_evidence_incons_nam = `Consistencia en la evidencia`;
+	lg.o_creator_argument_nam = `Argumento para Creador`;
 	lg.o_car_req_creativity_nam = `Creatividad & carro`;
 	lg.o_knife_req_creativity_nam = `Creatividad & cuchillo`;
 	lg.o_clock_req_creativity_nam = `Creatividad & reloj`;

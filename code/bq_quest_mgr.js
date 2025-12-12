@@ -47,6 +47,8 @@ const DEBUG_UPDATE_SCORES = false;
 const DEBUG_SHOW_USER = true;
 const DEBUG_FB_WRITE_GUEST_RESULTS = true;
 
+const INVALID_SCORE = -1;
+
 const MIN_ANSW_SHOW_INVERT = 3;
 
 const stg_prefix = "STRONG";
@@ -143,6 +145,7 @@ export let fb_mod = null;
 
 export async function init_firebase_mgr(call_bk){ // NEW CODE
 	if(fb_mod != null){ return; }
+	if(! navigator.onLine){ console.error("init_firebase_mgr. NOT ONLINE. CANNOT INIT FIREBASE."); return; }
 	try {
 		fb_mod = await import("./bq_firebase_mgr.js");
 		await fb_mod.firebase_check_user((user) => {
@@ -3660,6 +3663,10 @@ function on_stats_change_show_results(suf_id_results, stats_kind, db_ref, usr_rs
 	//const db_ref = fb_mod.md_db.ref(fb_database, stts_path);
 	fb_mod.md_db.onValue(db_ref, (snapshot) => {
 		if (snapshot.exists()) {
+			if(DEBUG_FB_WRITE_RESULTS){ 
+				console.log(`on_stats_change_show_results. FULL_SNAPSHOT=`);
+				console.log(snapshot);
+			}
 			const rd_obj = snapshot.val();
 			const fb_stats = JSON.parse(JSON.stringify(rd_obj));
 			if(DEBUG_FB_WRITE_RESULTS){ 
@@ -3667,9 +3674,10 @@ function on_stats_change_show_results(suf_id_results, stats_kind, db_ref, usr_rs
 				//console.log(rd_obj);
 				console.log(fb_stats);
 			}
-			if(fb_stats.num_checks != 1){	
-				// CHEATING !!!!  onValue called TWICE during update001 !!!! In one call fb_stats.num_checks has 1, the increment value !!!
-				show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts);
+			const qmod_scow = gvar.all_observations;	
+			const avg_score = calc_stats_qmodule_score(qmod_scow, fb_stats);
+			if(avg_score != INVALID_SCORE){	
+				show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts, avg_score);
 			}
 		} else {
 			console.error("on_stats_change_show_results. No data available");
@@ -3690,7 +3698,9 @@ function get_div_title(tit_str, is_small){
 	return dv_tit;
 }
 
-function show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts){
+function show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts, avg_score){
+	if(DEBUG_FB_WRITE_RESULTS){ console.log("Called show_results_in_observation"); }
+	
 	const lang = gvar.glb_curr_lang;
 	dv_results.innerHTML = "";
 
@@ -3707,8 +3717,8 @@ function show_results_in_observation(dv_results, stats_kind, fb_stats, usr_rslts
 	const dv_note1 = get_div_title(lang.msg_score_note, true);
 	dv_results.appendChild(dv_note1);
 	
-	const qmod_scow = gvar.all_observations;	
-	const avg_score = calc_stats_qmodule_score(qmod_scow, fb_stats);
+	//const qmod_scow = gvar.all_observations;	
+	//const avg_score = calc_stats_qmodule_score(qmod_scow, fb_stats);
 	const dv_score = get_div_title(avg_score);
 	dv_results.appendChild(dv_score);
 	
@@ -3785,6 +3795,8 @@ function calc_stats_qmodule_score(qmod_scow, fb_stats){
 	const num_deci = MAX_SCORE_WEIGHT_DECI;
 	
 	const all_qids = Object.keys(fb_stats);
+	const max_err = all_qids.length / 2;
+	let num_err = 0;
 	for(const qid of all_qids){
 		if(qmod_scow[qid] == null){
 			console.error(`qmod_scow[${qid}] == null`);
@@ -3793,6 +3805,11 @@ function calc_stats_qmodule_score(qmod_scow, fb_stats){
 		let cntr = fb_stats[qid];
 		if((cntr != null) && ((cntr <= 0) || (cntr > tot))){
 			console.error(`(${cntr} <= 0 || ${cntr} > ${tot}) for ${qid}`);
+			num_err++;
+			if(num_err > max_err){
+				console.error(`TOO MANY ERRORS. RETURNING INVALID_SCORE.`);
+				return INVALID_SCORE;
+			}
 			continue;
 		}
 		if(cntr == null){

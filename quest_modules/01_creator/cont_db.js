@@ -94,11 +94,24 @@ export function init_exam_database(){
 		},
 		activated_if: {
 			c1: { 
-				//q_bible__: { q1_0__YES_bible: "on", }, 
 				q_creator__: { q1_1__YES_creator: "on", }, 
 				q_six_days__: { q1_1_2__YES_six_days: "on", }, 
 				q_evolution__: { q1_3__NO_evolution: "on", }, 
 			},
+		},
+	};
+
+	db.q_from_adam_and_eve__ = { 
+		choose_yes: true,
+		context: ["ctx_general", "ctx_intelligent_design"],
+		htm_stm: "q_from_adam_and_eve",
+		img_href: "adam_and_eve.webp", 
+		answers: {
+			a_simple_YES: { img_pos: rgt, },
+			a_simple_NO: { img_pos: lft, },
+		},
+		activated_if: {
+			c1: { q_intelligent_design__: { a_simple_YES: "on", }, },
 		},
 	};
 
@@ -112,7 +125,7 @@ export function init_exam_database(){
 			a_simple_NO: { img_pos: lft, },
 		},
 		activated_if: {
-			c1: { q_intelligent_design__: { a_simple_YES: "on", }, },
+			c1: { q_from_adam_and_eve__: { a_simple_YES: "on", }, },
 		},
 	};
 
@@ -386,6 +399,16 @@ export function init_exam_database(){
 			c1: { q_genesis__: { a_simple_YES: "on", }, },
 		},		
 	};
+	
+	db.o_creator_argument__ = { 
+		context: ["ctx_general", "ctx_creator_argument", ],
+		htm_stm: "o_creator_argument_comm",
+		htm_nam: "o_creator_argument_nam",
+		activated_if: {
+			c1: { q_bible__: { a_simple_NO: "on", }, },
+			c2: { q_bible__: { shown: "off", }, },
+		},
+	};	
 	
 	db.q_car_req_creativity__ = { 
 		choose_yes: true,
