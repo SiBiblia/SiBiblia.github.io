@@ -2,7 +2,7 @@
 import { get_new_dv_under, scroll_to_top, toggle_select_option, 
 } from './bq_select_option_mgr.js';
 
-import { gvar, get_qid_base, bib_defaults, is_observation, get_date_and_time, clear_local_storage, 
+import { gvar, get_qid_base, bib_defaults, is_observation, get_date_and_time, clear_local_storage, set_nav_as_tester, reset_nav_as_non_tester, 
 } from './bq_tools.js';
 
 import { start_qmodu, 
@@ -97,6 +97,9 @@ const test_ops = {
 	delete_referrer:"delete_referrer",
 
 	read_all_referrer:"read_all_referrer",
+
+	set_nav_as_tester:"set_nav_as_tester",
+	reset_nav_as_non_tester:"reset_nav_as_non_tester",
 };
 
 const id_admin_ops = "id_admin_ops";
@@ -826,6 +829,12 @@ async function do_test_oper(oper, user_nam){
 	if(oper == test_ops.read_all_referrer){
 		await read_all_referrer(test_ids.user9);
 	}
+	if(oper == test_ops.set_nav_as_tester){
+		set_nav_as_tester();
+	}
+	if(oper == test_ops.reset_nav_as_non_tester){
+		reset_nav_as_non_tester();
+	}	
 	
 	if(oper == test_ops.reset_storage){
 		console.log("CALLED CLEAR_LOCAL_STORAGE");
@@ -1138,5 +1147,4 @@ async function read_all_referrer(user_id){
 		console.error(err);
 	}
 }
-
 

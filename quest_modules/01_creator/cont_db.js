@@ -119,7 +119,7 @@ export function init_exam_database(){
 		choose_yes: true,
 		context: ["ctx_general", "ctx_intelligent_design"],
 		htm_stm: "q_about_7_thousand_years",
-		img_href: "adam_and_eve.webp", 
+		img_href: "adam_created.webp", 
 		answers: {
 			a_simple_YES: { img_pos: rgt, },
 			a_simple_NO: { img_pos: lft, },

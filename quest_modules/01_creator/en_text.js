@@ -58,7 +58,7 @@ export function init_en_poll_txt(){
 
 	lg.q_intelligent_design = `<span class='big_font bold_font'>Intelligent design?</span>`;
 	lg.q_from_adam_and_eve = `<span class='big_font bold_font'>Are we all sons of Adam and Eve?</span>`;
-	lg.q_about_7_thousand_years = `<span class='big_font bold_font'>They lived less than 8 thousand years ago?</span>`;
+	lg.q_about_7_thousand_years = `<span class='big_font bold_font'>Created less than 8 thousand years ago?</span>`;
 	
 	lg.q_logic_stm = `<span class='big_font bold_font'>Logic?</span>`;
 	lg.a_YES_logic = "YES, logic is needed";

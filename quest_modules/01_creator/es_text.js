@@ -60,7 +60,7 @@ export function init_es_poll_txt(){
 
 	lg.q_intelligent_design = `<span class='big_font bold_font'>Diseño Inteligente?</span>`;
 	lg.q_from_adam_and_eve = `<span class='big_font bold_font'>Todos somos hijos de Adan y Eva?</span>`;
-	lg.q_about_7_thousand_years = `<span class='big_font bold_font'>Vivieron hace menos de 8 mil años?</span>`;
+	lg.q_about_7_thousand_years = `<span class='big_font bold_font'>Creados hace menos de 8 mil años?</span>`;
 	
 	lg.q_logic_stm = `<span class='big_font bold_font'>Lógica?</span>`;
 	lg.a_YES_logic = "SI es necesaria la lógica";

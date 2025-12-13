@@ -1,5 +1,5 @@
 
-import { gvar, init_glb_vars, get_qid_base, init_default_lang, find_GET_parameter, clear_local_storage, 	
+import { gvar, init_glb_vars, get_qid_base, init_default_lang, find_GET_parameter, clear_local_storage, 
 } from './bq_tools.js';
 
 import { init_page_buttons, init_firebase_mgr, fb_mod, fill_div_user, init_page_exam, start_qmodu, update_qmodu_title, add_last_module_ending, 

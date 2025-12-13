@@ -28,6 +28,8 @@ const INVALID_BIBREF = "INVALID_BIBREF";
 const UNKNOWN_VERSE = "UNKNOWN_VERSE";
 const INVALID_BOOK_ABBR = "INVALID_BOOK_ABBR";
 
+const NAVIGATOR_IS_TESTER = "NAVIGATOR_IS_TESTER";
+
 export let gvar = {};
 
 export const abbr2num = {};
@@ -46,11 +48,15 @@ export function find_GET_parameter(prm_nm) {
 }
 
 export function clear_local_storage(){
+	const was_tst = is_nav_tester();
 	console.log("CLEARING_LOCAL_STORAGE !!!!");
 	console.log("CLEARING_LOCAL_STORAGE !!!!");
 	console.log("CLEARING_LOCAL_STORAGE !!!!");
 	window.localStorage.clear();
 	gvar.did_local_storage_clear = true;
+	if(was_tst){
+		set_nav_as_tester();
+	}
 }
 
 export function fill_reversed_object(orig, reverse){
@@ -853,5 +859,18 @@ export function is_localhost(){
 	const nm = location.hostname;
 	const is_lh = ((nm === 'localhost') || (nm === '127.0.0.1'));
 	return is_lh;
+}
+
+export function set_nav_as_tester(){
+	window.localStorage.setItem(NAVIGATOR_IS_TESTER, "true");
+}
+
+export function reset_nav_as_non_tester(){
+	window.localStorage.removeItem(NAVIGATOR_IS_TESTER);
+}
+
+export function is_nav_tester(){
+	const is_tst = window.localStorage.getItem(NAVIGATOR_IS_TESTER);
+	return is_tst;
 }
 

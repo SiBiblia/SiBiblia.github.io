@@ -1,5 +1,5 @@
 
-import { get_date_and_time, is_localhost, } from './bq_tools.js';
+import { get_date_and_time, is_localhost, is_nav_tester, } from './bq_tools.js';
 
 import { write_storage_fini_qmodus, load_next_qmodu, } from './bq_module_mgr.js';
 
@@ -483,7 +483,7 @@ function get_guest_id(){
 	let gid = localStorage.getItem(LOCAL_STORAGE_GUEST_ID);
 	if(! gid) {
 		let PREF = "G";
-		if(is_localhost() || tc_fb_is_test_user){
+		if(is_localhost() || is_nav_tester() || tc_fb_is_test_user){
 			PREF = "L";
 		}
 		gid = PREF + 'xxxxxxxx_xxxx_4xxx_yxxx_xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {

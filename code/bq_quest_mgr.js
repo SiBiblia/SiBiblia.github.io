@@ -6,6 +6,7 @@ import { get_msg, make_bible_ref, make_strong_ref, bib_defaults, refs_ids, bib_o
 	gvar, 
 	get_qid_base, get_verse_match, get_answer_key, set_anchors_target, get_date_and_time, is_bad_bibcit, 
 	is_observation, qid_to_qhref, set_bibrefs, make_bibref, bibref_to_bibcit, get_bibcit_obs_stm_id, clear_local_storage, is_localhost, 
+	is_nav_tester, 
 } from './bq_tools.js';
 
 import { get_user_href, 
@@ -1628,7 +1629,7 @@ function pop_menu_handler(){
 	}
 
 	const is_tst_usr = ((fb_mod != null) && (fb_mod.tc_fb_is_admin || fb_mod.tc_fb_is_test_user));
-	const show_test_usr = DEBUG_SHOW_TEST_USERS && (is_localhost() || is_tst_usr);
+	const show_test_usr = DEBUG_SHOW_TEST_USERS && (is_localhost() || is_nav_tester() || is_tst_usr);
 	if(show_test_usr){
 		let op = document.createElement("div");
 		op.classList.add("exam");
