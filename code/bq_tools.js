@@ -25,6 +25,7 @@ const DEBUG_REPLACE_BIBREFS = false;
 const INVALID_MESSAGE = "INVALID_MESSAGE";
 const SUF_QID = "__";
 const INVALID_BIBREF = "INVALID_BIBREF";
+const THERE_IS_NO_BIBREF = "THERE_IS_NO_BIBREF";
 const UNKNOWN_VERSE = "UNKNOWN_VERSE";
 const INVALID_BOOK_ABBR = "INVALID_BOOK_ABBR";
 
@@ -464,6 +465,7 @@ export function init_glb_vars(all_vars){
 	all_vars.bibref_prefix = bibref_prefix;
 	all_vars.qid_sufix = SUF_QID;
 	all_vars.INVALID_BIBREF = INVALID_BIBREF;
+	all_vars.THERE_IS_NO_BIBREF = THERE_IS_NO_BIBREF;
 	all_vars.UNKNOWN_VERSE = UNKNOWN_VERSE;
 	if(all_vars.has_qrefs == null){ all_vars.has_qrefs = {}; } 
 	if(all_vars.has_bibrefs == null){ all_vars.has_bibrefs = {}; } 

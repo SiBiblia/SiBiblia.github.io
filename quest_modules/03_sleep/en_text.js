@@ -91,8 +91,8 @@ export function init_en_poll_txt(){
 	`;
 	lg.o_eternal_life_nm = `Eternal Life definition`;
 
-	lg.q_no_knowledge_in_death = `We can conclude that according to the bible <br> 
-	${bf}Jesus Christ KNOWLEDGE of God and of Himself${ef} <br> 
+	lg.q_no_knowledge_in_death = `We can conclude, according to these verses, that at least <br> 
+	${bf}The KNOWLEDGE of Jesus Christ about God and about Himself${ef} <br> 
 	was interrupted three nights and three days.
 	`;
 
@@ -462,6 +462,9 @@ export function init_en_poll_txt(){
 	lg.o_finished_resu_qmodu = "Congrats. You finished this module";
 	lg.o_module_writen_ok = "Module results saved ok in the cloud.";
 	lg.o_you_need_to_login_to_participate = "To participate you need to login.";
+
+	lg.o_changed_mind_comm = `It seems you changed your mind. Very good.`;
+	lg.o_changed_mind_nm = `Changed mind`;
 	
 }
 

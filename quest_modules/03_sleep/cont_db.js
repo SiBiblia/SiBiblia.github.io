@@ -154,6 +154,28 @@ export function init_exam_database(){
 			q13_1__verse8_str: { rclk_href: "q13_1__verse8_href", should_on: "q13_1__verse8_should", },
 		},
 	};	
+
+	db.o_changed_mind__ = { 
+		context: ["resurrection", "people", "changed_mind", ],
+		htm_stm: "o_changed_mind_comm",
+		htm_nam: "o_changed_mind_nm",
+		activated_if: {
+			c1: { 
+				q_sleep__: { a_is_FALSE: "on", }, 
+				q13_1__: { 
+					q13_1__verse1_str: "on",
+					q13_1__verse2_str: "on",
+					q13_1__verse3_str: "on",
+					q13_1__verse4_str: "on",
+					q13_1__verse5_str: "on",
+					q13_1__verse6_str: "on",
+					q13_1__verse7_str: "on",
+					q13_1__verse8_str: "on",
+				},
+			},
+		},
+	};
+
 }
 
 // 	c1: { q1_7__: { shown: "on", }, q1_91__: { shown: "on", }, q1_70__: { shown: "off", }, q1_91_0__: { shown: "off", }, },

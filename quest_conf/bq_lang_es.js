@@ -408,6 +408,8 @@ function init_es_basic_msg(){
 	obj.msg_final_obs_name = "Tipo de final";
 	obj.msg_citation_obs_html = "Observación de cita biblica";
 	obj.msg_citation_obs_name = "Observación de cita biblica";
+	obj.msg_there_are_none = "No hay";
+	obj.msg_chaged_mind = "Parece que cambio de idea. Muy bien.";
 	
 	obj.msg_icon_undo = "<i class='has_icons icon-undo'></i>";	
 	obj.msg_undo = "<i class='has_icons icon-undo'></i> Ups!";	

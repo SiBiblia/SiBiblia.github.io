@@ -47,6 +47,7 @@ const DEBUG_SCROLL = false;
 const DEBUG_UPDATE_SCORES = false;
 const DEBUG_SHOW_USER = true;
 const DEBUG_FB_WRITE_GUEST_RESULTS = true;
+const DEBUG_CHOSE_VERSE = false;
 
 const INVALID_SCORE = -1;
 
@@ -508,8 +509,18 @@ function init_answers(qid){
 			quest.answers.CHOSEN_BIBREF = gvar.INVALID_BIBREF;
 		}
 		const dv_bibref = add_answer(qid);
+		dv_bibref.innerHTML = gvar.glb_curr_lang.msg_there_are_none;
+		dv_bibref.addEventListener('click', async function() {
+			if(DEBUG_CHOSE_VERSE){
+				console.log(`is_choose_verse_question. CHOSE ${gvar.glb_curr_lang.msg_there_are_none}`);
+			}
+			quest.answers.CHOSEN_BIBREF = gvar.THERE_IS_NO_BIBREF;
+			end_question(qid);
+		});
+		
 		//dv_bibref.stm_id = null;
-		if(quest.answers.CHOSEN_BIBREF != gvar.INVALID_BIBREF){
+		const prv_cho = quest.answers.CHOSEN_BIBREF;
+		if((prv_cho != gvar.INVALID_BIBREF) && (prv_cho != gvar.THERE_IS_NO_BIBREF)){
 			dv_bibref.innerHTML = quest.answers.CHOSEN_BIBREF;
 			set_bibrefs(dv_bibref);
 		} else {
@@ -2949,9 +2960,17 @@ function show_observation(qid, all_to_act, qid_cllr){
 		qid_bcit = Object.keys(quest.activated_if.c1)[0];
 		const quest_bcit = gvar.glb_poll_db[qid_bcit];
 		cho_bref = quest_bcit.answers.CHOSEN_BIBREF;
-		const cho_bcit = bibref_to_bibcit(cho_bref);
-		bad_ref = is_bad_bibcit(cho_bcit);
-		stm_id = get_bibcit_obs_stm_id(qid_bcit, cho_bcit);
+		if((cho_bref == gvar.INVALID_BIBREF) || (cho_bref == gvar.THERE_IS_NO_BIBREF)){
+			stm_id = cho_bref;
+			if(DEBUG_CHOSE_VERSE){
+				console.log(`is_bibcit_observation. stm_id = ${quest.htm_stm}`);
+			}
+			bad_ref = gvar.glb_curr_lang.msg_chaged_mind;
+		} else {
+			const cho_bcit = bibref_to_bibcit(cho_bref);
+			bad_ref = is_bad_bibcit(cho_bcit);
+			stm_id = get_bibcit_obs_stm_id(qid_bcit, cho_bcit);
+		}
 	} else {
 		stm_id = quest.htm_stm;
 	}

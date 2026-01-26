@@ -86,8 +86,8 @@ export function init_es_poll_txt(){
 	`;
 	lg.o_eternal_life_nm = `Definición de Vida Eterna`;
 
-	lg.q_no_knowledge_in_death = `Podemos concluir que de acuerdo a la biblia <br> 
-	${bf}El CONOCIMIENTO de Jesucristo de Dios y de si mismo${ef} <br> 
+	lg.q_no_knowledge_in_death = `Podemos concluir, de acuerdo a estos versiculos, que como mínimo <br> 
+	${bf}El CONOCIMIENTO de Jesucristo acerca de Dios y acerca de si mismo${ef} <br> 
 	fue interrumpido por tres noches y tres dias.
 	`;
 
@@ -378,6 +378,9 @@ export function init_es_poll_txt(){
 	lg.o_finished_resu_qmodu = "Felicitaciones. Terminaste este modulo";
 	lg.o_module_writen_ok = "Modulo guardado en la nube correctamente.";
 	lg.o_you_need_to_login_to_participate = "Para participar necesitas hacer login.";
+
+	lg.o_changed_mind_comm = `Parece que cambiaste de idea. muy bien.`;
+	lg.o_changed_mind_nm = `Cambio idea`;
 	
 }
 
