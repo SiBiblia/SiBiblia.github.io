@@ -127,6 +127,18 @@ export function init_exam_database(){
 		},
 	};
 
+	db.o_changed_mind__ = { 
+		context: ["ctx_people", "ctx_sleep", "changed_mind", ],
+		htm_stm: "o_changed_mind_comm",
+		htm_nam: "o_changed_mind_nm",
+		activated_if: {
+			c1: { 
+				q_sleep__: { a_is_FALSE: "on", }, 
+				q_no_knowledge_in_death__: { a_simple_YES: "on", },
+			},
+		},
+	};
+	
 	db.q_verse_for_knowledge_in_death__ = { 
 		is_choose_verse_question: true,
 		context: ["ctx_people", "ctx_sleep", "ctx_verse_knowledge", ],
@@ -155,26 +167,6 @@ export function init_exam_database(){
 		},
 	};	
 
-	db.o_changed_mind__ = { 
-		context: ["resurrection", "people", "changed_mind", ],
-		htm_stm: "o_changed_mind_comm",
-		htm_nam: "o_changed_mind_nm",
-		activated_if: {
-			c1: { 
-				q_sleep__: { a_is_FALSE: "on", }, 
-				q13_1__: { 
-					q13_1__verse1_str: "on",
-					q13_1__verse2_str: "on",
-					q13_1__verse3_str: "on",
-					q13_1__verse4_str: "on",
-					q13_1__verse5_str: "on",
-					q13_1__verse6_str: "on",
-					q13_1__verse7_str: "on",
-					q13_1__verse8_str: "on",
-				},
-			},
-		},
-	};
 
 }
 

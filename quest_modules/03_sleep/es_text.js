@@ -47,10 +47,10 @@ export function init_es_poll_txt(){
 
 	const cl_bible = `La biblia afirma que <br>`;
 	const cl_jesus = `De acuerdo a la biblia, Jesucristo afirma que <br>`;
-	const cl_until = `La biblia afirma que DESPUES de la muerte física y HASTA nuestra resurrección <br>`;
+	const cl_until = `La biblia afirma que DESPUES de la muerte física y HASTA su resurrección física <br>`;
 	const the_gospel = `${bf}Negar esto es negar la Buenas Noticias, el Evangelio.${ef}`;
 	
-	lg.q_sleep = `${cl_until}${bf}el espíritu esta DORMIDO y NO hay CONOCIMIENTO.${ef}`;
+	lg.q_sleep = `${cl_until}${bf}el muerto NO tiene CONOCIMIENTO de si mismo.${ef}`;
 
 	lg.q_jesus_died = `${cl_bible}${bf}Jesucristo murió en la cruz.${ef}`;
 	
@@ -78,7 +78,7 @@ export function init_es_poll_txt(){
 	`;
 	lg.o_jesus_eternal_nm = `Vida de Jesus interrumpida`;
 	
-	lg.q_eternal_life = `${cl_jesus}${bf}La VIDA ETERNA es conocer al Dios Verdadero y su Hijo Jesucristo.${ef}`;
+	lg.q_eternal_life = `${cl_jesus}${bf}La VIDA ETERNA es conocer al único Dios Verdadero y su Hijo Jesucristo.${ef}`;
 
 	brf.o_eternal_life_comm = true;
 	lg.o_eternal_life_comm = `El siguiente versiculo enseña PRECISAMENTE eso <br> 
@@ -86,9 +86,9 @@ export function init_es_poll_txt(){
 	`;
 	lg.o_eternal_life_nm = `Definición de Vida Eterna`;
 
-	lg.q_no_knowledge_in_death = `Podemos concluir, de acuerdo a estos versiculos, que como mínimo <br> 
-	${bf}El CONOCIMIENTO de Jesucristo acerca de Dios y acerca de si mismo${ef} <br> 
-	fue interrumpido por tres noches y tres dias.
+	lg.q_no_knowledge_in_death = `Podemos concluir, de acuerdo a la biblia, que <br> 
+	${bf}Jesucristo NO tuvo CONOCIMIENTO de si mismo ni de el unico Dios Verdadero${ef} <br> 
+	durante tres noches y tres dias.
 	`;
 
 	brf.o_no_knowledge_comm = true;
@@ -348,7 +348,7 @@ export function init_es_poll_txt(){
 	
 	// -----------	
 	
-	lg.q13_1__sleep = `Seleccione todos los versículos que soportan que las personas muertas NO tienen CONCIENCIA hasta la <a class='exam_ref' href='${hb.href_resurrection}'>resurrección</a>.`;
+	lg.q13_1__sleep = `Seleccione todos los versículos que soportan que las personas muertas NO tienen CONSCIENCIA hasta la <a class='exam_ref' href='${hb.href_resurrection}'>resurrección</a>.`;
 	lg.q13_1__verse1_str = uppercase_words_in_string(rf.jhn_11_11_str, ["duerme;", "despertarle", ]);
 	lg.q13_1__verse1_href = rf.jhn_11_11_href;
 	lg.q13_1__verse1_should = "Lazaro DUERME hasta que es DESPERTADO";
@@ -358,17 +358,17 @@ export function init_es_poll_txt(){
 	lg.q13_1__verse2_should = "Esas personas estan DURMIENDO según la conjugación del griego";
 	lg.q13_1__verse3_str = uppercase_words_in_string(rf.ecc_9_10_str, ["no", "obra,", "ni", "trabajo,", "ciencia,", "sabiduría.", "Seol,", ]);
 	lg.q13_1__verse3_href = rf.ecc_9_10_href;
-	lg.q13_1__verse3_should = "OBRA, TRABAJO, CIENCIA, SABIDURIA. Estas palabras se refieren específicamente a acciones de CONCIENCIA, una propiedad de las PERSONAS vivas, no sólo de cuerpos convertidos en polvo.";
+	lg.q13_1__verse3_should = "OBRA, TRABAJO, CIENCIA, SABIDURIA. Estas palabras se refieren específicamente a acciones de CONSCIENCIA, una propiedad de las PERSONAS vivas, no sólo de cuerpos convertidos en polvo.";
 	lg.q13_1__verse4_str = uppercase_words_in_string(rf.ecc_12_7_str, ["polvo", "torne", "vuelva", "espíritu", ]);
 	lg.q13_1__verse4_href = rf.ecc_12_7_href;
-	lg.q13_1__verse4_should = "Despues de morir las cosas REGRESAN a como eran antes de nacer. Usted NO tenia CONCIENCIA antes de nacer.";
+	lg.q13_1__verse4_should = "Despues de morir las cosas REGRESAN a como eran antes de nacer. Usted NO tenia CONSCIENCIA antes de nacer.";
 	lg.q13_1__verse5_str = uppercase_words_in_string(rf.job_7_21_str, ["no", 'seré.', ]);
 	lg.q13_1__verse5_href = rf.job_7_21_href;
 	lg.q13_1__verse5_should = "Cuando una persona muere ya NO SERA";
 	lg.q13_1__verse6_str = uppercase_words_in_string(rf.job_14_12_str, ["Hasta", "no", "despertarán,", "Ni", "levantarán", "sueño.", ]);
 	lg.q13_1__verse6_href = rf.job_14_12_href;
 	lg.q13_1__verse6_should = "Los muertos NO se LEVANTARAN ni se DESPERTARAN de su SUEÑO HASTA que no haya cielos";
-	lg.q13_1__verse7_str = uppercase_words_in_string(rf.psa_115_17_str, ["muertos", "No", "alabarán", ]);
+	lg.q13_1__verse7_str = uppercase_words_in_string(rf.psa_115_17_str, ["muertos", "No", "alabarán", "silencio;", ]);
 	lg.q13_1__verse7_href = rf.psa_115_17_href;
 	lg.q13_1__verse7_should = "Los MUERTOS (NO solo los cuerpos) NO ALABAN";	
 	lg.q13_1__verse8_str = uppercase_words_in_string(rf.jhn_5_28_str, ["están", "en", "sepulcros"]);
@@ -379,7 +379,7 @@ export function init_es_poll_txt(){
 	lg.o_module_writen_ok = "Modulo guardado en la nube correctamente.";
 	lg.o_you_need_to_login_to_participate = "Para participar necesitas hacer login.";
 
-	lg.o_changed_mind_comm = `Parece que cambiaste de idea. muy bien.`;
+	lg.o_changed_mind_comm = `Parece que cambiaste de idea. Muy bien.`;
 	lg.o_changed_mind_nm = `Cambio idea`;
 	
 }

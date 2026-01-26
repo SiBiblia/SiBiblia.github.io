@@ -53,10 +53,10 @@ export function init_en_poll_txt(){
 
 	const cl_bible = `The bible claims that <br>`;
 	const cl_jesus = `According to the bible, Jesus Christ claims that <br>`;
-	const cl_until = `The bible claims that AFTER physical death and UNTIL our resurrection <br>`;
+	const cl_until = `The bible claims that AFTER his physical death and UNTIL his physical resurrection <br>`;
 	const the_gospel = `${bf}To deny this is to deny the Good News, the Gospel.${ef}`;
 		
-	lg.q_sleep = `${cl_until}${bf}the spirit is ASLEEP and there is NO KNOWLEDGE.${ef}`;
+	lg.q_sleep = `${cl_until}${bf} the dead has NO KNOWLEDGE of himself.${ef}`;
 
 	lg.q_jesus_died = `${cl_bible}${bf}Jesus Christ died on the cross.${ef}`;
 	
@@ -83,7 +83,7 @@ export function init_en_poll_txt(){
 	`;
 	lg.o_jesus_eternal_nm = `Jesus life interrupted`;
 	
-	lg.q_eternal_life = `${cl_jesus}${bf}ETERNAL LIFE is to know the True God and His son Jesus Christ.${ef}`;
+	lg.q_eternal_life = `${cl_jesus}${bf}ETERNAL LIFE is to know the only True God and His son Jesus Christ.${ef}`;
 
 	brf.o_eternal_life_comm = true;
 	lg.o_eternal_life_comm = `In the following verse teaches PRECISELY that <br> 
@@ -91,9 +91,9 @@ export function init_en_poll_txt(){
 	`;
 	lg.o_eternal_life_nm = `Eternal Life definition`;
 
-	lg.q_no_knowledge_in_death = `We can conclude, according to these verses, that at least <br> 
-	${bf}The KNOWLEDGE of Jesus Christ about God and about Himself${ef} <br> 
-	was interrupted three nights and three days.
+	lg.q_no_knowledge_in_death = `We can conclude, according to the bible, that <br> 
+	${bf}Jesus Christ did NOT have KNOWLEDGE of Himself nor of the only True God${ef} <br> 
+	during three nights and three days.
 	`;
 
 	brf.o_no_knowledge_comm = true;
@@ -452,7 +452,7 @@ export function init_en_poll_txt(){
 	lg.q13_1__verse6_str = uppercase_words_in_string(rf.job_14_12_str, ["Until", "nor", "roused", "out", "sleep.", ]);
 	lg.q13_1__verse6_href = rf.job_14_12_href;
 	lg.q13_1__verse6_should = "People will NOT be ROUSED OUT of their SLEEP UNTIL these heavens are no more";
-	lg.q13_1__verse7_str = uppercase_words_in_string(rf.psa_115_17_str, ["dead", "don’t", "praise", ]);
+	lg.q13_1__verse7_str = uppercase_words_in_string(rf.psa_115_17_str, ["dead", "don’t", "praise", "silence,", ]);
 	lg.q13_1__verse7_href = rf.psa_115_17_href;
 	lg.q13_1__verse7_should = "DEAD people (NOT just bodies) do NOT PRAISE";	
 	lg.q13_1__verse8_str = uppercase_words_in_string(rf.jhn_5_28_str, ["are", "in", "tombs"]);
